@@ -1,0 +1,10 @@
+name: objectory
+description: Object persistency layer
+version: 0.0.1
+dependencies:
+ unittest:
+  sdk: unittest
+ log4dart:
+  git: git://github.com/Solvr/log4dart.git  
+ mongo-dart:
+  git: git://github.com/vadimtsushko/mongo-dart.git
