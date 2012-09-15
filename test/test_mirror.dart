@@ -14,10 +14,15 @@ main() {
   domainModelLib.classes.forEach((name,classMirror) {    
     if (classMirror.superinterfaces.length > 0 && classMirror.superinterfaces[0].simpleName == 'PersistentObject') {      
       print(classMirror.simpleName);
-      classMirror.variables.forEach((name,field) {
-// Currently throws error "VariableMirror.type not yet implemented"        
-//        print(" field $name ${field.simpleName} ${field.type}");
-        print(" field $name ${field.simpleName}");
+      classMirror.variables.forEach((name,field) {        
+        print(" field $name ${field.simpleName} ${field.type}");
+        if (field.type.simpleName == 'List') {
+          var tv = field.type.typeVariables["E"];          
+          print('       $tv');
+          // last unimplemented feature:
+          //print(tv.type);
+          //print(field.type.typeArguments);          
+        }
       });       
     }      
   });    
