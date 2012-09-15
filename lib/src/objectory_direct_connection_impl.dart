@@ -1,7 +1,7 @@
 #library("objectory_direct_connection");
 #import("schema.dart");
-#import("package:mongo-dart/mongo.dart");
-#import("package:mongo-dart/bson.dart");
+#import("package:mongo_dart/mongo.dart");
+#import("package:mongo_dart/bson.dart");
 #import("persistent_object.dart");
 #import("objectory_query_builder.dart");
 #import("objectory_base.dart");

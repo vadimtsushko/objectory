@@ -1,6 +1,6 @@
 #import('dart:io');
-#import("../../packages/mongo-dart/mongo.dart");
-#import("../../packages/mongo-dart/bson.dart");
+#import("../../packages/mongo_dart/mongo.dart");
+#import("../../packages/mongo_dart/bson.dart");
 
 final PORT = 8080;
 final DATABASE = 'OBJECTORY_WS_TEST';

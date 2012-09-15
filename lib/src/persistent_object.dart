@@ -1,7 +1,7 @@
 #library("persistent_object");
 #import("schema.dart");
 #import("objectory_query_builder.dart");
-#import("package:mongo-dart/bson.dart");
+#import("package:mongo_dart/bson.dart");
 #import("objectory_base.dart");
 #source("persistent_list.dart");
 interface PersistentObject{

@@ -4,7 +4,7 @@
 #import("../lib/src/persistent_object.dart");
 #import("../lib/src/objectory_query_builder.dart");
 #import("../lib/src/schema.dart");
-#import("package:mongo-dart/bson.dart");
+#import("package:mongo_dart/bson.dart");
 
 interface Author extends PersistentObject default ObjectoryFactory {
   Author();

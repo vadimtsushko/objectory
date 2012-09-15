@@ -1,6 +1,6 @@
 #library("objectory_query");
 #import("schema.dart");
-#import("package:mongo-dart/bson.dart");
+#import("package:mongo_dart/bson.dart");
 #import("objectory_base.dart");
 
 class ObjectoryQueryBuilder {  

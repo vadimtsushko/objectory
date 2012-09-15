@@ -4,8 +4,8 @@
 #import("package:objectory/src/persistent_object.dart");
 #import("package:objectory/src/objectory_query_builder.dart");
 #import("package:objectory/src/schema.dart");
-#import("package:mongo-dart/bson.dart");
-#import("package:mongo-dart/bson_vm.dart");
+#import("package:mongo_dart/bson.dart");
+#import("package:mongo_dart/bson_vm.dart");
 #import('package:unittest/unittest.dart');
 #import("domain_model.dart");
 testAuthorCreation(){

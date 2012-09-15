@@ -6,5 +6,5 @@ dependencies:
   sdk: unittest
  log4dart:
   git: git://github.com/Solvr/log4dart.git  
- mongo-dart:
-  git: git://github.com/vadimtsushko/mongo-dart.git
+ mongo_dart:
+  git: git://github.com/vadimtsushko/mongo_dart.git
