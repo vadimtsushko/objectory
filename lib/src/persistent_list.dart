@@ -147,6 +147,5 @@ class PersistentList<T> implements List<T>{
   void setRange(int start, int length, List<T> from, [int startFrom]){    
     _list.setRange(start, length, from, startFrom);    
     setDirty(null);
-  } 
-
+  }
 }

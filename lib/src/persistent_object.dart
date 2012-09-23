@@ -205,7 +205,7 @@ abstract class BasePersistentObject implements PersistentObject{
   }  
 }
 abstract class RootPersistentObject extends BasePersistentObject{
-   ObjectId id;
+   var id;
    
    void _initMap() {
      map["_id"] = null;

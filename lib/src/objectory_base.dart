@@ -1,6 +1,5 @@
 #library("objectory_base");
 #import("schema.dart");
-#import("package:mongo_dart/bson.dart");
 #import("persistent_object.dart");
 #import("objectory_query_builder.dart");
 
@@ -44,14 +43,14 @@ abstract class ObjectoryBaseImpl implements Objectory{
   }
   
   void addToCache(RootPersistentObject obj) {
-    cache[obj.id.toHexString()] = obj;
+    cache[obj.id.toString()] = obj;
   }
   
-  RootPersistentObject findInCache(ObjectId id) {
+  RootPersistentObject findInCache(var id) {
     if (id === null) {
       return null;
     }
-    return cache[id.toHexString()];
+    return cache[id.toString()];
   }
   
   BasePersistentObject newInstance(String className){
