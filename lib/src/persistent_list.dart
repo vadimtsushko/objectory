@@ -148,4 +148,11 @@ class PersistentList<T> implements List<T>{
     _list.setRange(start, length, from, startFrom);    
     setDirty(null);
   }
+  void set length(int newLength) {   
+    _list.length = newLength;
+  }
+  T removeAt(int index) => _list.removeAt(index);
+  Dynamic reduce(Dynamic initialValue,
+                 Dynamic combine(Dynamic previousValue, T element)) => _list.reduce(initialValue, combine);
+  
 }

@@ -1,8 +1,8 @@
-//#import("../lib/objectory_vm.dart");
-#import("package:objectory/objectory_vm.dart");
+#library('blog_example');
+#import('package:objectory/objectory_vm.dart');
 #import("domain_model.dart");
-#import("../lib/src/objectory_direct_connection_impl.dart");
-#import("../lib/src/objectory_base.dart");
+#import('package:objectory/src/objectory_direct_connection_impl.dart');
+#import('package:objectory/src/objectory_base.dart');
 main(){
   var authors = new Map<String,Author>();
   var users = new Map<String,User>();  

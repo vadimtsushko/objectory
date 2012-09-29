@@ -4,6 +4,10 @@ version: 0.0.1
 dependencies:
  unittest:
   sdk: unittest
+ logging:
+  sdk: logging
+ args:
+  sdk: args  
  log4dart:
   git: git://github.com/Solvr/log4dart.git  
  mongo_dart:

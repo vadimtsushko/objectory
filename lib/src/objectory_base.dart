@@ -1,7 +1,8 @@
-#library("objectory_base");
-#import("schema.dart");
-#import("persistent_object.dart");
-#import("objectory_query_builder.dart");
+#library('objectory_base');
+#import('schema.dart');
+#import('persistent_object.dart');
+#import('objectory_query_builder.dart');
+#import('package:mongo_dart/bson.dart');
 
 interface Objectory{  
   void registerClass(ClassSchema schema);
@@ -11,8 +12,8 @@ interface Objectory{
   RootPersistentObject findInCache(ObjectId id);
   Future<RootPersistentObject> findOne(ObjectoryQueryBuilder selector);
   Future<List<RootPersistentObject>> find(ObjectoryQueryBuilder selector);
-  void save(RootPersistentObject persistentObject);
-  void remove(PersistentObject persistentObject);
+  save(RootPersistentObject persistentObject);
+  remove(PersistentObject persistentObject);
   Future<bool> open(String uri);
   Future dropCollections();
   Future<Map> dropDb();
@@ -73,7 +74,7 @@ abstract class ObjectoryBaseImpl implements Objectory{
           return res;
         }
       }        
-    }    
+    }
     var result = newInstance(className);
     result.map = map;
     if (result is RootPersistentObject){
@@ -95,7 +96,7 @@ abstract class ObjectoryBaseImpl implements Objectory{
         }
       }            
       result.clearDirtyStatus();      
-    }    
+    }
     if (result is RootPersistentObject) {
       if (result.id !== null) {
         objectory.addToCache(result);

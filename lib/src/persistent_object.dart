@@ -7,7 +7,7 @@
 interface PersistentObject{
   Future fetchLink(String property);
   Future fetchLinks();
-  void save();
+  save();
   void remove();
 }
 abstract class BasePersistentObject implements PersistentObject{
@@ -211,11 +211,11 @@ abstract class RootPersistentObject extends BasePersistentObject{
      map["_id"] = null;
      super._initMap();
    }
-   void remove() {
+   remove() {
      objectory.remove(this);
    }
    
-   void save() {
+   save() {
      objectory.save(this);
    }
 }

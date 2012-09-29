@@ -1,10 +1,10 @@
-#library("domain_model");
-#import("../lib/src/objectory_base.dart");
-#import("../lib/src/objectory_direct_connection_impl.dart");
-#import("../lib/src/persistent_object.dart");
-#import("../lib/src/objectory_query_builder.dart");
-#import("../lib/src/schema.dart");
-#import("package:mongo_dart/bson.dart");
+#library('domain_model');
+#import('package:objectory/src/objectory_base.dart');
+#import('package:objectory/src/objectory_direct_connection_impl.dart');
+#import('package:objectory/src/persistent_object.dart');
+#import('package:objectory/src/objectory_query_builder.dart');
+#import('package:objectory/src/schema.dart');
+#import('package:mongo_dart/bson.dart');
 
 interface Author extends PersistentObject default ObjectoryFactory {
   Author();

@@ -11,7 +11,7 @@ class ObjectoryQueryBuilder {
     map = new LinkedHashMap();
   }
   
-  toString() => "ObjectoryQueryBuilder($map)";
+  toString() => "ObjectoryQueryBuilder($className $map)";
   
   String get className => schema.className;
   

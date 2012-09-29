@@ -1,12 +1,44 @@
-#library("ObjectoryVM");
-#import("package:objectory/src/objectory_direct_connection_impl.dart");
-#import("package:objectory/src/objectory_base.dart");
-#import("package:objectory/src/persistent_object.dart");
-#import("package:objectory/src/objectory_query_builder.dart");
-#import("package:objectory/src/schema.dart");
-#import("package:mongo_dart/bson.dart");
+#library('ObjectoryVM');
+#import('package:objectory/src/objectory_websocket_connection_vm.dart');
+#import('package:objectory/src/objectory_base.dart');
+#import('package:objectory/src/persistent_object.dart');
+#import('package:objectory/src/objectory_query_builder.dart');
+#import('package:objectory/src/schema.dart');
+#import('package:mongo_dart/bson.dart');
 #import('package:unittest/unittest.dart');
-#import("domain_model.dart");
+#import('domain_model_websocket.dart');
+#import('package:objectory/src/json_ext.dart');
+#import('package:logging/logging.dart');
+#import('package:objectory/src/log_helper.dart');
+void simpleTest(){
+  initDomainModel().then((_) {
+    Author author = new Author();  
+    author.name = 'Dan';
+    author.age = 3;
+    author.email = 'who@cares.net';
+    author.save();
+//    objectory.wait().then((res) {
+//      print(res);
+      objectory.find($Author).then((coll){
+        for (var each in coll) {
+          print(each);
+        }
+        objectory.close();
+      });
+//    });
+  });      
+}
+
+void simpleTest1(){
+  initDomainModel().then((_) {
+    objectory.wait().then((res) {
+      print(res);
+      objectory.close();
+    });
+  });      
+}
+
+
 
 void testInsertionAndUpdate(){
   initDomainModel().then((_) {
@@ -17,7 +49,7 @@ void testInsertionAndUpdate(){
     author.save();
     author.age = 4;
     author.save();
-//    objectory.wait().then((_) {
+    objectory.wait().then((_) {
       objectory.find($Author).then((coll){
         expect(coll.length,1);
         Author authFromMongo = coll[0];
@@ -25,7 +57,7 @@ void testInsertionAndUpdate(){
         objectory.close();
         callbackDone();
       });
-//    });
+    });
   });
 }
 testCompoundObject(){
@@ -160,7 +192,10 @@ testPropertyNameChecks() {
   expect(() => $Person.eq('address.cityName1', 'Tyumen'),throws);
 }
 
-main(){    
+main(){
+  configureConsoleLogger(Level.ALL);
+  simpleTest();
+  /*
   group("ObjectoryVM", () {        
     asyncTest("testInsertionAndUpdate",1,testInsertionAndUpdate);
     asyncTest("testCompoundObject",1,testCompoundObject);                  
@@ -170,5 +205,6 @@ main(){
   });
   group("ObjectoryQuery", ()  {    
     test("testPropertyNameChecks",testPropertyNameChecks);
-  });  
+  });
+  */
 }
