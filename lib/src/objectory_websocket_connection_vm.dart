@@ -72,20 +72,19 @@ class ObjectoryWebsocketConnectionImpl extends ObjectoryBaseImpl{
   Map createCommand(String command, String collection){
     return {'command': command, 'collection': collection}; 
   }
-  save(RootPersistentObject persistentObject){
-    webSocket.send(JSON.stringify([createCommand('save',persistentObject.type),persistentObject.map]));
-//    postMessage(createCommand('save',persistentObject.type),persistentObject.map).then((Map m) {
-//      log.fine('currentCompleter completes with $m');
-//      if (persistentObject.id === null) {
-//        persistentObject.id = m["createdId"];
-//        if (persistentObject.id === null) {
-//          throw 'Error! Mongo_dart_server did not return Object id after object insertion: $m'; 
-//        }
-//        persistentObject.map["_id"] = persistentObject.id;
-//        objectory.addToCache(persistentObject);
-//        log.fine('$persistentObject');
-//      }              
-//    });    
+  save(RootPersistentObject persistentObject){  
+    postMessage(createCommand('save',persistentObject.type),persistentObject.map).then((Map m) {
+      log.fine('currentCompleter completes with $m');
+      if (persistentObject.id === null) {
+        persistentObject.id = m["createdId"];
+        if (persistentObject.id === null) {
+          throw 'Error! Mongo_dart_server did not return Object id after object insertion: $m'; 
+        }
+        persistentObject.map["_id"] = persistentObject.id;
+        objectory.addToCache(persistentObject);
+        log.fine('$persistentObject');
+      }              
+    });    
   }
   void remove(RootPersistentObject persistentObject){
     if (persistentObject.id === null){
@@ -99,9 +98,7 @@ class ObjectoryWebsocketConnectionImpl extends ObjectoryBaseImpl{
     Completer completer = new Completer();
     var result = new List<RootPersistentObject>();
     postMessage(createCommand('find',selector.className),selector.map).then((list) {
-      print('List recieved in find $list');
       for (var map in list) {
-        print('$selector $map');
         RootPersistentObject obj = objectory.map2Object(selector.className,map);
         result.add(obj);
       }        
@@ -110,61 +107,60 @@ class ObjectoryWebsocketConnectionImpl extends ObjectoryBaseImpl{
     return completer.future;  
   }
   
-//  Future<RootPersistentObject> findOne(ObjectoryQueryBuilder selector){
-//    Completer completer = new Completer();
-//    var obj;
-//    if (selector.map.containsKey("_id")) {
-//      obj = findInCache(selector.map["_id"]);
-//    }
-//    if (obj !== null) {
-//      completer.complete(obj);
-//    }  
-//    else {
-//      db.collection(selector.className)
-//        .findOne(selector.map)
-//        .then((map){
-//          if (map === null) {
-//           completer.complete(null); 
-//          }
-//          else {
-//            obj = findInCache(map["_id"]);          
-//            if (obj === null) {
-//              if (map !== null) {
-//                obj = objectory.map2Object(selector.className,map);
-//                addToCache(obj);
-//                }              
-//              }
-//            completer.complete(obj);
-//          }              
-//        });
-//      }    
-//    return completer.future;  
-//  }
-//  
-//  Future<Map> dropDb(){
-//    return db.drop();
-//  }
-//
+  Future<RootPersistentObject> findOne(ObjectoryQueryBuilder selector){
+    Completer completer = new Completer();
+    var obj;
+    if (selector.map.containsKey("_id")) {
+      obj = findInCache(selector.map["_id"]);
+    }
+    if (obj !== null) {
+      completer.complete(obj);
+    }  
+    else {
+      postMessage(createCommand('findOne',selector.className),selector.map)
+      .then((map){
+        if (map === null) {
+         completer.complete(null); 
+        }
+        else {
+          obj = findInCache(map["_id"]);          
+          if (obj === null) {
+            if (map !== null) {
+              obj = objectory.map2Object(selector.className,map);
+              addToCache(obj);
+              }              
+            }
+          completer.complete(obj);
+        }              
+      });
+    }    
+    return completer.future;  
+  }
+  
+  Future<Map> dropDb() {
+    return postMessage(createCommand('dropDb',null),{});    
+  }
+
   Future<Map> queryDb(Map map) {    
     return postMessage(createCommand('queryDb',null),map);
   }
+  
   Future<Map> wait(){
     return queryDb({"getlasterror":1});
   }
-//
-//
+  
   void close(){
     webSocket.close(1, 'Normal close');
   }
-//  Future dropCollections() {
-//    List futures = [];
-//    schemata.forEach( (key, value) {
-//       if (value.isRoot) {
-//        futures.add(db.collection(key).drop());
-//       }
-//    });
-//    return Futures.wait(futures);
-//  }
+  Future dropCollections() {
+    List futures = [];
+    schemata.forEach( (key, value) {
+       if (value.isRoot) {
+        futures.add(postMessage(createCommand('dropCollection',key),{}));
+       }
+    });
+    return Futures.wait(futures);
+  }
 }
 
 

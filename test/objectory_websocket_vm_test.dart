@@ -47,15 +47,21 @@ void testInsertionAndUpdate(){
     author.age = 3;
     author.email = 'who@cares.net';
     author.save();
-    author.age = 4;
-    author.save();
-    objectory.wait().then((_) {
+    objectory.wait().then((_) {    
+      author.age = 4;
+      author.save();    
       objectory.find($Author).then((coll){
+        print('testInsertionAndUpdate() 1');
+        print(coll);
         expect(coll.length,1);
+        print('testInsertionAndUpdate() 2');
         Author authFromMongo = coll[0];
+        print('testInsertionAndUpdate() 3');
         expect(authFromMongo.age,4);
+        print('testInsertionAndUpdate() 4');
         objectory.close();
-        callbackDone();
+        print('testInsertionAndUpdate() 5');
+        callbackDone();        
       });
     });
   });
@@ -195,16 +201,15 @@ testPropertyNameChecks() {
 main(){
   configureConsoleLogger(Level.ALL);
   simpleTest();
-  /*
-  group("ObjectoryVM", () {        
-    asyncTest("testInsertionAndUpdate",1,testInsertionAndUpdate);
-    asyncTest("testCompoundObject",1,testCompoundObject);                  
-    asyncTest("testObjectWithExternalRefs",1,testObjectWithExternalRefs);    
-    asyncTest("testObjectWithCollectionOfExternalRefs",1,testObjectWithCollectionOfExternalRefs);
-    asyncTest("testMap2ObjectWithListtOfInternalObjectsWithExternalRefs",1,testMap2ObjectWithListtOfInternalObjectsWithExternalRefs);
-  });
-  group("ObjectoryQuery", ()  {    
-    test("testPropertyNameChecks",testPropertyNameChecks);
-  });
-  */
+ 
+// group("ObjectoryVM", () {        
+//    asyncTest("testInsertionAndUpdate",1,testInsertionAndUpdate);
+//    asyncTest("testCompoundObject",1,testCompoundObject);                  
+//    asyncTest("testObjectWithExternalRefs",1,testObjectWithExternalRefs);    
+//    asyncTest("testObjectWithCollectionOfExternalRefs",1,testObjectWithCollectionOfExternalRefs);
+//    asyncTest("testMap2ObjectWithListtOfInternalObjectsWithExternalRefs",1,testMap2ObjectWithListtOfInternalObjectsWithExternalRefs);
+//});
+//  group("ObjectoryQuery", ()  {    
+//    test("testPropertyNameChecks",testPropertyNameChecks);
+//  });
 }

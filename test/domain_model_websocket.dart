@@ -146,7 +146,7 @@ void registerClasses() {
   
 }
 Future<bool> initDomainModel(){
-  return setUpObjectory('127.0.0.1:8080', registerClasses);
+  return setUpObjectory('127.0.0.1:8080', registerClasses,true);
 }
 
 ObjectoryQueryBuilder get $Person => new ObjectoryQueryBuilder('Person');

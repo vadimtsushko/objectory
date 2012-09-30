@@ -52,7 +52,16 @@ class ObjectoryClient {
       if (header.command == "queryDb") {
         queryDb(header,content);
         return;
+      }
+      if (header.command == "dropDb") {
+        dropDb(header);
+        return;
       }      
+      if (header.command == "dropCollection") {
+        dropCollection(header);
+        return;
+      }      
+      
       log.shout('Unexpected message: $message');
       sendResult(header,content);
     };
@@ -114,7 +123,21 @@ class ObjectoryClient {
       sendResult(header,responseData);
     });
   }
+  dropDb(RequestHeader header) {
+    db.drop()
+    .then((responseData) {
+      log.fine('$responseData');
+      sendResult(header,responseData);
+    });
+  }
   
+  dropCollection(RequestHeader header) {
+    db.dropCollection(header.collection)
+    .then((responseData) {
+      log.fine('$responseData');
+      sendResult(header,responseData);
+    });
+  }
   
   
   protocolError(String errorMessage) {
