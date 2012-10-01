@@ -1,5 +1,3 @@
-#Mongo-dart - MongoDB drive
-
 #Objectory - thin object persistency layer built on top of Mongo-dart
 
 **Objectory** is a library that provide typed, checked environment to model, save and query data persisted on MongoDb.    
