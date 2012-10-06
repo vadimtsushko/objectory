@@ -6,6 +6,7 @@
 #import('objectory_base.dart');
 #import('json_ext.dart');
 #import('package:logging/logging.dart');
+#import('package:mongo_dart/bson.dart');
 #import('log_helper.dart');
 
 const IP = '127.0.0.1';
@@ -72,19 +73,17 @@ class ObjectoryWebsocketConnectionImpl extends ObjectoryBaseImpl{
   Map createCommand(String command, String collection){
     return {'command': command, 'collection': collection}; 
   }
-  save(RootPersistentObject persistentObject){  
-    postMessage(createCommand('save',persistentObject.type),persistentObject.map).then((Map m) {
-      log.fine('currentCompleter completes with $m');
-      if (persistentObject.id === null) {
-        persistentObject.id = m["createdId"];
-        if (persistentObject.id === null) {
-          throw 'Error! Mongo_dart_server did not return Object id after object insertion: $m'; 
-        }
-        persistentObject.map["_id"] = persistentObject.id;
-        objectory.addToCache(persistentObject);
-        log.fine('$persistentObject');
-      }              
-    });    
+  save(RootPersistentObject persistentObject){
+    if (persistentObject.id === null) {      
+      persistentObject.id = new ObjectId(clientMode:true);
+      persistentObject.map["_id"] = persistentObject.id;
+      objectory.addToCache(persistentObject);
+      postMessage(createCommand('insert',persistentObject.type),persistentObject.map);
+      log.fine('$persistentObject saved to cache');
+    } else {
+      postMessage(createCommand('update',persistentObject.type),persistentObject.map);
+    }
+    
   }
   void remove(RootPersistentObject persistentObject){
     if (persistentObject.id === null){

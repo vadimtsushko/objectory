@@ -20,8 +20,8 @@ main() {
           var tv = field.type.typeVariables["E"];          
           print('       $tv');
           // last unimplemented feature:
-          //print(tv.type);
-          //print(field.type.typeArguments);          
+//          print(tv.runtimeType);
+//          print(field.type.typeArguments);          
         }
       });       
     }      

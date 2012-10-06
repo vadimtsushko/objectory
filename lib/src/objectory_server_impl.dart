@@ -37,10 +37,14 @@ class ObjectoryClient {
       var jdata = JSON.parse(message);      
       var header = new RequestHeader.fromMap(jdata[0]);
       Map content = jdata[1];
-      if (header.command == "save") {
+      if (header.command == "insert") {
         save(header,content);
         return;
       }
+      if (header.command == "update") {
+        save(header,content);
+        return;
+      }      
       if (header.command == "findOne") {
         findOne(header,content);
         return;
@@ -80,28 +84,24 @@ class ObjectoryClient {
     }      
   }
   save(RequestHeader header, Map mapToSave) {
-    var createdId;
-    if (mapToSave !== null && header.collection !== null) {
-      if (mapToSave["_id"] === null) {
-        createdId = new ObjectId(); 
-        mapToSave["_id"] = createdId;
-        db.collection(header.collection).insert(mapToSave);
-      } else {
-        db.collection(header.collection).save(mapToSave);     
-      }       
-      db.getLastError().then((responseData) {
-        log.fine('$responseData');
-        if (createdId !== null) {
-          responseData["createdId"] = createdId;
-        }
-        sendResult(header, responseData);
-      });
+    if (header.command == 'insert') {
+      db.collection(header.collection).insert(mapToSave);
     }
-    else {
-      protocolError('Command: save, MapToSave: $mapToSave');
-    }
+    else
+    {
+      ObjectId id = mapToSave['_id'];
+      if (id != null) {
+        db.collection(header.collection).update({'_id': id},mapToSave);        
+      }
+      else {
+        log.shout('ERROR: Trying to update object without ObjectId set. $header, $mapToSave');
+      }        
+    }      
+    db.getLastError().then((responseData) {
+      log.fine('$responseData');
+      sendResult(header, responseData);
+    });
   }
-  
   find(RequestHeader header, Map selector) {        
     db.collection(header.collection).find(selector).toList().
     then((responseData) {       
