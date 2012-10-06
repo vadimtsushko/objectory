@@ -1,5 +1,5 @@
 #library("domain_model");
-#import("package:objectory/src/objectory_websocket_connection_vm.dart");
+#import("package:objectory/src/objectory_websocket_vm_impl.dart");
 #import("package:objectory/src/objectory_base.dart");
 #import("package:objectory/src/persistent_object.dart");
 #import("package:objectory/src/objectory_query_builder.dart");

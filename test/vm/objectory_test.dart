@@ -1,15 +1,13 @@
-#library('ObjectoryVM');
-#import('package:objectory/src/objectory_websocket_connection_vm.dart');
-#import('package:objectory/src/objectory_base.dart');
-#import('package:objectory/src/persistent_object.dart');
-#import('package:objectory/src/objectory_query_builder.dart');
-#import('package:objectory/src/schema.dart');
-#import('package:mongo_dart/bson.dart');
-#import('package:unittest/unittest.dart');
-#import('domain_model_websocket.dart');
-#import('package:objectory/src/json_ext.dart');
-#import('package:logging/logging.dart');
-#import('package:objectory/src/log_helper.dart');
+library objectory_test;
+import 'package:objectory/src/objectory_direct_connection_impl.dart';
+import 'package:objectory/src/objectory_base.dart';
+import 'package:objectory/src/persistent_object.dart';
+import 'package:objectory/src/objectory_query_builder.dart';
+import 'package:objectory/src/schema.dart';
+import 'package:mongo_dart/bson.dart';
+import 'package:unittest/unittest.dart';
+import 'domain_model.dart';
+
 void testInsertionAndUpdate(){
   initDomainModel().then(expectAsync1((_) {
     Author author = new Author();  
@@ -151,14 +149,12 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
 }
 
 testPropertyNameChecks() {
-//  new Future.immediate(true).then(expectAsync1((_) {
   var query = $Person.eq('firstName', 'Vadim');
   expect(query.map,containsPair('firstName', 'Vadim'));  
   expect(() => $Person.eq('unkwnownProperty', null),throws);
   query = $Person.eq('address.cityName', 'Tyumen');
   expect(query.map,containsPair('address.cityName','Tyumen'));
-  expect(() => $Person.eq('address.cityName1', 'Tyumen'),throws);
-//  }));  
+  expect(() => $Person.eq('address.cityName1', 'Tyumen'),throws);  
 }
 
 main(){ 

@@ -1,5 +1,5 @@
-#library('objectory_restful_connection');
-#import('dart:io');
+#library('objectory_impl');
+#import('dart:html');
 #import('schema.dart');
 #import('persistent_object.dart');
 #import('objectory_query_builder.dart');
@@ -21,7 +21,7 @@ class ObjectoryMessage {
   toString() => 'ObjectoryMessage(command: $command, content: $content)'; 
 }
 
-class ObjectoryWebsocketConnectionImpl extends ObjectoryBaseImpl{  
+class ObjectoryWebsocketBrowserImpl extends ObjectoryBaseImpl{  
   WebSocket webSocket;
   bool isConnected;  
   Map<int,Completer> awaitedRequests = new Map<int,Completer>();
@@ -33,17 +33,17 @@ class ObjectoryWebsocketConnectionImpl extends ObjectoryBaseImpl{
   Future<bool> setupWebsocket(String uri) {
     Completer completer = new Completer();
     webSocket = new WebSocket("ws://$uri/ws");
-    webSocket.onopen = () {
+    webSocket.on.open.add((MessageEvent e) {
       isConnected = true;
       completer.complete(true);
-    };
+    });
     
-    webSocket.onclose = (c) {
-      log.fine('close ${c.code} ${c.reason} ${c.wasClean}');
+    webSocket.on.close.add((MessageEvent e) {
+      log.fine('close ${e.data}');
       isConnected = false;
-    };
+    });
     
-    webSocket.onmessage = (m) {
+    webSocket.on.message.add((MessageEvent m) {
       var jdata = JSON.parse(m.data);
       log.info('onmessage: $jdata');
       var message = new ObjectoryMessage.fromList(jdata);
@@ -59,7 +59,7 @@ class ObjectoryWebsocketConnectionImpl extends ObjectoryBaseImpl{
         log.shout('Not found completer for request: $receivedRequestId');
       }
       
-    };
+    });
     return completer.future;
   }
   Future postMessage(Map command, Map content) {
@@ -165,7 +165,7 @@ class ObjectoryWebsocketConnectionImpl extends ObjectoryBaseImpl{
 
 Future<bool> setUpObjectory(String uri, Function registerClassCallback, [bool dropCollections = false]){
   var res = new Completer();
-  objectory = new ObjectoryWebsocketConnectionImpl();
+  objectory = new ObjectoryWebsocketBrowserImpl();
   objectory.open(uri).then((_){
       registerClassCallback();      
       if (dropCollections) {
