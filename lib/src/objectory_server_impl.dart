@@ -1,7 +1,7 @@
 #library('objectory_server_impl');
 #import('dart:io');
-#import('json_ext.dart');
-#import('package:mongo_dart/mongo.dart');
+#import('package:mongo_dart/src/bson/json_ext.dart');
+#import('package:mongo_dart/mongo_dart.dart');
 #import('package:mongo_dart/bson.dart');
 #import('package:logging/logging.dart');
 #import('log_helper.dart');

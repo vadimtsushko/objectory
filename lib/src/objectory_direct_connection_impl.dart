@@ -1,14 +1,14 @@
 #library("objectory_direct_connection");
 #import("schema.dart");
-#import("package:mongo_dart/mongo.dart");
+#import("package:mongo_dart/mongo_dart.dart");
 #import("package:mongo_dart/bson.dart");
 #import("persistent_object.dart");
 #import("objectory_query_builder.dart");
 #import("objectory_base.dart");
 
-class ObjectoryDirectConnectionImpl extends ObjectoryBaseImpl{  
+class ObjectoryDirectConnectionImpl extends Objectory{  
   Db db;
-  
+  ObjectoryDirectConnectionImpl(): super();
   Future<bool> open(String uri){
     if (db !== null){
       db.close();
@@ -86,8 +86,9 @@ class ObjectoryDirectConnectionImpl extends ObjectoryBaseImpl{
   }
   Future dropCollections() {
     List futures = [];
-    schemata.forEach( (key, value) {
-       if (value.isRoot) {
+    factories.forEach( (key, value) {
+       PersistentObject obj = value(); 
+       if (obj is RootPersistentObject) {
         futures.add(db.collection(key).drop());
        }
     });
@@ -98,7 +99,7 @@ class ObjectoryDirectConnectionImpl extends ObjectoryBaseImpl{
 
 Future<bool> setUpObjectory(String uri, Function registerClassCallback, [bool dropCollections = false]){
   var res = new Completer();
-  objectory = new ObjectoryDirectConnectionImpl();
+  objectory = new ObjectoryDirectConnectionImpl();  
   objectory.open(uri).then((_){
       registerClassCallback();
       if (dropCollections) {

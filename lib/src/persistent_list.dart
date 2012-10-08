@@ -1,61 +1,62 @@
-class _ValueConverter{
-  BasePersistentObject parent;
-  String pathToMe;
-  
-  _ValueConverter(this.parent,this.pathToMe);
+class _ValueConverter{  
+  PersistentList persistentList;
+  _ValueConverter(this.persistentList);
   
    convertValue(value) {
     var result;
-    PropertySchema propertySchema = objectory.getSchema(parent.type).properties[pathToMe];
-    if (propertySchema.embeddedObject) {
-      if (value is PersistentObject) {
-        result = value;
-      } else {
-        result = objectory.map2Object(propertySchema.type, value);
-      }          
+    if (value == null) {
+      return null;
+    } 
+    if (value is Map) {
+      return objectory.map2Object(persistentList.elementType, value); 
     }
-    else if (propertySchema.hasLinks) {      
-      if (value !== null) {
-        result = objectory.findInCache(value);
-      }
-      if (result === null) {
-        throw "Object $value of class ${propertySchema.type} has not been fetched from objectory yet";
-      }
+    if (value is DbRef) {
+      return objectory.dbRef2Object(value);
     }
-    else {
-      throw "Wrong property schema $propertySchema";
-    }
-    return result;
   }
 }
 class PersistentIterator<T> implements Iterator<T> {
   Iterator _it;
-  _ValueConverter valueConverter;  
-  PersistentIterator(this._it, this.valueConverter);  
+  _ValueConverter valueConverter;
+  PersistentList persistentList;
+  PersistentIterator(this.persistentList,this._it, this.valueConverter);  
   T next() => valueConverter.convertValue(_it.next());
   bool hasNext() => _it.hasNext();
 }
 
 class PersistentList<T> implements List<T>{
-  BasePersistentObject parent;
-  String pathToMe;  
-  final List _list;
+  bool isEmbeddedObject = false;
+  PersistentObject parent;
+  String pathToMe;
+  String elementType;
+  List _list;
+//  set internalList(List value) => _list = value;
   List get internalList => _list;
-  _ValueConverter _valueConverter;
-  PersistentList(this._list,[this.parent, this.pathToMe]);
-  
+  _ValueConverter valueConverter;
+  PersistentList._internal(this.parent, this.elementType, this.pathToMe) {
+    if (parent.map[pathToMe] == null) {
+      parent.map[pathToMe] = [];      
+    }
+    _list = parent.map[pathToMe];
+    if (objectory.newInstance(elementType) is EmbeddedPersistentObject) {
+      isEmbeddedObject = true;
+    }
+    valueConverter = new _ValueConverter(this);
+  }  
+  factory PersistentList(PersistentObject parent, String elementType, String pathToMe) {
+    PersistentList result = parent._compoundProperties[pathToMe];   
+    if (result == null) {      
+      result = new PersistentList._internal(parent,elementType,pathToMe);
+      parent._compoundProperties[pathToMe] = result;  
+    }
+    return result;
+  }
   toString() => "PersistentList($_list)";
   
   void setDirty(String propertyName) {
     parent.setDirty(pathToMe);    
   }
   
-  _ValueConverter get valueConverter{
-    if (_valueConverter === null) {
-      _valueConverter = new _ValueConverter(parent,pathToMe);
-    }
-    return _valueConverter;
-  }  
   
   internValue(T value) {  
     if (value is EmbeddedPersistentObject) {
@@ -64,19 +65,12 @@ class PersistentList<T> implements List<T>{
       return value.map;
     }
     if (value is RootPersistentObject) {
-      return value.id;
+      return value.dbRef;
     }
     return value;
   }
     
-  void operator[]=(int index, T value){
-    _list[index] = internValue(value);
-    setDirty(null);
-  }
-  
-  T operator[](int index) {
-    return valueConverter.convertValue(_list[index]);
-  }  
+    
   bool isEmpty() => _list.isEmpty();
   
   void forEach(void f(element)) => _list.forEach(f);
@@ -89,9 +83,9 @@ class PersistentList<T> implements List<T>{
   
   bool some(bool f(T element)) => _list.some(f);
   
-  Iterator<T> iterator() => new PersistentIterator(_list.iterator(),valueConverter);
+  Iterator<T> iterator() => new PersistentIterator(this,_list.iterator(),valueConverter);
   
-  int indexOf(T element, [int start]) => _list.indexOf(element, start);
+  int indexOf(T element, [int start = 0]) => _list.indexOf(element, start);
   
   int lastIndexOf(T element, [int start]) => _list.lastIndexOf(element, start);
   
@@ -154,5 +148,16 @@ class PersistentList<T> implements List<T>{
   T removeAt(int index) => _list.removeAt(index);
   Dynamic reduce(Dynamic initialValue,
                  Dynamic combine(Dynamic previousValue, T element)) => _list.reduce(initialValue, combine);
+
+  
+  void operator[]=(int index, T value){
+    _list[index] = internValue(value);
+    setDirty(null);
+  }
+  
+  T operator[](int index) {
+    return valueConverter.convertValue(_list[index]);
+  }
+  
   
 }

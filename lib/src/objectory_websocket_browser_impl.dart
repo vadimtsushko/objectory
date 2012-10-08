@@ -4,9 +4,9 @@
 #import('persistent_object.dart');
 #import('objectory_query_builder.dart');
 #import('objectory_base.dart');
-#import('json_ext.dart');
 #import('package:logging/logging.dart');
 #import('package:mongo_dart/bson.dart');
+#import('package:mongo_dart/src/bson/json_ext.dart');
 #import('log_helper.dart');
 
 const IP = '127.0.0.1';
@@ -21,7 +21,7 @@ class ObjectoryMessage {
   toString() => 'ObjectoryMessage(command: $command, content: $content)'; 
 }
 
-class ObjectoryWebsocketBrowserImpl extends ObjectoryBaseImpl{  
+class ObjectoryWebsocketBrowserImpl extends Objectory{  
   WebSocket webSocket;
   bool isConnected;  
   Map<int,Completer> awaitedRequests = new Map<int,Completer>();
@@ -39,7 +39,7 @@ class ObjectoryWebsocketBrowserImpl extends ObjectoryBaseImpl{
     });
     
     webSocket.on.close.add((MessageEvent e) {
-      log.fine('close ${e.data}');
+      log.fine('close $e');
       isConnected = false;
     });
     
@@ -149,12 +149,13 @@ class ObjectoryWebsocketBrowserImpl extends ObjectoryBaseImpl{
   }
   
   void close(){
-    webSocket.close(1, 'Normal close');
+    webSocket.close();
   }
   Future dropCollections() {
     List futures = [];
-    schemata.forEach( (key, value) {
-       if (value.isRoot) {
+    factories.forEach( (key, value) {
+      PersistentObject obj = value(); 
+      if (obj is RootPersistentObject) {
         futures.add(postMessage(createCommand('dropCollection',key),{}));
        }
     });

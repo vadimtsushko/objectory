@@ -3,38 +3,36 @@
 #import("package:mongo_dart/bson.dart");
 #import("objectory_base.dart");
 
-class ObjectoryQueryBuilder {  
-  ClassSchema schema;
+class ObjectoryQueryBuilder {
   Map map;
-  ObjectoryQueryBuilder(String className){
-    schema = objectory.getSchema(className);
+  ObjectoryQueryBuilder(this.className){    
     map = new LinkedHashMap();
   }
   
   toString() => "ObjectoryQueryBuilder($className $map)";
   
-  String get className => schema.className;
+  String className;
   
   void testPropertyName(String propertyName) {
-    var propertyChain = propertyName.split('.');
-    var currentProperty = propertyChain[0]; 
-    var propertySchema = schema.properties[currentProperty];
-    if (propertySchema === null) {
-      throw "Unknown property $currentProperty in class ${schema.className}";
-    }
-    if (propertyChain.length > 1) {
-      if (!propertySchema.embeddedObject)
-      {  
-        throw "$currentProperty is not an embedded object in class ${schema.className}. Dot notation of $propertyName is not applicable";
-      }
-      propertyChain.removeRange(0, 1);
-      currentProperty = Strings.join(propertyChain,'.');
-      new ObjectoryQueryBuilder(propertySchema.type).testPropertyName(currentProperty);
-    }
+//    var propertyChain = propertyName.split('.');
+//    var currentProperty = propertyChain[0]; 
+//    var propertySchema = schema.properties[currentProperty];
+//    if (propertySchema === null) {
+//      throw "Unknown property $currentProperty in class ${schema.className}";
+//    }
+//    if (propertyChain.length > 1) {
+//      if (!propertySchema.embeddedObject)
+//      {  
+//        throw "$currentProperty is not an embedded object in class ${schema.className}. Dot notation of $propertyName is not applicable";
+//      }
+//      propertyChain.removeRange(0, 1);
+//      currentProperty = Strings.join(propertyChain,'.');
+//      new ObjectoryQueryBuilder(propertySchema.type).testPropertyName(currentProperty);
+//    }
   }
   
   ObjectoryQueryBuilder eq(String propertyName,value){
-    testPropertyName(propertyName);
+    //testPropertyName(propertyName);
     map[propertyName] = value;
     return this;
   }

@@ -86,6 +86,7 @@ main(){
       var completer = new Completer();
       futures.add(completer.future);
       article.fetchLinks().then((__) {
+        print(article);
         print("${article.author.name}:${article.title}:${article.body}");
         for (var comment in article.comments) {
           print("     ${comment.date}:${comment.user.name}: ${comment.body}");     

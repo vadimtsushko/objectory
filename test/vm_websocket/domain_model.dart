@@ -4,149 +4,108 @@
 #import("package:objectory/src/persistent_object.dart");
 #import("package:objectory/src/objectory_query_builder.dart");
 #import("package:objectory/src/schema.dart");
-const DefaultUri = 'mongodb://127.0.0.1/';
-interface Author extends PersistentObject default ObjectoryFactory {
-  Author();
-  String name;
-  int age;
-  String email;
-}
-interface Person extends PersistentObject default ObjectoryFactory {
-  Person();
-  String firstName;
-  String lastName;
-  Date birthday;
-  Address address;  
-  Person father;
-  Person mother;
-  List<Person> children;
-}
-interface Address extends PersistentObject default ObjectoryFactory {
-  Address();
-  String cityName;
-  String zipcode;
-  String streetName;
-}
-interface Customer extends PersistentObject default ObjectoryFactory {
-  Customer();
-  String name;
-  List<Address> addresses; 
+const DefaultUri = '127.0.0.1:8080';
+class Author extends RootPersistentObject  {  
+  String get name() => getProperty('name');
+  set name(String value) => setProperty('name',value.toUpperCase());
+  
+  String get email() => getProperty('email');
+  set email(String value) => setProperty('email',value);
+  
+  int get age() => getProperty('age');
+  set age(int value) => setProperty('age',value);
+
+  Address get address() => getEmbeddedObject('Address', 'address');
+    
 }
 
-interface User extends PersistentObject default ObjectoryFactory {
-  User();
-  String name;
-  String login;
-  String email;
+class Address extends EmbeddedPersistentObject {
+  
+  String get cityName() => getProperty('cityName');
+  set cityName(String value) => setProperty('cityName',value);
+  
+  String get zipCode() => getProperty('zipCode');
+  set zipCode(String value) => setProperty('zipCode',value);
+  
+  String get streetName() => getProperty('streetName');
+  set streetName(String value) => setProperty('streetName',value);
 }
 
-interface Article extends PersistentObject default ObjectoryFactory {
-  Article();
-  String title;
-  String body;
-  Author author;
-  List<Comment> comments;
+class Customer extends RootPersistentObject {  
+  String get name() => getProperty('name');
+  set name(String value) => setProperty('name',value);
+
+  List<Address> get addresses => new PersistentList<Address>(this,'Address','addresses');  
+  
 }
 
-interface Comment extends PersistentObject default ObjectoryFactory {
-  Comment();
-  User user;  
-  String body;
-  Date date;
+
+class Person extends RootPersistentObject {
+  String get firstName() => getProperty('firstName');
+  set firstName(String value) => setProperty('firstName',value);
+  
+  String get lastName() => getProperty('lastName');
+  set lastName(String value) => setProperty('lastName',value);
+  
+  Address get address() => getEmbeddedObject('Address', 'address');
+  
+  Person get father => getLinkedObject('father');
+  set father (RootPersistentObject value) => setLinkedObject('father',value);
+
+  Person get mother => getLinkedObject('mother');
+  set mother (RootPersistentObject value) => setLinkedObject('mother',value);
+
+  List<Person> get children => new PersistentList<Person>(this,'Person','children');  
 }
 
-class UserImpl extends RootPersistentObject implements User {  
-  String get type => "User";
+class User extends RootPersistentObject {
+  String get name() => getProperty('name');
+  set name(String value) => setProperty('name',value);
+  
+  String get email() => getProperty('email');
+  set email(String value) => setProperty('email',value);
+
+  String get login() => getProperty('login');
+  set login(String value) => setProperty('login',value);  
 }
 
-class ArticleImpl extends RootPersistentObject implements Article {
-  String get type => "Article";
+class Article extends RootPersistentObject {
+  String get title() => getProperty('title');
+  set title(String value) => setProperty('title',value);
+  
+  String get body() => getProperty('body');
+  set body(String value) => setProperty('body',value);
+  
+  Author get author => getLinkedObject('author');
+  set author (Author value) => setLinkedObject('author',value);
+
+  List<Comment> get comments => new PersistentList<Comment>(this,'Comment','comments');
 }
 
-class CommentImpl extends EmbeddedPersistentObject implements Comment {
-  String get type => "Comment";
+class Comment extends EmbeddedPersistentObject {
+  
+  User get user => getLinkedObject('user');
+  set user (User value) => setLinkedObject('user',value);
+    
+  String get body() => getProperty('body');
+  set body(String value) => setProperty('body',value);
+  
+  Date get date() => getProperty('date');
+  set date(Date value) => setProperty('date',value);  
 }
 
-class AuthorImpl extends RootPersistentObject implements Author {  
-  String get type=>'Author';
-  set name(String value){
-    if (value is String){
-      value = value.toUpperCase();
-    }      
-    setProperty('name', value);
-  }
-  String get name=>getProperty('name');
-}
-class PersonImpl extends RootPersistentObject implements Person {  
-  String get type=>"Person";
-}
-class CustomerImpl extends RootPersistentObject implements Customer {  
-  String get type=>"Customer";
-}  
-
-class AddressImpl extends EmbeddedPersistentObject implements Address {  
-  String get type=>"Address";
-}
-class ObjectoryFactory{
-  factory Author() => new AuthorImpl();
-  factory Person() => new PersonImpl();
-  factory Address() => new AddressImpl();
-  factory Customer() => new CustomerImpl();
-  factory User() => new UserImpl();
-  factory Article() => new ArticleImpl();
-  factory Comment() => new CommentImpl();  
-}
 void registerClasses() {
-  ClassSchema schema;
-  schema = new ClassSchema('Author',()=>new Author());
-  schema.addProperty(new PropertySchema("name", "String"));
-  schema.addProperty(new PropertySchema("age", "String"));
-  schema.addProperty(new PropertySchema("email", "String"));
-  objectory.registerClass(schema);
-  
-  schema = new ClassSchema('Address',()=>new Address());
-  schema.addProperty(new PropertySchema("cityName", "String"));
-  schema.addProperty(new PropertySchema("zipCode", "String"));
-  schema.addProperty(new PropertySchema("streetName", "String"));
-  objectory.registerClass(schema); 
-
-  schema = new ClassSchema('Person',()=>new Person());
-  schema.addProperty(new PropertySchema("firstName", "String"));
-  schema.addProperty(new PropertySchema("lastName", "String"));
-  schema.addProperty(new PropertySchema("birthday", "Date"));
-  schema.addProperty(new PropertySchema("address", "Address",embeddedObject: true));  
-  schema.addProperty(new PropertySchema("father", "Person",link: true));
-  schema.addProperty(new PropertySchema("mother", "Person",link: true));
-  schema.addProperty(new PropertySchema("children", "Person",hasLinks: true, collection: true));
-  objectory.registerClass(schema); 
-
-  schema = new ClassSchema('Customer',()=>new Customer());
-  schema.addProperty(new PropertySchema("name", "String"));
-  schema.addProperty(new PropertySchema("addresses", "Address",embeddedObject: true, collection: true));  
-  objectory.registerClass(schema); 
-  
-  schema = new ClassSchema('User',()=>new User());
-  schema.addProperty(new PropertySchema("name", "String"));
-  schema.addProperty(new PropertySchema("login", "String"));
-  schema.addProperty(new PropertySchema("email", "String"));
-  objectory.registerClass(schema);
-
-  schema = new ClassSchema('Article',()=>new Article());
-  schema.addProperty(new PropertySchema("title", "String"));
-  schema.addProperty(new PropertySchema("body", "String"));
-  schema.addProperty(new PropertySchema("author", "Author",link: true));
-  schema.addProperty(new PropertySchema("comments", "Comment",embeddedObject: true, collection: true, hasLinks: true));
-  objectory.registerClass(schema); 
-
-  schema = new ClassSchema('Comment',()=>new Comment());
-  schema.addProperty(new PropertySchema("title", "String"));
-  schema.addProperty(new PropertySchema("body", "String"));
-  schema.addProperty(new PropertySchema("user", "User",link: true));
-  objectory.registerClass(schema);  
-  
+  objectory.registerClass('Author',()=>new Author());
+  objectory.registerClass('Address',()=>new Address());
+  objectory.registerClass('Person',()=>new Person());
+  objectory.registerClass('Customer',()=>new Customer());
+  objectory.registerClass('User',()=>new User());
+  objectory.registerClass('Article',()=>new Article());
+  objectory.registerClass('Comment',()=>new Comment());
 }
-Future<bool> initDomainModel(){
-  return setUpObjectory('127.0.0.1:8080', registerClasses,true);
+
+Future<bool> initDomainModel(){  
+  return setUpObjectory(DefaultUri, registerClasses,true);
 }
 
 ObjectoryQueryBuilder get $Person => new ObjectoryQueryBuilder('Person');

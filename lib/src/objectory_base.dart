@@ -1,46 +1,22 @@
 #library('objectory_base');
-#import('schema.dart');
 #import('persistent_object.dart');
 #import('objectory_query_builder.dart');
 #import('package:mongo_dart/bson.dart');
 
-interface Objectory{  
-  void registerClass(ClassSchema schema);
-  BasePersistentObject newInstance(String className);
-  BasePersistentObject map2Object(String className, Map map);
-  void addToCache(RootPersistentObject obj);
-  RootPersistentObject findInCache(ObjectId id);
-  Future<RootPersistentObject> findOne(ObjectoryQueryBuilder selector);
-  Future<List<RootPersistentObject>> find(ObjectoryQueryBuilder selector);
-  save(RootPersistentObject persistentObject);
-  remove(PersistentObject persistentObject);
-  Future<bool> open(String uri);
-  Future dropCollections();
-  Future<Map> dropDb();
-  Future<Map> wait();
-  ClassSchema getSchema(String className);
-  void close();
-}
+typedef Object FactoryMethod();
 
-set objectory(Objectory impl) => ObjectoryBaseImpl.objectoryImpl = impl; 
-Objectory get objectory => ObjectoryBaseImpl.objectoryImpl; 
+set objectory(Objectory impl) => Objectory.objectoryImpl = impl; 
+Objectory get objectory => Objectory.objectoryImpl; 
 
-abstract class ObjectoryBaseImpl implements Objectory{
+abstract class Objectory{
     
   static Objectory objectoryImpl;  
   Map<String,PersistentObject> cache;
-  Map<String,ClassSchema> schemata;    
+  Map<String,FactoryMethod> factories;    
 
-  ObjectoryBaseImpl(){
-    schemata = new  Map<String,ClassSchema>();
+  Objectory(){
+    factories = new  Map<String,FactoryMethod>();
     cache = new Map<String,PersistentObject>();
-  }
-  
-  ClassSchema getSchema(String className){
-    if (!schemata.containsKey(className)) {
-      throw "Class $className not registered in Objectory";
-    }
-    return schemata[className];
   }
   
   void addToCache(RootPersistentObject obj) {
@@ -53,15 +29,28 @@ abstract class ObjectoryBaseImpl implements Objectory{
     }
     return cache[id.toString()];
   }
-  
-  BasePersistentObject newInstance(String className){
-    if (schemata.containsKey(className)){
-      return schemata[className].factoryMethod();
+  RootPersistentObject findInCacheOrGetProxy(var id, String className) {
+    if (id == null) {
+      return null;
+    }
+    RootPersistentObject result = findInCache(id);
+    if (result == null) {
+      result = objectory.newInstance(className);
+      result.id = id;
+      result.notFetched = true;
+    }
+    return result;
+  }
+  PersistentObject newInstance(String className){
+    if (factories.containsKey(className)){
+      return factories[className]();
     }
     throw "Class $className have not been registered in Objectory";
   }
-  
-  BasePersistentObject map2Object(String className, Map map){
+  RootPersistentObject dbRef2Object(DbRef dbRef) {
+    return findInCacheOrGetProxy(dbRef.id, dbRef.collection);
+  }  
+  PersistentObject map2Object(String className, Map map){
     if (map === null) {
       map = new LinkedHashMap();
     }
@@ -80,23 +69,6 @@ abstract class ObjectoryBaseImpl implements Objectory{
     if (result is RootPersistentObject){
       result.id = map["_id"];    
     }
-    var propertyValue;
-    for (var propertySchema in schemata[className].properties.getValues()) {
-      bool b = false;
-      if (propertySchema.collection) {        
-        propertyValue = new PersistentList<BasePersistentObject>(map[propertySchema.name]);
-        result.setProperty(propertySchema.name,propertyValue);
-      }
-      else {
-        if (propertySchema.embeddedObject) {
-          propertyValue = map2Object(propertySchema.type,map[propertySchema.name]);
-          propertyValue.parent = result;
-          propertyValue.pathToMe = propertySchema.name;
-          result.setProperty(propertySchema.name,propertyValue);          
-        }
-      }            
-      result.clearDirtyStatus();      
-    }
     if (result is RootPersistentObject) {
       if (result.id !== null) {
         objectory.addToCache(result);
@@ -107,12 +79,21 @@ abstract class ObjectoryBaseImpl implements Objectory{
   
   List<PersistentObject> list2listOfObjects(){}
   
-  void clearSchemata(){
-    schemata.clear();
-  }
   
-  void registerClass(ClassSchema schema){
-    schemata[schema.className] = schema;
-    schema.isRoot = schema.factoryMethod() is RootPersistentObject;
+  void registerClass(String className,FactoryMethod factory){
+    factories[className] = factory;    
   }
+  Future dropCollections();
+  Future<bool> open(String uri);
+
+  
+  Future<RootPersistentObject> findOne(ObjectoryQueryBuilder selector);
+  Future<List<RootPersistentObject>> find(ObjectoryQueryBuilder selector);
+  save(RootPersistentObject persistentObject);
+  remove(PersistentObject persistentObject);
+
+  Future<Map> dropDb();
+  Future<Map> wait();  
+  void close();
+  
 }

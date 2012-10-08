@@ -6,7 +6,7 @@ import 'package:objectory/src/objectory_query_builder.dart';
 import 'package:objectory/src/schema.dart';
 import 'package:mongo_dart/bson.dart';
 import 'domain_model.dart';
-import 'package:objectory/src/json_ext.dart';
+import 'package:mongo_dart/src/bson/json_ext.dart';
 import 'package:logging/logging.dart';
 import 'package:objectory/src/log_helper.dart';
 import 'package:unittest/unittest.dart';
@@ -57,7 +57,7 @@ testObjectWithExternalRefs(){
       // Links must be fetched before use.
       //Do not know yet how to test throws in async tests
       //Expect.throws(()=>sonFromObjectory.father.firstName);
-      expect(sonFromObjectory.map['father'] is ObjectId, reason: 'Unfetched links are of type ObjectId');
+      expect(sonFromObjectory.map['father'] is DbRef, reason: 'Raw links are of type DbRef');
       expect(sonFromObjectory.mother,isNull, reason: 'Unassigned link');
       sonFromObjectory.fetchLinks().then(expectAsync1((__){  
         expect(sonFromObjectory.father.firstName,'Father');
@@ -162,7 +162,6 @@ testPropertyNameChecks() {
 }
 
 main(){
- //useHtmlConfiguration();
  useHtmlEnhancedConfiguration();
  group('ObjectoryVM', () {        
     test('testInsertionAndUpdate',testInsertionAndUpdate);
@@ -171,7 +170,7 @@ main(){
     test('testObjectWithCollectionOfExternalRefs',testObjectWithCollectionOfExternalRefs);
     test('testMap2ObjectWithListtOfInternalObjectsWithExternalRefs',testMap2ObjectWithListtOfInternalObjectsWithExternalRefs);
 });
-  group('ObjectoryQuery', ()  {    
-    test('testPropertyNameChecks',testPropertyNameChecks);
-  });
+//  group('ObjectoryQuery', ()  {    
+//    test('testPropertyNameChecks',testPropertyNameChecks);
+//  });
 }

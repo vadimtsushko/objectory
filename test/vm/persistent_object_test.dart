@@ -12,14 +12,14 @@ testAuthorCreation(){
   var author = new Author();
   author.name = 'vadim';
   author.age = 99;
-  author.email = 'sdf';
-  expect(author.map.getKeys()[0],"_id");
-  expect(author.map.getKeys()[1],"name");
-  expect(author.map.getKeys()[2],"age");
-  expect(author.map.getKeys().last(),"email");
-  expect(author.map.getKeys().length,4);
-  expect(author.name,'VADIM'); // converted to uppercase by custom  setter;
-}
+  author.email = 'sdf';  
+  expect((author.map.getKeys() as List)[0],"_id");
+  expect(author.name,'VADIM', reason: 'converted to uppercase by custom  setter');
+  author.address.cityName = 'Tyumen';
+  author.address.streetName = 'Elm tree street';
+  expect(author.map['address']['cityName'],'Tyumen');
+  expect(author.map['address']['streetName'],'Elm tree street');
+} 
 
 testSetDirty(){
   var author = new Author();
@@ -37,7 +37,6 @@ testCompoundObject(){
   expect(person.address.parent,person);
   expect(person.address.pathToMe,"address");
   expect(person.isDirty());
-//  expect(person.address.isDirty());
 }
 testFailOnSettingUnsavedLinkObject(){
   var son = new Person();  
@@ -46,7 +45,7 @@ testFailOnSettingUnsavedLinkObject(){
   Expect.throws(()=>son.father = father,reason:"Link object must be saved (have ObjectId)");
 }  
 testFailOnAbsentProperty(){
-  Author author = new Author();
+  Dynamic author = new Author();
   Expect.throws(()=>author.sdfsdfsdfgdfgdf,reason:"Must fail on missing property getter");
 }
 testNewInstanceMethod(){
@@ -89,7 +88,7 @@ testObjectWithListOfInternalObjects2Map() {
 }
 testMap2ObjectWithListOfInternalObjects() {
   var map = {"_id": null, "name": "Tequila corporation", "addresses": [{"cityName": "Mexico"}, {"cityName": "Moscow"}]};
-  var customer = objectory.map2Object($Customer.className, map);
+  Customer customer = objectory.map2Object($Customer.className, map);
   expect(customer.name,"Tequila corporation");
   expect(customer.addresses.length,2);
   expect(customer.addresses[1].cityName,"Moscow");
@@ -120,8 +119,8 @@ testObjectWithListtOfExternalRefs2Map() {
   father.children.add(son);  
   father.children.add(null);
   father.children[1] = daughter;
-  expect(father.map["children"][0],son.id);
-  expect(father.map["children"][1],daughter.id);
+  expect(father.map["children"][0],son.dbRef);
+  expect(father.map["children"][1],daughter.dbRef);  
 }
 testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   User user = new User();
@@ -131,14 +130,14 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   user.map["_id"] = user.id;
   objectory.addToCache(user);
   Map articleMap = {"title": "test article", "body": "sasdfasdfasdf", 
-                    "comments": [{"body": "Excellent", "user": user.id}]};               
-  Article article = objectory.map2Object($Article.className,articleMap);
-  expect(article.map["comments"][0]["user"],user.id);
+                    "comments": [{"body": "Excellent", "user": user.dbRef}]};               
+  Article article = objectory.map2Object($Article.className,articleMap);  
+  expect(article.map["comments"][0]["user"].id,user.dbRef.id);
   expect(article.comments[0].user,user);
 }
 
 main(){
-  objectory = new ObjectoryDirectConnectionImpl();
+  objectory = new ObjectoryDirectConnectionImpl();  
   initBsonPlatform();
   registerClasses();  
   group("PersistenObjectTests", ()  {

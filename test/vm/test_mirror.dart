@@ -11,19 +11,19 @@
 
 main() {
   var domainModelLib = currentMirrorSystem().libraries['domain_model'];  
-  domainModelLib.classes.forEach((name,classMirror) {    
-    if (classMirror.superinterfaces.length > 0 && classMirror.superinterfaces[0].simpleName == 'PersistentObject') {      
-      print(classMirror.simpleName);
-      classMirror.variables.forEach((name,field) {        
-        print(" field $name ${field.simpleName} ${field.type}");
-        if (field.type.simpleName == 'List') {
-          var tv = field.type.typeVariables["E"];          
-          print('       $tv');
-          // last unimplemented feature:
+//  domainModelLib.classes.forEach((name,classMirror) {    
+//    if (true || classMirror.superinterfaces.length > 0 && classMirror.superinterfaces[0].simpleName == 'RootPersistentObject') {      
+//      print(classMirror.simpleName);
+//      classMirror.variables.forEach((name,field) {        
+//        print(" field $name ${field.simpleName} ${field.type}");
+//        if (field.type.simpleName == 'List') {
+//          var tv = field.type.typeVariables["E"];          
+//          print('       $tv');
+//          // last unimplemented feature:
 //          print(tv.runtimeType);
 //          print(field.type.typeArguments);          
-        }
-      });       
-    }      
-  });    
+//        }
+//      });       
+//    }      
+//  });    
 }
