@@ -1,8 +1,8 @@
-#library("persistent_object");
-#import("objectory_query_builder.dart");
-#import("package:mongo_dart/bson.dart");
-#import("objectory_base.dart");
-#source("persistent_list.dart");
+library persistent_object;
+import 'objectory_query_builder.dart';
+import 'package:mongo_dart/bson.dart';
+import 'objectory_base.dart';
+part 'persistent_list.dart';
 
 abstract class PersistentObject {
   LinkedHashMap map;  

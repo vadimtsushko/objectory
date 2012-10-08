@@ -1,13 +1,12 @@
-#library('objectory_impl');
-#import('dart:html');
-#import('schema.dart');
-#import('persistent_object.dart');
-#import('objectory_query_builder.dart');
-#import('objectory_base.dart');
-#import('package:logging/logging.dart');
-#import('package:mongo_dart/bson.dart');
-#import('package:mongo_dart/src/bson/json_ext.dart');
-#import('log_helper.dart');
+library objectory_impl;
+import 'dart:html';
+import 'persistent_object.dart';
+import 'objectory_query_builder.dart';
+import 'objectory_base.dart';
+import 'package:logging/logging.dart';
+import 'package:mongo_dart/bson.dart';
+import 'package:mongo_dart/src/bson/json_ext.dart';
+import 'log_helper.dart';
 
 const IP = '127.0.0.1';
 const PORT = 8080;

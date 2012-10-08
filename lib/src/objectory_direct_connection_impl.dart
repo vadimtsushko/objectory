@@ -1,10 +1,9 @@
-#library("objectory_direct_connection");
-#import("schema.dart");
-#import("package:mongo_dart/mongo_dart.dart");
-#import("package:mongo_dart/bson.dart");
-#import("persistent_object.dart");
-#import("objectory_query_builder.dart");
-#import("objectory_base.dart");
+library objectory_direct_connection;
+import 'package:mongo_dart/mongo_dart.dart';
+import 'package:mongo_dart/bson.dart';
+import 'persistent_object.dart';
+import 'objectory_query_builder.dart';
+import 'objectory_base.dart';
 
 class ObjectoryDirectConnectionImpl extends Objectory{  
   Db db;

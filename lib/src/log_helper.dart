@@ -1,5 +1,5 @@
-#library('log_helper');
-#import('package:logging/logging.dart');
+library log_helper;
+import 'package:logging/logging.dart';
 final Logger log = Logger.root; 
 configureConsoleLogger([Level level = Level.INFO]) {
   log.level = level;

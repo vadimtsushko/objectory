@@ -1,7 +1,7 @@
-#library('objectory_base');
-#import('persistent_object.dart');
-#import('objectory_query_builder.dart');
-#import('package:mongo_dart/bson.dart');
+library objectory_base;
+import 'persistent_object.dart';
+import 'objectory_query_builder.dart';
+import 'package:mongo_dart/bson.dart';
 
 typedef Object FactoryMethod();
 

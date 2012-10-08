@@ -1,9 +1,9 @@
-#library("domain_model");
-#import("package:objectory/src/objectory_direct_connection_impl.dart");
-#import("package:objectory/src/objectory_base.dart");
-#import("package:objectory/src/persistent_object.dart");
-#import("package:objectory/src/objectory_query_builder.dart");
-#import("package:objectory/src/schema.dart");
+library domain_model;
+import 'package:objectory/src/objectory_direct_connection_impl.dart';
+import 'package:objectory/src/objectory_base.dart';
+import 'package:objectory/src/persistent_object.dart';
+import 'package:objectory/src/objectory_query_builder.dart';
+
 const DefaultUri = 'mongodb://127.0.0.1/objectory_vm_tests';
 
 class Author extends RootPersistentObject  {  

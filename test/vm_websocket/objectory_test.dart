@@ -3,7 +3,6 @@ import 'package:objectory/src/objectory_websocket_vm_impl.dart';
 import 'package:objectory/src/objectory_base.dart';
 import 'package:objectory/src/persistent_object.dart';
 import 'package:objectory/src/objectory_query_builder.dart';
-import 'package:objectory/src/schema.dart';
 import 'package:mongo_dart/bson.dart';
 import 'package:unittest/unittest.dart';
 import 'domain_model.dart';

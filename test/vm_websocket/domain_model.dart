@@ -1,9 +1,9 @@
-#library("domain_model");
-#import("package:objectory/src/objectory_websocket_vm_impl.dart");
-#import("package:objectory/src/objectory_base.dart");
-#import("package:objectory/src/persistent_object.dart");
-#import("package:objectory/src/objectory_query_builder.dart");
-#import("package:objectory/src/schema.dart");
+library domain_model;
+import 'package:objectory/src/objectory_websocket_vm_impl.dart';
+import 'package:objectory/src/objectory_base.dart';
+import 'package:objectory/src/persistent_object.dart';
+import 'package:objectory/src/objectory_query_builder.dart';
+
 const DefaultUri = '127.0.0.1:8080';
 class Author extends RootPersistentObject  {  
   String get name() => getProperty('name');
