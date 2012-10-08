@@ -1,8 +1,8 @@
-#library('blog_example');
-#import('package:objectory/objectory_vm.dart');
-#import("domain_model.dart");
-#import('package:objectory/src/objectory_direct_connection_impl.dart');
-#import('package:objectory/src/objectory_base.dart');
+library blog_example;
+import 'package:objectory/objectory_vm.dart';
+import 'domain_model.dart';
+import 'package:objectory/src/objectory_direct_connection_impl.dart';
+import 'package:objectory/src/objectory_base.dart';
 main(){
   var authors = new Map<String,Author>();
   var users = new Map<String,User>();  
@@ -44,8 +44,7 @@ main(){
     print("===================================================================================");
     print(">> >> Users ordered by login ascending");
     for (var user in usrs) {
-      print("[${user.login}]:[${user.name}]:[${user.email}]");
-      print(user);
+      print("[${user.login}]:[${user.name}]:[${user.email}]");      
       users[user.login] = user;
     }
     print("===================================================================================");
@@ -85,8 +84,7 @@ main(){
     for (var article in articles) {
       var completer = new Completer();
       futures.add(completer.future);
-      article.fetchLinks().then((__) {
-        print(article);
+      article.fetchLinks().then((__) {        
         print("${article.author.name}:${article.title}:${article.body}");
         for (var comment in article.comments) {
           print("     ${comment.date}:${comment.user.name}: ${comment.body}");     

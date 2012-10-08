@@ -155,7 +155,7 @@ class ObjectoryServerImpl {
   String hostName; 
   int port;
   String mongoUri;
-  ObjectoryServerImpl(this.hostName,this.port,this.mongoUri){
+  ObjectoryServerImpl(this.hostName,this.port,this.mongoUri, bool verbose){
     chatText = [];
     int token = 0;
     HttpServer server;
@@ -164,7 +164,12 @@ class ObjectoryServerImpl {
       server = new HttpServer();
       WebSocketHandler wsHandler = new WebSocketHandler();
       server.addRequestHandler((req) => req.path == '/ws', wsHandler.onRequest);
-      configureConsoleLogger(Level.ALL);
+      if (verbose) {
+        configureConsoleLogger(Level.ALL);
+      }
+      else {
+        configureConsoleLogger(Level.INFO);
+      }        
       wsHandler.onOpen = (WebSocketConnection conn) {
         token+=1;
         var c = new ObjectoryClient('objectory_client_${token}', token, conn);
