@@ -6,7 +6,7 @@ import 'package:objectory/src/objectory_query_builder.dart';
 
 const DefaultUri = '127.0.0.1:8080';
 
-class Author extends RootPersistentObject  {  
+class Author extends PersistentObject  {  
   String get name() => getProperty('name');
   set name(String value) => setProperty('name',value);
   
@@ -22,7 +22,7 @@ class Author extends RootPersistentObject  {
 
 
 
-class User extends RootPersistentObject {
+class User extends PersistentObject {
   String get name() => getProperty('name');
   set name(String value) => setProperty('name',value);
   
@@ -33,7 +33,7 @@ class User extends RootPersistentObject {
   set login(String value) => setProperty('login',value);  
 }
 
-class Article extends RootPersistentObject {
+class Article extends PersistentObject {
   String get title() => getProperty('title');
   set title(String value) => setProperty('title',value);
   

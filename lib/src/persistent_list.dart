@@ -27,7 +27,7 @@ class PersistentIterator<T> implements Iterator<T> {
 
 class PersistentList<T> implements List<T>{
   bool isEmbeddedObject = false;
-  PersistentObject parent;
+  BasePersistentObject parent;
   String pathToMe;
   String elementType;
   List _list;
@@ -44,7 +44,7 @@ class PersistentList<T> implements List<T>{
     }
     valueConverter = new _ValueConverter(this);
   }  
-  factory PersistentList(PersistentObject parent, String elementType, String pathToMe) {
+  factory PersistentList(BasePersistentObject parent, String elementType, String pathToMe) {
     PersistentList result = parent._compoundProperties[pathToMe];   
     if (result == null) {      
       result = new PersistentList._internal(parent,elementType,pathToMe);
@@ -65,7 +65,7 @@ class PersistentList<T> implements List<T>{
       value.pathToMe = pathToMe;
       return value.map;
     }
-    if (value is RootPersistentObject) {
+    if (value is PersistentObject) {
       return value.dbRef;
     }
     return value;

@@ -55,8 +55,8 @@ testObjectWithExternalRefs(){
     objectory.findOne($Person.id(son.id)).then(expectAsync1((sonFromObjectory){
       // Links must be fetched before use.
       //Do not know yet how to test throws in async tests
-      //Expect.throws(()=>sonFromObjectory.father.firstName);
-      expect(sonFromObjectory.map['father'] is DbRef, reason: 'Raw links are of type DbRef');
+      //Expect.throws(()=>sonFromObjectory.father.firstName);      
+      expect(sonFromObjectory.map['father'] is DbRef, reason: 'Unfetched links are of type ObjectId');
       expect(sonFromObjectory.mother,isNull, reason: 'Unassigned link');
       sonFromObjectory.fetchLinks().then(expectAsync1((__){  
         expect(sonFromObjectory.father.firstName,'Father');
@@ -94,7 +94,7 @@ testObjectWithCollectionOfExternalRefs(){
     //expect(()=>father.children[0],throws);      
     return father.fetchLinks();
   })).chain(expectAsync1((_) {
-    sonFromObjectory = father.children[0];  
+    sonFromObjectory = father.children[0];    
     expect(sonFromObjectory.mother,isNull);
     return sonFromObjectory.fetchLinks();
   })).then(expectAsync1((_){
@@ -125,9 +125,11 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
     article.body = "It's been a hard days night";
     var comment = new Comment();
     comment.body = 'great article, dude';
-    comment.user = joe;    
+    comment.user = joe;
+    comment.date = new Date(2012,10,5,9,9,20);
     article.comments.add(comment);
     article.author = author;
+    comment.date = new Date(2012,10,6,10,15,20);
     comment = new Comment();
     comment.body = 'It is lame, sweety';
     comment.user = lisa;    
@@ -135,9 +137,9 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
     objectory.save(article);
     return objectory.findOne($Article.sortBy('title'));
   })).chain(expectAsync1((artcl) {
-    expect(artcl.comments[0] is PersistentObject);    
+    expect(artcl.comments[0] is EmbeddedPersistentObject);    
     for (var each in artcl.comments) {
-      expect(each is PersistentObject);     
+      expect(each is EmbeddedPersistentObject);     
     }
     //Do not know yet how to test throws in async tests
     //expect(()=>artcl.comments[0].user,throws);
@@ -161,15 +163,12 @@ testPropertyNameChecks() {
 }
 
 main(){
- useHtmlEnhancedConfiguration();
- group('ObjectoryVM', () {        
+  useHtmlEnhancedConfiguration();
+  group('ObjectoryVM', () {        
     test('testInsertionAndUpdate',testInsertionAndUpdate);
     test('testCompoundObject',testCompoundObject);                  
     test('testObjectWithExternalRefs',testObjectWithExternalRefs);    
     test('testObjectWithCollectionOfExternalRefs',testObjectWithCollectionOfExternalRefs);
     test('testMap2ObjectWithListtOfInternalObjectsWithExternalRefs',testMap2ObjectWithListtOfInternalObjectsWithExternalRefs);
-});
-//  group('ObjectoryQuery', ()  {    
-//    test('testPropertyNameChecks',testPropertyNameChecks);
-//  });
+  });
 }

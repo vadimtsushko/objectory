@@ -32,17 +32,17 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future<bool> setupWebsocket(String uri) {
     Completer completer = new Completer();
     webSocket = new WebSocket("ws://$uri/ws");
-    webSocket.on.open.add((MessageEvent e) {
+    webSocket.on.open.add((e) {
       isConnected = true;
       completer.complete(true);
     });
     
-    webSocket.on.close.add((MessageEvent e) {
+    webSocket.on.close.add((e) {
       log.fine('close $e');
       isConnected = false;
     });
     
-    webSocket.on.message.add((MessageEvent m) {
+    webSocket.on.message.add((m) {
       var jdata = JSON.parse(m.data);
       log.info('onmessage: $jdata');
       var message = new ObjectoryMessage.fromList(jdata);
@@ -72,7 +72,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Map createCommand(String command, String collection){
     return {'command': command, 'collection': collection}; 
   }
-  save(RootPersistentObject persistentObject){
+  save(PersistentObject persistentObject){
     if (persistentObject.id === null) {      
       persistentObject.id = new ObjectId(clientMode:true);
       persistentObject.map["_id"] = persistentObject.id;
@@ -84,7 +84,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     }
     
   }
-  void remove(RootPersistentObject persistentObject){
+  void remove(PersistentObject persistentObject){
     if (persistentObject.id === null){
       log.severe('Attempt to remove not saved object: $persistentObject');
       return;
@@ -92,12 +92,12 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     postMessage(createCommand('remove',persistentObject.type),persistentObject.map);    
   }
   
-  Future<List<RootPersistentObject>> find(ObjectoryQueryBuilder selector){    
+  Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){    
     Completer completer = new Completer();
-    var result = new List<RootPersistentObject>();
+    var result = new List<PersistentObject>();
     postMessage(createCommand('find',selector.className),selector.map).then((list) {
       for (var map in list) {
-        RootPersistentObject obj = objectory.map2Object(selector.className,map);
+        PersistentObject obj = objectory.map2Object(selector.className,map);
         result.add(obj);
       }        
       completer.complete(result);        
@@ -105,7 +105,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     return completer.future;  
   }
   
-  Future<RootPersistentObject> findOne(ObjectoryQueryBuilder selector){
+  Future<PersistentObject> findOne(ObjectoryQueryBuilder selector){
     Completer completer = new Completer();
     var obj;
     if (selector.map.containsKey("_id")) {
@@ -153,8 +153,8 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future dropCollections() {
     List futures = [];
     factories.forEach( (key, value) {
-      PersistentObject obj = value(); 
-      if (obj is RootPersistentObject) {
+      var obj = value(); 
+      if (obj is PersistentObject) {
         futures.add(postMessage(createCommand('dropCollection',key),{}));
        }
     });

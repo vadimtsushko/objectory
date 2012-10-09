@@ -11,29 +11,29 @@ Objectory get objectory => Objectory.objectoryImpl;
 abstract class Objectory{
     
   static Objectory objectoryImpl;  
-  Map<String,PersistentObject> cache;
+  Map<String,BasePersistentObject> cache;
   Map<String,FactoryMethod> factories;    
 
   Objectory(){
     factories = new  Map<String,FactoryMethod>();
-    cache = new Map<String,PersistentObject>();
+    cache = new Map<String,BasePersistentObject>();
   }
   
-  void addToCache(RootPersistentObject obj) {
+  void addToCache(PersistentObject obj) {
     cache[obj.id.toString()] = obj;
   }
   
-  RootPersistentObject findInCache(var id) {
+  PersistentObject findInCache(var id) {
     if (id === null) {
       return null;
     }
     return cache[id.toString()];
   }
-  RootPersistentObject findInCacheOrGetProxy(var id, String className) {
+  PersistentObject findInCacheOrGetProxy(var id, String className) {
     if (id == null) {
       return null;
     }
-    RootPersistentObject result = findInCache(id);
+    PersistentObject result = findInCache(id);
     if (result == null) {
       result = objectory.newInstance(className);
       result.id = id;
@@ -41,16 +41,16 @@ abstract class Objectory{
     }
     return result;
   }
-  PersistentObject newInstance(String className){
+  BasePersistentObject newInstance(String className){
     if (factories.containsKey(className)){
       return factories[className]();
     }
     throw "Class $className have not been registered in Objectory";
   }
-  RootPersistentObject dbRef2Object(DbRef dbRef) {
+  PersistentObject dbRef2Object(DbRef dbRef) {
     return findInCacheOrGetProxy(dbRef.id, dbRef.collection);
   }  
-  PersistentObject map2Object(String className, Map map){
+  BasePersistentObject map2Object(String className, Map map){
     if (map === null) {
       map = new LinkedHashMap();
     }
@@ -66,10 +66,10 @@ abstract class Objectory{
     }
     var result = newInstance(className);
     result.map = map;
-    if (result is RootPersistentObject){
+    if (result is PersistentObject){
       result.id = map["_id"];    
     }
-    if (result is RootPersistentObject) {
+    if (result is PersistentObject) {
       if (result.id !== null) {
         objectory.addToCache(result);
       }          
@@ -77,7 +77,7 @@ abstract class Objectory{
     return result;
   }
   
-  List<PersistentObject> list2listOfObjects(){}
+  List<BasePersistentObject> list2listOfObjects(){}
   
   
   void registerClass(String className,FactoryMethod factory){
@@ -87,10 +87,10 @@ abstract class Objectory{
   Future<bool> open(String uri);
 
   
-  Future<RootPersistentObject> findOne(ObjectoryQueryBuilder selector);
-  Future<List<RootPersistentObject>> find(ObjectoryQueryBuilder selector);
-  save(RootPersistentObject persistentObject);
-  remove(PersistentObject persistentObject);
+  Future<PersistentObject> findOne(ObjectoryQueryBuilder selector);
+  Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector);
+  save(PersistentObject persistentObject);
+  remove(BasePersistentObject persistentObject);
 
   Future<Map> dropDb();
   Future<Map> wait();  

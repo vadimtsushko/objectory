@@ -4,12 +4,12 @@ import 'package:mongo_dart/bson.dart';
 import 'objectory_base.dart';
 part 'persistent_list.dart';
 
-abstract class PersistentObject {
+abstract class BasePersistentObject {
   LinkedHashMap map;  
   bool setupMode;
   Set<String> dirtyFields;
   Map<String,Dynamic> _compoundProperties; 
-  PersistentObject() {
+  BasePersistentObject() {
     map = new LinkedHashMap();
     setMap(map);
   }
@@ -34,7 +34,7 @@ abstract class PersistentObject {
     }
     return result;
   }
-  RootPersistentObject getLinkedObject(String property) {
+  PersistentObject getLinkedObject(String property) {
     DbRef dbRef = map[property];    
     if (dbRef == null) {
       return null;
@@ -42,7 +42,7 @@ abstract class PersistentObject {
     return objectory.findInCacheOrGetProxy(dbRef.id,dbRef.collection);
   }  
   
-  setLinkedObject(String property, RootPersistentObject value) {
+  setLinkedObject(String property, PersistentObject value) {
     if (value == null) {
       map[property] = null;      
     } else {
@@ -138,7 +138,7 @@ abstract class PersistentObject {
   
   String get type => runtimeType.toString();
   
-  Future<RootPersistentObject> fetchLinks(){
+  Future<PersistentObject> fetchLinks(){
     var dbRefs = new List<DbRef>();    
     getDbRefsFromMap(map, dbRefs);    
     var objects = dbRefs.map((each) => objectory.dbRef2Object(each));    
@@ -175,7 +175,7 @@ abstract class PersistentObject {
   }
   
 }
-abstract class RootPersistentObject extends PersistentObject{
+abstract class PersistentObject extends BasePersistentObject{
   ObjectId get id => map['_id'];
   DbRef get dbRef => new DbRef(this.type,this.id);  
   set id (ObjectId value) => map['_id'] = value;
@@ -198,8 +198,8 @@ abstract class RootPersistentObject extends PersistentObject{
     return completer.future;
   }
 }
-abstract class EmbeddedPersistentObject extends PersistentObject{
-  PersistentObject parent;
+abstract class EmbeddedPersistentObject extends BasePersistentObject{
+  BasePersistentObject parent;
   String pathToMe;  
   void setDirty(String fieldName){
     super.setDirty(fieldName);

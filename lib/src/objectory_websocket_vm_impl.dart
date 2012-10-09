@@ -61,10 +61,10 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     };
     return completer.future;
   }
-  Future postMessage(Map command, Map content) {
+  Future postMessage(Map command, Map content) {    
     requestId++;
-    command['requestId'] = requestId;
-    webSocket.send(JSON.stringify([command,content]));
+    command['requestId'] = requestId;  
+    webSocket.send(JSON.stringify([command,content]));    
     var completer = new Completer();
     awaitedRequests[requestId] = completer;    
     return completer.future;    
@@ -72,7 +72,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
   Map createCommand(String command, String collection){
     return {'command': command, 'collection': collection}; 
   }
-  save(RootPersistentObject persistentObject){
+  save(PersistentObject persistentObject){
     if (persistentObject.id === null) {      
       persistentObject.id = new ObjectId(clientMode:true);
       persistentObject.map["_id"] = persistentObject.id;
@@ -84,7 +84,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     }
     
   }
-  void remove(RootPersistentObject persistentObject){
+  void remove(PersistentObject persistentObject){
     if (persistentObject.id === null){
       log.severe('Attempt to remove not saved object: $persistentObject');
       return;
@@ -92,12 +92,12 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     postMessage(createCommand('remove',persistentObject.type),persistentObject.map);    
   }
   
-  Future<List<RootPersistentObject>> find(ObjectoryQueryBuilder selector){    
+  Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){    
     Completer completer = new Completer();
-    var result = new List<RootPersistentObject>();
+    var result = new List<PersistentObject>();
     postMessage(createCommand('find',selector.className),selector.map).then((list) {
       for (var map in list) {
-        RootPersistentObject obj = objectory.map2Object(selector.className,map);
+        PersistentObject obj = objectory.map2Object(selector.className,map);
         result.add(obj);
       }        
       completer.complete(result);        
@@ -105,7 +105,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     return completer.future;  
   }
   
-  Future<RootPersistentObject> findOne(ObjectoryQueryBuilder selector){
+  Future<PersistentObject> findOne(ObjectoryQueryBuilder selector){
     Completer completer = new Completer();
     var obj;
     if (selector.map.containsKey("_id")) {
@@ -151,10 +151,10 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     webSocket.close(1, 'Normal close');
   }
   Future dropCollections() {
-    List futures = [];
-    factories.forEach( (key, value) {
-      PersistentObject obj = value(); 
-      if (obj is RootPersistentObject) {
+    List futures = [];    
+    factories.forEach( (key, value) {      
+      var obj = value(); 
+      if (obj is PersistentObject) {    
         futures.add(postMessage(createCommand('dropCollection',key),{}));
        }
     });
@@ -166,8 +166,8 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
 Future<bool> setUpObjectory(String uri, Function registerClassCallback, [bool dropCollections = false]){
   var res = new Completer();
   objectory = new ObjectoryWebsocketConnectionImpl();
-  objectory.open(uri).then((_){
-      registerClassCallback();      
+  objectory.open(uri).then((_){      
+      registerClassCallback();
       if (dropCollections) {
         objectory.dropCollections().then((_) =>  res.complete(true));
       }

@@ -6,7 +6,7 @@ import 'package:objectory/src/persistent_object.dart';
 import 'package:objectory/src/objectory_query_builder.dart';
 
 const DefaultUri = '127.0.0.1:8080';
-class Author extends RootPersistentObject  {  
+class Author extends PersistentObject  {  
   String get name() => getProperty('name');
   set name(String value) => setProperty('name',value.toUpperCase());
   
@@ -21,6 +21,7 @@ class Author extends RootPersistentObject  {
 }
 
 class Address extends EmbeddedPersistentObject {
+  
   String get cityName() => getProperty('cityName');
   set cityName(String value) => setProperty('cityName',value);
   
@@ -31,7 +32,7 @@ class Address extends EmbeddedPersistentObject {
   set streetName(String value) => setProperty('streetName',value);
 }
 
-class Customer extends RootPersistentObject {
+class Customer extends PersistentObject {  
   String get name() => getProperty('name');
   set name(String value) => setProperty('name',value);
 
@@ -40,7 +41,7 @@ class Customer extends RootPersistentObject {
 }
 
 
-class Person extends RootPersistentObject {
+class Person extends PersistentObject {
   String get firstName() => getProperty('firstName');
   set firstName(String value) => setProperty('firstName',value);
   
@@ -50,15 +51,15 @@ class Person extends RootPersistentObject {
   Address get address() => getEmbeddedObject('Address', 'address');
   
   Person get father => getLinkedObject('father');
-  set father (RootPersistentObject value) => setLinkedObject('father',value);
+  set father (PersistentObject value) => setLinkedObject('father',value);
 
   Person get mother => getLinkedObject('mother');
-  set mother (RootPersistentObject value) => setLinkedObject('mother',value);
+  set mother (PersistentObject value) => setLinkedObject('mother',value);
 
   List<Person> get children => new PersistentList<Person>(this,'Person','children');  
 }
 
-class User extends RootPersistentObject {
+class User extends PersistentObject {
   String get name() => getProperty('name');
   set name(String value) => setProperty('name',value);
   
@@ -69,7 +70,7 @@ class User extends RootPersistentObject {
   set login(String value) => setProperty('login',value);  
 }
 
-class Article extends RootPersistentObject {
+class Article extends PersistentObject {
   String get title() => getProperty('title');
   set title(String value) => setProperty('title',value);
   
@@ -82,7 +83,8 @@ class Article extends RootPersistentObject {
   List<Comment> get comments => new PersistentList<Comment>(this,'Comment','comments');
 }
 
-class Comment extends EmbeddedPersistentObject { 
+class Comment extends EmbeddedPersistentObject {
+  
   User get user => getLinkedObject('user');
   set user (User value) => setLinkedObject('user',value);
     

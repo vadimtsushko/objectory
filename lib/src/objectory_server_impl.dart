@@ -168,7 +168,7 @@ class ObjectoryServerImpl {
         configureConsoleLogger(Level.ALL);
       }
       else {
-        configureConsoleLogger(Level.INFO);
+        configureConsoleLogger(Level.ALL);
       }        
       wsHandler.onOpen = (WebSocketConnection conn) {
         token+=1;

@@ -12,6 +12,4 @@ dependencies:
   git: git://github.com/Solvr/log4dart.git  
  mongo_dart:
   git: git://github.com/vadimtsushko/mongo_dart.git
- DartJsonClient:
-  git: git://github.com/vadimtsushko/DartJsonClient.git
   

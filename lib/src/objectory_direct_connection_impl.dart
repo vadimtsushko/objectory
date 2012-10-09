@@ -16,31 +16,31 @@ class ObjectoryDirectConnectionImpl extends Objectory{
     return db.open();
   }
   
-  void save(RootPersistentObject persistentObject){
+  void save(PersistentObject persistentObject){
     db.collection(persistentObject.type).save(persistentObject.map);
     persistentObject.id = persistentObject.map["_id"];
   }
   
-  void remove(RootPersistentObject persistentObject){
+  void remove(PersistentObject persistentObject){
     if (persistentObject.id === null){
       return;
     }
     db.collection(persistentObject.type).remove({"_id":persistentObject.id});
   }
   
-  Future<List<RootPersistentObject>> find(ObjectoryQueryBuilder selector){    
+  Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){    
     Completer completer = new Completer();
-    var result = new List<RootPersistentObject>();
+    var result = new List<PersistentObject>();
     db.collection(selector.className)
       .find(selector.map)
       .each((map){
-        RootPersistentObject obj = objectory.map2Object(selector.className,map);
+        PersistentObject obj = objectory.map2Object(selector.className,map);
         result.add(obj);
       }).then((_) => completer.complete(result));
     return completer.future;  
   }
   
-  Future<RootPersistentObject> findOne(ObjectoryQueryBuilder selector){
+  Future<PersistentObject> findOne(ObjectoryQueryBuilder selector){
     Completer completer = new Completer();
     var obj;
     if (selector.map.containsKey("_id")) {
@@ -86,8 +86,8 @@ class ObjectoryDirectConnectionImpl extends Objectory{
   Future dropCollections() {
     List futures = [];
     factories.forEach( (key, value) {
-       PersistentObject obj = value(); 
-       if (obj is RootPersistentObject) {
+       BasePersistentObject obj = value(); 
+       if (obj is PersistentObject) {
         futures.add(db.collection(key).drop());
        }
     });

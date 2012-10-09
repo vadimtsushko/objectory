@@ -89,16 +89,14 @@ main(){
       var completer = new Completer();
       futures.add(completer.future);
       article.fetchLinks().then((__) {        
-        print("${article.author.name}:${article.title}:${article.body}");
+        print("${article.author.name}:&nbsp;&nbsp;${article.title}:&nbsp;&nbsp;${article.body}");
         for (var comment in article.comments) {
-          print("     ${comment.date}:${comment.user.name}: ${comment.body}");     
+          print("&nbsp;&nbsp;&nbsp;${comment.date}:&nbsp;&nbsp;${comment.user.name}:&nbsp;&nbsp;${comment.body}");     
         }
         completer.complete(true);
       });
     }
     return Futures.wait(futures);
-  }).chain((_) {
-    return objectory.dropCollections();
   }).then((_) {
    objectory.close();
   });      
