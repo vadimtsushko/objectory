@@ -19,3 +19,5 @@ Now you may run server side objectory tests in **/test/vm**
 - Configure Dartium launches for **/test/browser/objectory_test.html** and **/example/browser/example/blog.html** In group Dartium settings uncheck *Run in checked mode* and *Enable debugging*.  
 
 Now you may run browser tests and blog example (port of server-side example to browser)
+
+See [Quick tour](https://github.com/vadimtsushko/objectory/blob/master/doc/quick_tour.md) for futher information
