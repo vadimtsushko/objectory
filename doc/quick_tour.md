@@ -78,16 +78,17 @@ what give us on MongoDb:
 Whith linked objects we store in document's attribute referense on another document, usually stored in another collection. In Objectory we model this as getter/setter pair of appropriate type which use `getLinkedObject`, `setLinkedObject` methods.
 
     class Person extends PersistentObject {
-     
+      // String field lastName
       String get lastName() => getProperty('lastName');
       set lastName(String value) => setProperty('lastName',value);
       
-      
+      // Link to object of class Person
       Person get father => getLinkedObject('father');
-      set father (PersistentObject value) => setLinkedObject('father',value);
+      set father (Person value) => setLinkedObject('father',value);
     
+      // Link to object of class Person
       Person get mother => getLinkedObject('mother');
-      set mother (PersistentObject value) => setLinkedObject('mother',value);
+      set mother (Person value) => setLinkedObject('mother',value);
     }
 
 Given above class definition corresponding MongoDb document may look like:
@@ -98,16 +99,93 @@ Document property of linked object type may contain reference to linked object o
 
 #####Embedded lists
 
-Tbd
+Embedded lists are defined by means of getter annotated as `List<SomeClass>` 
 
-####CRUD API:
+For example we can define Article which contains list of comments so 
 
-Tbd
+    class Comment extends EmbeddedPersistentObject {
+      
+      User get user => getLinkedObject('user');
+      set user (User value) => setLinkedObject('user',value);
+        
+      String get body() => getProperty('body');
+      set body(String value) => setProperty('body',value);
+      
+      Date get date() => getProperty('date');
+      set date(Date value) => setProperty('date',value);  
+    }
+    
+    class Article extends PersistentObject {
+      String get title() => getProperty('title');
+      set title(String value) => setProperty('title',value);
+      
+      String get body() => getProperty('body');
+      set body(String value) => setProperty('body',value);
+      
+      Author get author => getLinkedObject('author');
+      set author (Author value) => setLinkedObject('author',value);
+    
+      List<Comment> get comments => new PersistentList<Comment>(this,'Comment','comments');
+    }
 
-####Querying objectory:
+So firstly we define class for embedded object Comment, then in class Article define getter for list of comments. Getter invokes factory of PersistentList class, with referense on entity object, type of elements for list and name of property as parameters.
 
-Tbd
+In MongoDB such a document may look like:
 
-####Troubleshooting
+    { "_id" : ObjectId("5075084ec1058b6801000001"), "title" : "My first article", "body" : "It's been a hard days night", "comments" : [    {       "body" : "great article, dude",         "date" : ISODate("2012-10-06T04:15:20Z") },     {"body" : "It is lame, sweety" } ], "author" : { "ns" : "Author", "id" : ObjectId("5075084ec1058b6801000000") } }
 
-Tbd
+Embedded lists may contain elements of concrete mongodb types, embedded documents or linked documents. 
+
+####Data manipulation:
+
+Objectory libary exports top level getter named `objectory` wich is used to manipulate and query persistent data.
+Typical snipped to save new object may be:
+
+    var author = new Author();
+    author.name = 'Vadim';
+    objectory.save(author);      
+
+For newly created entity object objectory's method `save` generate new id and insert object into MongoDb. For existing entity object this method update MongoDB with current state of whole object. Selective updates are not supported for now. 
+PersistentObject have helper method `save()` so snipped above may be rewritten to 
+
+    var author = new Author();
+    author.name = 'Vadim';
+    author.save();
+
+Objectory abd PersistentObject have method remove().
+
+####Data querying:
+
+To query data objectory have methods `find` (returning result as `Future` of list of `PersistenObject`'s) and `finOne` (returning `Future` of `PeristentObject`)
+For example that script prints some information for all Articles in db:
+
+    initDomainModel().chain((_) {    
+      return objectory.find($Article);
+    }).then((articles) {
+      for (var article  in articles) {
+        print('title: ${article.title}; ==> ${article.body}');
+        for (Comment each in article.comments) {
+          print('    ${each.date} => ${each.body}');
+        }
+      }
+    }  
+
+$Article above is top level getter for ObjectoryQueryBuilder for type Article, defined in domain model library of application (library where defined all entity classes)
+ObjectoryQueryBuilder provide fluent API to build valid MongoDB queries. 
+
+To print all articles having comments in 2011 year and later with word "new" in their titles: 
+
+    initDomainModel().chain((_) {    
+      return objectory.find($Article.match('title','[nN]ew').gte('comments.date', new Date(2011,01,01)));
+    }).then((articles) {
+      for (var article  in articles) {
+        print('title: ${article.title}; ==> ${article.body}');
+        for (Comment each in article.comments) {
+          print('    ${each.date} => ${each.body}');
+        }
+      }
+    }  
+
+####More information
+
+See tests and examples.

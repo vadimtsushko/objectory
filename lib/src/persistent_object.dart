@@ -76,60 +76,12 @@ abstract class BasePersistentObject {
   
   
   void setProperty(String property, value){
-//    ClassSchema schema = objectory.getSchema(type);
-//    PropertySchema propertySchema;    
-//    propertySchema = schema.properties[property];
-//    if (propertySchema === null) {
-//      throw 'Property $property not found';
-//    }   
-//    if (propertySchema.link && !propertySchema.collection && value is RootPersistentObject){
-//      if (value !== null) {            
-//        if (value.id === null){        
-//          throw "Error setting link property $property. Link object must have not null id";
-//        }
-//        value = value.id;             
-//      }          
-//    }
-//    if (value is BasePersistentObject) {
-//      value = value.map;
-//    }
-//    if (value is PersistentList) {
-//      value = value.internalList;
-//    }        
     onValueChanging(property, value);
     this.map[property] = value;    
   }
   
-  Dynamic getProperty(String property){
-//    ClassSchema schema = objectory.getSchema(type);
-//    PropertySchema propertySchema;    
-//    propertySchema = schema.properties[property];
-//    if (propertySchema === null) {
-//      throw 'Property $property not found';
-//    }    
-    final value = this.map[property];      
-//    if (propertySchema.collection) {
-//      return new PersistentList(value, parent: this, pathToMe: property);
-//    }
-//    if (propertySchema.embeddedObject) {
-//      EmbeddedPersistentObject result =  objectory.map2Object(propertySchema.type, value);
-//      result.parent = this;
-//      result.pathToMe = property;
-//      return result;
-//    }
-//    if (propertySchema.link)  {      
-//      if (value === null) {
-//        return null;
-//      }
-//      else {
-//        var result = objectory.findInCache(value);
-//        if (result === null) {
-//          throw "External ref ${propertySchema.name} has not been fetched yet";
-//        }
-//        return result;
-//      }
-//    }
-    return value;
+  Dynamic getProperty(String property){          
+    return this.map[property];
   }
   
   String toString()=>"$type($map)";
