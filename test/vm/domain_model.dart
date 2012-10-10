@@ -16,7 +16,7 @@ class Author extends PersistentObject  {
   int get age() => getProperty('age');
   set age(int value) => setProperty('age',value);
 
-  Address get address() => getEmbeddedObject('Address', 'address');
+  Address get address() => getEmbeddedObject('Address', 'address');  
     
 }
 

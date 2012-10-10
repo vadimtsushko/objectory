@@ -16,29 +16,29 @@ class _ValueConverter{
     }
   }
 }
-class PersistentIterator<T> implements Iterator<T> {
+class _PersistentIterator<T> implements Iterator<T> {
   Iterator _it;
   _ValueConverter valueConverter;
   PersistentList persistentList;
-  PersistentIterator(this.persistentList,this._it, this.valueConverter);  
+  _PersistentIterator(this.persistentList,this._it, this.valueConverter);  
   T next() => valueConverter.convertValue(_it.next());
   bool hasNext() => _it.hasNext();
 }
 
 class PersistentList<T> implements List<T>{
   bool isEmbeddedObject = false;
-  BasePersistentObject parent;
+  BasePersistentObject _parent;
   String pathToMe;
   String elementType;
   List _list;
 //  set internalList(List value) => _list = value;
   List get internalList => _list;
   _ValueConverter valueConverter;
-  PersistentList._internal(this.parent, this.elementType, this.pathToMe) {
-    if (parent.map[pathToMe] == null) {
-      parent.map[pathToMe] = [];      
+  PersistentList._internal(this._parent, this.elementType, this.pathToMe) {
+    if (_parent.map[pathToMe] == null) {
+      _parent.map[pathToMe] = [];      
     }
-    _list = parent.map[pathToMe];
+    _list = _parent.map[pathToMe];
     if (objectory.newInstance(elementType) is EmbeddedPersistentObject) {
       isEmbeddedObject = true;
     }
@@ -55,14 +55,14 @@ class PersistentList<T> implements List<T>{
   toString() => "PersistentList($_list)";
   
   void setDirty(String propertyName) {
-    parent.setDirty(pathToMe);    
+    _parent.setDirty(pathToMe);    
   }
   
   
   internValue(T value) {  
     if (value is EmbeddedPersistentObject) {
-      value.parent = parent;
-      value.pathToMe = pathToMe;
+      value._parent = _parent;
+      value._pathToMe = pathToMe;
       return value.map;
     }
     if (value is PersistentObject) {
@@ -84,7 +84,7 @@ class PersistentList<T> implements List<T>{
   
   bool some(bool f(T element)) => _list.some(f);
   
-  Iterator<T> iterator() => new PersistentIterator(this,_list.iterator(),valueConverter);
+  Iterator<T> iterator() => new _PersistentIterator(this,_list.iterator(),valueConverter);
   
   int indexOf(T element, [int start = 0]) => _list.indexOf(element, start);
   

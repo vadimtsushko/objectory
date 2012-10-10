@@ -3,6 +3,7 @@ import 'package:objectory/objectory_vm.dart';
 import 'domain_model.dart';
 import 'package:objectory/src/objectory_direct_connection_impl.dart';
 import 'package:objectory/src/objectory_base.dart';
+
 main(){
   var authors = new Map<String,Author>();
   var users = new Map<String,User>();  
@@ -77,25 +78,25 @@ main(){
     article.comments.add(comment);
     article.save();
     return objectory.find($Article);  
-  }).chain((articles){    
-    var futures = new List();
+  }).chain((articles){
     print("===================================================================================");
     print(">> Printing articles");
-    for (var article in articles) {
-      var completer = new Completer();
-      futures.add(completer.future);
-      article.fetchLinks().then((__) {        
-        print("${article.author.name}:${article.title}:${article.body}");
-        for (var comment in article.comments) {
-          print("     ${comment.date}:${comment.user.name}: ${comment.body}");     
-        }
-        completer.complete(true);
-      });
-    }
-    return Futures.wait(futures);
+    return Futures.wait(articles.map((article) => printArticle(article)));     
   }).chain((_) {
     return objectory.dropCollections();
   }).then((_) {
    objectory.close();
   });      
+}
+
+Future printArticle(article) { 
+  var completer = new Completer();      
+  article.fetchLinks().then((__) {        
+    print("${article.author.name}:${article.title}:${article.body}");
+    for (var comment in article.comments) {
+      print("     ${comment.date}:${comment.user.name}: ${comment.body}");     
+    }
+    completer.complete(true);
+  });
+  return completer.future;  
 }
