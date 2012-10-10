@@ -82,21 +82,7 @@ main(){
     article.save();
     return objectory.find($Article);  
   }).chain((articles){    
-    var futures = new List();
-    print("===================================================================================");
-    print(">> Printing articles");
-    for (var article in articles) {
-      var completer = new Completer();
-      futures.add(completer.future);
-      article.fetchLinks().then((__) {        
-        print("${article.author.name}:&nbsp;&nbsp;${article.title}:&nbsp;&nbsp;${article.body}");
-        for (var comment in article.comments) {
-          print("&nbsp;&nbsp;&nbsp;${comment.date}:&nbsp;&nbsp;${comment.user.name}:&nbsp;&nbsp;${comment.body}");     
-        }
-        completer.complete(true);
-      });
-    }
-    return Futures.wait(futures);
+    return Futures.wait(articles.map((article) => printArticle(article)));
   }).then((_) {
    objectory.close();
   });      
@@ -105,4 +91,16 @@ main(){
 print(message) {
   var textElement = html.query('#text');
   textElement.innerHTML = '${textElement.innerHTML}<br>\n${message.toString()}';
+}
+
+Future printArticle(article) { 
+  var completer = new Completer();      
+  article.fetchLinks().then((__) {        
+    print("${article.author.name}:&nbsp;&nbsp;${article.title}:&nbsp;&nbsp;${article.body}");
+    for (var comment in article.comments) {
+      print("&nbsp;&nbsp;&nbsp;${comment.date}:&nbsp;&nbsp;${comment.user.name}:&nbsp;&nbsp;${comment.body}");     
+    }
+    completer.complete(true);
+  });
+  return completer.future;  
 }

@@ -5,9 +5,8 @@ import 'objectory_base.dart';
 part 'persistent_list.dart';
 
 abstract class BasePersistentObject {
-  LinkedHashMap map;  
-  bool setupMode;
-  Set<String> dirtyFields;
+  LinkedHashMap map;
+  Set<String> _dirtiFields;
   Map<String,Dynamic> _compoundProperties; 
   BasePersistentObject() {
     map = new LinkedHashMap();
@@ -18,7 +17,7 @@ abstract class BasePersistentObject {
     map = newValue;
     _initMap();
     init();
-    dirtyFields = new Set<String>();    
+    _dirtiFields = new Set<String>();    
   }
   
   EmbeddedPersistentObject getEmbeddedObject(String className, String property) {
@@ -29,8 +28,8 @@ abstract class BasePersistentObject {
       }
       result = objectory.newInstance(className);
       result.setMap(map[property]);
-      result.parent = this;
-      result.pathToMe = property;
+      result._parent = this;
+      result._pathToMe = property;
     }
     return result;
   }
@@ -56,14 +55,14 @@ abstract class BasePersistentObject {
   }  
   
   void setDirty(String fieldName) {
-    if (dirtyFields === null){
+    if (_dirtiFields === null){
       return;
     }
-    dirtyFields.add(fieldName);
+    _dirtiFields.add(fieldName);
   }
   
   void clearDirtyStatus() {
-    dirtyFields.clear();
+    _dirtiFields.clear();
   }
   
   void onValueChanging(String fieldName, newValue) {
@@ -71,7 +70,7 @@ abstract class BasePersistentObject {
   }
   
   isDirty() {
-    return !dirtyFields.isEmpty();
+    return !_dirtiFields.isEmpty();
   }
   
   
@@ -131,7 +130,7 @@ abstract class PersistentObject extends BasePersistentObject{
   ObjectId get id => map['_id'];
   DbRef get dbRef => new DbRef(this.type,this.id);  
   set id (ObjectId value) => map['_id'] = value;
-  bool notFetched = false; 
+  bool notFetched = false;  
   void _initMap() {
     map["_id"] = null;
     super._initMap();
@@ -151,12 +150,12 @@ abstract class PersistentObject extends BasePersistentObject{
   }
 }
 abstract class EmbeddedPersistentObject extends BasePersistentObject{
-  BasePersistentObject parent;
-  String pathToMe;  
+  BasePersistentObject _parent;
+  String _pathToMe;  
   void setDirty(String fieldName){
     super.setDirty(fieldName);
-    if (parent !== null) {
-      parent.setDirty(pathToMe);
+    if (_parent !== null) {
+      _parent.setDirty(_pathToMe);
     }
   }  
   remove() {

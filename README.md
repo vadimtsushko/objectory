@@ -2,7 +2,7 @@
 
 Objectory provides typed, checked environment to model, save and query data persisted on MongoDb.
 
-Objectory provides identical API for server side and browser applications (currently only Dartium platform supported, dart2js support blocked by [this bug](http://code.google.com/p/dart/issues/detail?id=4050))
+Objectory provides identical API for server side and browser applications (currently only Dartium platform supported, dart2js support blocked by several incompatibilities with *M1* spec.
 
 ###Getting started
 

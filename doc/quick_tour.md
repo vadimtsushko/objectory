@@ -136,6 +136,9 @@ In MongoDB such a document may look like:
 
 Embedded lists may contain elements of concrete mongodb types, embedded documents or linked documents. 
 
+Embedded objects, lists, and linked objects may freely combine. So for example Article may contain list of Comments (embedded objects), and Comment in turn may contain link to User (linked object).
+
+
 ####Data manipulation:
 
 Objectory libary exports top level getter named `objectory` wich is used to manipulate and query persistent data.
@@ -185,6 +188,11 @@ To print all articles having comments in 2011 year and later with word "new" in 
         }
       }
     }  
+
+#####Fetching linked objects.
+
+
+
 
 ####More information
 
