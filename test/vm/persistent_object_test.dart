@@ -11,7 +11,8 @@ testAuthorCreation(){
   var author = new Author();
   author.name = 'vadim';
   author.age = 99;
-  author.email = 'sdf';  
+  author.email = 'sdf';
+  author.
   expect((author.map.getKeys() as List)[0],"_id");
   expect(author.name,'VADIM', reason: 'converted to uppercase by custom  setter');
   author.address.cityName = 'Tyumen';
