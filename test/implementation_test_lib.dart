@@ -1,18 +1,14 @@
-library objectory_test;
-import 'package:objectory/src/objectory_websocket_browser_impl.dart';
+library implementation_test_lib;
 import 'package:objectory/src/objectory_base.dart';
 import 'package:objectory/src/persistent_object.dart';
 import 'package:objectory/src/objectory_query_builder.dart';
 import 'package:mongo_dart/bson.dart';
-import 'domain_model.dart';
-import 'package:mongo_dart/src/bson/json_ext.dart';
-import 'package:logging/logging.dart';
-import 'package:objectory/src/log_helper.dart';
 import 'package:unittest/unittest.dart';
-import 'package:unittest/html_enhanced_config.dart';
+import 'domain_model.dart';
+
 
 void testInsertionAndUpdate(){
-  initDomainModel().then(expectAsync1((_) {
+  objectory.initDomainModel().then(expectAsync1((_) {
     Author author = new Author();  
     author.name = 'Dan';
     author.age = 3;
@@ -29,7 +25,7 @@ void testInsertionAndUpdate(){
   }));
 }
 testCompoundObject(){
-  initDomainModel().then(expectAsync1((_) {  
+  objectory.initDomainModel().then(expectAsync1((_) {  
     var person = new Person();
     person.address.cityName = 'Tyumen';
     person.address.streetName = 'Elm';  
@@ -44,7 +40,7 @@ testCompoundObject(){
   }));
 }
 testObjectWithExternalRefs(){
-  initDomainModel().then(expectAsync1((_) {
+  objectory.initDomainModel().then(expectAsync1((_) {
     Person father = new Person();  
     father.firstName = 'Father';
     father.save();    
@@ -71,7 +67,7 @@ testObjectWithCollectionOfExternalRefs(){
   Person son;
   Person daughter;
   Person sonFromObjectory;
-  initDomainModel().chain(expectAsync1((_) {
+  objectory.initDomainModel().chain(expectAsync1((_) {
     father = new Person();  
     father.firstName = 'Father';
     father.save();
@@ -108,7 +104,7 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   User joe;
   User lisa;
   Author author;
-  initDomainModel().chain(expectAsync1((_) {    
+  objectory.initDomainModel().chain(expectAsync1((_) {    
     author = new Author();
     author.name = 'Vadim';
     author.save();
@@ -162,13 +158,10 @@ testPropertyNameChecks() {
   expect(() => $Person.eq('address.cityName1', 'Tyumen'),throws);  
 }
 
-main(){
-  useHtmlEnhancedConfiguration();
-  group('ObjectoryVM', () {        
+allImplementationTests(){
     test('testInsertionAndUpdate',testInsertionAndUpdate);
     test('testCompoundObject',testCompoundObject);                  
     test('testObjectWithExternalRefs',testObjectWithExternalRefs);    
     test('testObjectWithCollectionOfExternalRefs',testObjectWithCollectionOfExternalRefs);
     test('testMap2ObjectWithListtOfInternalObjectsWithExternalRefs',testMap2ObjectWithListtOfInternalObjectsWithExternalRefs);
-  });
 }

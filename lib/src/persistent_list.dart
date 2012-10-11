@@ -1,4 +1,3 @@
-part of persistent_object;
 class _ValueConverter{  
   PersistentList persistentList;
   _ValueConverter(this.persistentList);

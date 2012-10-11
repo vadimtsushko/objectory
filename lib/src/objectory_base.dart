@@ -8,13 +8,16 @@ typedef Object FactoryMethod();
 set objectory(Objectory impl) => Objectory.objectoryImpl = impl; 
 Objectory get objectory => Objectory.objectoryImpl; 
 
-abstract class Objectory{
+class Objectory{
     
-  static Objectory objectoryImpl;  
+  static Objectory objectoryImpl;
+  String uri;
+  Function registerClassesCallback;
+  bool dropCollectionsOnStartup;  
   Map<String,BasePersistentObject> cache;
   Map<String,FactoryMethod> factories;    
 
-  Objectory(){
+  Objectory(this.uri,this.registerClassesCallback,this.dropCollectionsOnStartup){
     factories = new  Map<String,FactoryMethod>();
     cache = new Map<String,BasePersistentObject>();
   }
@@ -83,17 +86,33 @@ abstract class Objectory{
   void registerClass(String className,FactoryMethod factory){
     factories[className] = factory;    
   }
-  Future dropCollections();
-  Future<bool> open(String uri);
+  Future dropCollections() { throw 'Must be implemented'; }
+  Future<bool> open() { throw 'Must be implemented'; }
 
   
-  Future<PersistentObject> findOne(ObjectoryQueryBuilder selector);
-  Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector);
-  save(PersistentObject persistentObject);
-  remove(BasePersistentObject persistentObject);
+  Future<PersistentObject> findOne(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
+  Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
+  save(PersistentObject persistentObject) { throw 'Must be implemented'; }
+  remove(BasePersistentObject persistentObject) { throw 'Must be implemented'; }
 
-  Future<Map> dropDb();
-  Future<Map> wait();  
-  void close();
+  Future<Map> dropDb() { throw 'Must be implemented'; }
+  Future<Map> wait() { throw 'Must be implemented'; }  
+  void close() { throw 'Must be implemented'; }
+ 
+  Future<bool> initDomainModel() {
+    var res = new Completer();  
+    open().then((_){
+      registerClassesCallback();
+      if (dropCollectionsOnStartup) {
+        objectory.dropCollections().then((_) =>  res.complete(true));
+      }
+      else
+      {
+        res.complete(true);
+      }
+    });    
+    return res.future;
+  }
+
   
 }

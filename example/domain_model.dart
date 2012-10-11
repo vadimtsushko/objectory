@@ -1,11 +1,12 @@
 library domain_model;
 import 'package:objectory/src/objectory_base.dart';
-import 'package:objectory/src/objectory_direct_connection_impl.dart';
 import 'package:objectory/src/persistent_object.dart';
 import 'package:objectory/src/objectory_query_builder.dart';
-import 'package:mongo_dart/bson.dart';
 
-class Author extends PersistentObject  {  
+const DefaultUri = '127.0.0.1:8080';
+
+class Author extends PersistentObject  {
+  String get type => 'Author';
   String get name() => getProperty('name');
   set name(String value) => setProperty('name',value);
   
@@ -22,6 +23,8 @@ class Author extends PersistentObject  {
 
 
 class User extends PersistentObject {
+  String get type => 'User';
+  
   String get name() => getProperty('name');
   set name(String value) => setProperty('name',value);
   
@@ -33,6 +36,8 @@ class User extends PersistentObject {
 }
 
 class Article extends PersistentObject {
+  String get type => 'Article';
+  
   String get title() => getProperty('title');
   set title(String value) => setProperty('title',value);
   
@@ -42,11 +47,11 @@ class Article extends PersistentObject {
   Author get author => getLinkedObject('author');
   set author (Author value) => setLinkedObject('author',value);
 
-  List<Comment> get comments => new PersistentList<Comment>(this,'Comment','comments');  
-
+  List<Comment> get comments => new PersistentList<Comment>(this,'Comment','comments');
 }
 
 class Comment extends EmbeddedPersistentObject {
+  String get type => 'Comment';
   
   User get user => getLinkedObject('user');
   set user (User value) => setLinkedObject('user',value);
@@ -69,9 +74,6 @@ void registerClasses() {
   objectory.registerClass('Comment',()=>new Comment());
 }
 
-Future<bool> initDomainModel(){
-  return setUpObjectory('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog', registerClasses, true);
-}
 
 ObjectoryQueryBuilder get $Author => new ObjectoryQueryBuilder('Author');
 ObjectoryQueryBuilder get $User => new ObjectoryQueryBuilder('User');

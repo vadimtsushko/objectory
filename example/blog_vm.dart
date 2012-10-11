@@ -3,11 +3,12 @@ import 'package:objectory/objectory_vm.dart';
 import 'domain_model.dart';
 import 'package:objectory/src/objectory_direct_connection_impl.dart';
 import 'package:objectory/src/objectory_base.dart';
-
+const Uri = 'mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog';
 main(){
+  objectory = new ObjectoryDirectConnectionImpl(Uri,registerClasses,true);
   var authors = new Map<String,Author>();
   var users = new Map<String,User>();  
-  initDomainModel().chain((_) {
+  objectory.initDomainModel().chain((_) {
     print("===================================================================================");
     print(">> Adding Authors");
     var author = new Author();

@@ -3,10 +3,8 @@ import 'dart:html';
 import 'persistent_object.dart';
 import 'objectory_query_builder.dart';
 import 'objectory_base.dart';
-import 'package:logging/logging.dart';
 import 'package:mongo_dart/bson.dart';
 import 'package:mongo_dart/src/bson/json_ext.dart';
-import 'log_helper.dart';
 
 const IP = '127.0.0.1';
 const PORT = 8080;
@@ -25,7 +23,10 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   bool isConnected;  
   Map<int,Completer> awaitedRequests = new Map<int,Completer>();
   int requestId = 0;
-  Future<bool> open(String uri){
+  ObjectoryWebsocketBrowserImpl(String uri,Function registerClassesCallback,bool dropCollectionsOnStartup):
+    super(uri, registerClassesCallback, dropCollectionsOnStartup);
+  
+  Future<bool> open(){
     return setupWebsocket(uri);
   }
   
@@ -38,13 +39,13 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     });
     
     webSocket.on.close.add((e) {
-      log.fine('close $e');
+      //log.fine('close $e');
       isConnected = false;
     });
     
     webSocket.on.message.add((m) {
       var jdata = JSON.parse(m.data);
-      log.info('onmessage: $jdata');
+      //log.info('onmessage: $jdata');
       var message = new ObjectoryMessage.fromList(jdata);
       int receivedRequestId = message.command['requestId'];
       if (receivedRequestId == null) {
@@ -52,10 +53,10 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
       }   
       var completer = awaitedRequests[receivedRequestId]; 
       if (completer != null) {
-        log.fine("Complete request: $receivedRequestId message: $message");
+        //log.fine("Complete request: $receivedRequestId message: $message");
         completer.complete(message.content);        
       } else {
-        log.shout('Not found completer for request: $receivedRequestId');
+        //log.shout('Not found completer for request: $receivedRequestId');
       }
       
     });
@@ -77,19 +78,19 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
       persistentObject.id = new ObjectId(clientMode:true);
       persistentObject.map["_id"] = persistentObject.id;
       objectory.addToCache(persistentObject);
-      postMessage(createCommand('insert',persistentObject.type),persistentObject.map);
-      log.fine('$persistentObject saved to cache');
+      postMessage(createCommand('insert',persistentObject.dbType),persistentObject.map);
+      //log.fine('$persistentObject saved to cache');
     } else {
-      postMessage(createCommand('update',persistentObject.type),persistentObject.map);
+      postMessage(createCommand('update',persistentObject.dbType),persistentObject.map);
     }
     
   }
   void remove(PersistentObject persistentObject){
     if (persistentObject.id === null){
-      log.severe('Attempt to remove not saved object: $persistentObject');
+      //log.severe('Attempt to remove not saved object: $persistentObject');
       return;
     }
-    postMessage(createCommand('remove',persistentObject.type),persistentObject.map);    
+    postMessage(createCommand('remove',persistentObject.dbType),persistentObject.map);    
   }
   
   Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){    
@@ -160,21 +161,4 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     });
     return Futures.wait(futures);
   }
-}
-
-
-Future<bool> setUpObjectory(String uri, Function registerClassCallback, [bool dropCollections = false]){
-  var res = new Completer();
-  objectory = new ObjectoryWebsocketBrowserImpl();
-  objectory.open(uri).then((_){
-      registerClassCallback();      
-      if (dropCollections) {
-        objectory.dropCollections().then((_) =>  res.complete(true));
-      }
-      else
-      {
-        res.complete(true);
-      }
-  });    
-  return res.future;
 }

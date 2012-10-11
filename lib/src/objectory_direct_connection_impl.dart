@@ -7,8 +7,9 @@ import 'objectory_base.dart';
 
 class ObjectoryDirectConnectionImpl extends Objectory{  
   Db db;
-  ObjectoryDirectConnectionImpl(): super();
-  Future<bool> open(String uri){
+  ObjectoryDirectConnectionImpl(String uri,Function registerClassesCallback,bool dropCollectionsOnStartup):
+    super(uri, registerClassesCallback, dropCollectionsOnStartup);
+  Future<bool> open(){
     if (db !== null){
       db.close();
     }    
@@ -17,7 +18,7 @@ class ObjectoryDirectConnectionImpl extends Objectory{
   }
   
   void save(PersistentObject persistentObject){
-    db.collection(persistentObject.type).save(persistentObject.map);
+    db.collection(persistentObject.dbType).save(persistentObject.map);
     persistentObject.id = persistentObject.map["_id"];
   }
   
@@ -25,7 +26,7 @@ class ObjectoryDirectConnectionImpl extends Objectory{
     if (persistentObject.id === null){
       return;
     }
-    db.collection(persistentObject.type).remove({"_id":persistentObject.id});
+    db.collection(persistentObject.dbType).remove({"_id":persistentObject.id});
   }
   
   Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){    
@@ -93,21 +94,4 @@ class ObjectoryDirectConnectionImpl extends Objectory{
     });
     return Futures.wait(futures);
   }
-}
-
-
-Future<bool> setUpObjectory(String uri, Function registerClassCallback, [bool dropCollections = false]){
-  var res = new Completer();
-  objectory = new ObjectoryDirectConnectionImpl();  
-  objectory.open(uri).then((_){
-      registerClassCallback();
-      if (dropCollections) {
-        objectory.dropCollections().then((_) =>  res.complete(true));
-      }
-      else
-      {
-        res.complete(true);
-      }
-  });    
-  return res.future;
 }

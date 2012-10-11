@@ -1,4 +1,4 @@
-library PersistenObjectTests;
+library base_objectory_tests;
 import 'package:objectory/src/objectory_base.dart';
 import 'package:objectory/src/objectory_direct_connection_impl.dart';
 import 'package:objectory/src/persistent_object.dart';
@@ -11,8 +11,7 @@ testAuthorCreation(){
   var author = new Author();
   author.name = 'vadim';
   author.age = 99;
-  author.email = 'sdf';
-  author.
+  author.email = 'sdf';  
   expect((author.map.getKeys() as List)[0],"_id");
   expect(author.name,'VADIM', reason: 'converted to uppercase by custom  setter');
   author.address.cityName = 'Tyumen';
@@ -137,7 +136,7 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
 }
 
 main(){
-  objectory = new ObjectoryDirectConnectionImpl();  
+  objectory = new Objectory(null,null, false);  
   initBsonPlatform();
   registerClasses();  
   group("PersistenObjectTests", ()  {

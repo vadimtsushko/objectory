@@ -7,10 +7,12 @@ import 'package:mongo_dart/bson.dart';
 import 'domain_model.dart';
 import 'package:mongo_dart/src/bson/json_ext.dart';
 import 'dart:html' as html;
+const DefaultUri = '127.0.0.1:8080';
 main(){
+  objectory = new ObjectoryWebsocketBrowserImpl(DefaultUri,registerClasses,true);
   var authors = new Map<String,Author>();
   var users = new Map<String,User>();  
-  initDomainModel().chain((_) {
+  objectory.initDomainModel().chain((_) {
     print("===================================================================================");
     print(">> Adding Authors");
     var author = new Author();

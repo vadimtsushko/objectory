@@ -25,7 +25,11 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
   bool isConnected;  
   Map<int,Completer> awaitedRequests = new Map<int,Completer>();
   int requestId = 0;
-  Future<bool> open(String uri){
+  
+  ObjectoryWebsocketConnectionImpl(String uri,Function registerClassesCallback,bool dropCollectionsOnStartup):
+    super(uri, registerClassesCallback, dropCollectionsOnStartup);
+  
+  Future<bool> open(){
     return setupWebsocket(uri);
   }
   
@@ -77,10 +81,10 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
       persistentObject.id = new ObjectId(clientMode:true);
       persistentObject.map["_id"] = persistentObject.id;
       objectory.addToCache(persistentObject);
-      postMessage(createCommand('insert',persistentObject.type),persistentObject.map);
+      postMessage(createCommand('insert',persistentObject.dbType),persistentObject.map);
       log.fine('$persistentObject saved to cache');
     } else {
-      postMessage(createCommand('update',persistentObject.type),persistentObject.map);
+      postMessage(createCommand('update',persistentObject.dbType),persistentObject.map);
     }
     
   }
@@ -89,7 +93,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
       log.severe('Attempt to remove not saved object: $persistentObject');
       return;
     }
-    postMessage(createCommand('remove',persistentObject.type),persistentObject.map);    
+    postMessage(createCommand('remove',persistentObject.dbType),persistentObject.map);    
   }
   
   Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){    
@@ -160,21 +164,4 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     });
     return Futures.wait(futures);
   }
-}
-
-
-Future<bool> setUpObjectory(String uri, Function registerClassCallback, [bool dropCollections = false]){
-  var res = new Completer();
-  objectory = new ObjectoryWebsocketConnectionImpl();
-  objectory.open(uri).then((_){      
-      registerClassCallback();
-      if (dropCollections) {
-        objectory.dropCollections().then((_) =>  res.complete(true));
-      }
-      else
-      {
-        res.complete(true);
-      }
-  });    
-  return res.future;
 }

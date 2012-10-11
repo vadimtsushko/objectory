@@ -1,8 +1,8 @@
-library persistent_object;
-import 'objectory_query_builder.dart';
-import 'package:mongo_dart/bson.dart';
-import 'objectory_base.dart';
-part 'persistent_list.dart';
+#library('persistent_object');
+#import('objectory_query_builder.dart');
+#import('package:mongo_dart/bson.dart');
+#import('objectory_base.dart');
+#source('persistent_list.dart');
 
 abstract class BasePersistentObject {
   LinkedHashMap map;
@@ -83,11 +83,12 @@ abstract class BasePersistentObject {
     return this.map[property];
   }
   
-  String toString()=>"$type($map)";
+  String toString()=>"$dbType($map)";
   
   void init(){}
   
-  String get type => runtimeType.toString();
+  //TODO use runtimeType.toString() when dart2js undertand this
+  String get dbType => 'PersistentObject';
   
   Future<PersistentObject> fetchLinks(){
     var dbRefs = new List<DbRef>();    
@@ -128,7 +129,7 @@ abstract class BasePersistentObject {
 }
 abstract class PersistentObject extends BasePersistentObject{
   ObjectId get id => map['_id'];
-  DbRef get dbRef => new DbRef(this.type,this.id);  
+  DbRef get dbRef => new DbRef(this.dbType,this.id);  
   set id (ObjectId value) => map['_id'] = value;
   bool notFetched = false;  
   void _initMap() {
@@ -143,7 +144,7 @@ abstract class PersistentObject extends BasePersistentObject{
   }
   Future<bool> fetch() {
     Completer completer = new Completer();
-    objectory.findOne(new ObjectoryQueryBuilder(type).id(id)).then((res){        
+    objectory.findOne(new ObjectoryQueryBuilder(dbType).id(id)).then((res){        
       completer.complete(true);
     });
     return completer.future;
