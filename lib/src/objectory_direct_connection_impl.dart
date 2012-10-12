@@ -1,6 +1,5 @@
 library objectory_direct_connection;
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/bson.dart';
 import 'persistent_object.dart';
 import 'objectory_query_builder.dart';
 import 'objectory_base.dart';
@@ -17,7 +16,7 @@ class ObjectoryDirectConnectionImpl extends Objectory{
     return db.open();
   }
   
-  void save(PersistentObject persistentObject){
+  void save(PersistentObject persistentObject){    
     db.collection(persistentObject.dbType).save(persistentObject.map);
     persistentObject.id = persistentObject.map["_id"];
   }
@@ -85,13 +84,7 @@ class ObjectoryDirectConnectionImpl extends Objectory{
     db.close();
   }
   Future dropCollections() {
-    List futures = [];
-    factories.forEach( (key, value) {
-       BasePersistentObject obj = value(); 
-       if (obj is PersistentObject) {
-        futures.add(db.collection(key).drop());
-       }
-    });
-    return Futures.wait(futures);
+    return Futures.wait(getCollections().map(
+        (collection) => db.collection(collection).drop()));    
   }
 }

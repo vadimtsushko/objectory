@@ -1,10 +1,8 @@
 library objectory_server_impl;
 import 'dart:io';
-import 'package:mongo_dart/src/bson/json_ext.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import 'package:mongo_dart/bson.dart';
 import 'package:logging/logging.dart';
-import 'log_helper.dart';
+import 'vm_log_config.dart';
 
 final IP = '127.0.0.1';
 final PORT = 8080;
@@ -31,10 +29,10 @@ class ObjectoryClient {
   WebSocketConnection conn;
   bool closed = false;
   ObjectoryClient(this.name, this.token, this.conn) {
-    conn.send(JSON.stringify([{'command':'hello'}, {'connection':this.name}]));
+    conn.send(JSON_EXT.stringify([{'command':'hello'}, {'connection':this.name}]));
     conn.onMessage = (message) {
       log.fine('message is $message');
-      var jdata = JSON.parse(message);      
+      var jdata = JSON_EXT.parse(message);      
       var header = new RequestHeader.fromMap(jdata[0]);
       Map content = jdata[1];
       if (header.command == "insert") {
@@ -80,7 +78,7 @@ class ObjectoryClient {
     if (closed) {
       log.shout('ERROR: trying send on closed connection. $header, $content');
     } else {
-      conn.send(JSON.stringify([header.toMap(),content]));
+      conn.send(JSON_EXT.stringify([header.toMap(),content]));
     }      
   }
   save(RequestHeader header, Map mapToSave) {
@@ -142,7 +140,7 @@ class ObjectoryClient {
   
   protocolError(String errorMessage) {
     log.shout('PROTOCOL ERROR: $errorMessage');
-    conn.send(JSON.stringify({'error': errorMessage}));
+    conn.send(JSON_EXT.stringify({'error': errorMessage}));
   }    
   
   

@@ -79,6 +79,18 @@ class Objectory{
     }        
     return result;
   }
+
+  List<String> getCollections() {
+    var result = new List<String>();
+    factories.forEach( (key, value) {      
+      var obj = value(); 
+      if (obj is PersistentObject) {    
+        result.add(key);
+       }
+    });
+    return result;
+  }
+  
   
   List<BasePersistentObject> list2listOfObjects(){}
   
@@ -98,7 +110,6 @@ class Objectory{
   Future<Map> dropDb() { throw 'Must be implemented'; }
   Future<Map> wait() { throw 'Must be implemented'; }  
   void close() { throw 'Must be implemented'; }
- 
   Future<bool> initDomainModel() {
     var res = new Completer();  
     open().then((_){

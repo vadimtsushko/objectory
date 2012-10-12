@@ -4,7 +4,9 @@ import 'persistent_object.dart';
 import 'objectory_query_builder.dart';
 import 'objectory_base.dart';
 import 'package:mongo_dart/bson.dart';
-import 'package:mongo_dart/src/bson/JSON_ext.dart';
+import 'package:mongo_dart/src/bson/json_ext.dart';
+import 'package:logging/logging.dart';
+import 'package:objectory/src/browser_log_config.dart';
 
 const IP = '127.0.0.1';
 const PORT = 8080;
@@ -18,61 +20,54 @@ class ObjectoryMessage {
   toString() => 'ObjectoryMessage(command: $command, content: $content)'; 
 }
 
-class ObjectoryWebsocketBrowserImpl extends Objectory{  
-  WebSocket webSocket;
+class ObjectoryIndexDbImpl extends Objectory{  
+  IDBDatabase _db;
+  int _version = 1;
   bool isConnected;  
   Map<int,Completer> awaitedRequests = new Map<int,Completer>();
   int requestId = 0;
-  ObjectoryWebsocketBrowserImpl(String uri,Function registerClassesCallback,bool dropCollectionsOnStartup):
+  ObjectoryIndexDbImpl(String uri,Function registerClassesCallback,bool dropCollectionsOnStartup):
     super(uri, registerClassesCallback, dropCollectionsOnStartup);
   
   Future<bool> open(){
-    return setupWebsocket(uri);
+    configureBrowserLogger(Level.ALL);
+    return setupDb(uri);
   }
   
-  Future<bool> setupWebsocket(String uri) {
+  Future<bool> setupDb(String uri) {
     Completer completer = new Completer();
-    webSocket = new WebSocket("ws://$uri/ws");
-    webSocket.on.open.add((e) {
-      isConnected = true;
-      completer.complete(true);
-    });
     
-    webSocket.on.close.add((e) {
-      //log.fine('close $e');
-      isConnected = false;
-    });
+    var request = window.indexedDB.open(uri, _version);
+    request.on.success.add((e) => _onDbOpened(request.result,completer));
     
-    webSocket.on.message.add((m) {
-      var jdata = JSON_EXT.parse(m.data);
-      //log.info('onmessage: $jdata');
-      var message = new ObjectoryMessage.fromList(jdata);
-      int receivedRequestId = message.command['requestId'];
-      if (receivedRequestId == null) {
-        return;
-      }   
-      var completer = awaitedRequests[receivedRequestId]; 
-      if (completer != null) {
-        //log.fine("Complete request: $receivedRequestId message: $message");
-        completer.complete(message.content);        
-      } else {
-        //log.shout('Not found completer for request: $receivedRequestId');
-      }
-      
-    });
-    return completer.future;
+    request.on.error.add(_onError);
+    //request.on.upgradeNeeded.add((e) => _onUpgradeNeeded(request.transaction));
+    
+  }    
+  void _onDbOpened(IDBDatabase db, Completer completer) {
+    _db = db;
+    completer.complete(true);
   }
-  Future postMessage(Map command, Map content) {
-    requestId++;
-    command['requestId'] = requestId;
-    webSocket.send(JSON_EXT.stringify([command,content]));
-    var completer = new Completer();
-    awaitedRequests[requestId] = completer;    
-    return completer.future;    
+   
+  void _onError(e) {
+    // Get the user's attention for the sake of this tutorial. (Of course we
+    // would *never* use window.alert() in real life.)
+    log.severe('An error occurred: {$e}');
+  }    
+    
+  void _onUpgradeNeeded(IDBTransaction changeVersionTransaction, Completer completer) {
+    window.console.log('In _onUpgradeNeeded');
+    changeVersionTransaction.on.complete.add((e) => completer.complete(true));
+    changeVersionTransaction.on.error.add(_onError);
+    _db = changeVersionTransaction.db;
+    for (var collection in getCollections()) {
+      changeVersionTransaction.db.createObjectStore(collection,
+          {'keyPath': '_id'});
+    }    
   }
-  Map createCommand(String command, String collection){
-    return {'command': command, 'collection': collection}; 
-  }
+
+  
+  
   save(PersistentObject persistentObject){
     if (persistentObject.id === null) {      
       persistentObject.id = new ObjectId(clientMode:true);
@@ -148,11 +143,16 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     return queryDb({"getlasterror":1});
   }
   
-  void close(){
-    webSocket.close();
+  void close(){   
   }
   Future dropCollections() {
-    return Futures.wait(getCollections().map(
-        (collection) => postMessage(createCommand('dropCollection',collection),{})));
+    List futures = [];
+    factories.forEach( (key, value) {
+      var obj = value(); 
+      if (obj is PersistentObject) {
+        futures.add(postMessage(createCommand('dropCollection',key),{}));
+       }
+    });
+    return Futures.wait(futures);
   }
 }

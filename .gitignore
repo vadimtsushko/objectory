@@ -1,3 +1,5 @@
 /null/
 packages
+*.js
+*.js.map
 /*.lock
