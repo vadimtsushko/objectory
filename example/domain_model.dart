@@ -6,7 +6,7 @@ import 'package:objectory/src/objectory_query_builder.dart';
 const DefaultUri = '127.0.0.1:8080';
 
 class Author extends PersistentObject  {
-  String get type => 'Author';
+  String get dbType => 'Author';
   String get name() => getProperty('name');
   set name(String value) => setProperty('name',value);
   
@@ -22,8 +22,8 @@ class Author extends PersistentObject  {
 
 
 
-class User extends PersistentObject {
-  String get type => 'User';
+class User extends PersistentObject {  
+  String get dbType => 'User';
   
   String get name() => getProperty('name');
   set name(String value) => setProperty('name',value);
@@ -36,7 +36,7 @@ class User extends PersistentObject {
 }
 
 class Article extends PersistentObject {
-  String get type => 'Article';
+  String get dbType => 'Article';
   
   String get title() => getProperty('title');
   set title(String value) => setProperty('title',value);
@@ -51,7 +51,7 @@ class Article extends PersistentObject {
 }
 
 class Comment extends EmbeddedPersistentObject {
-  String get type => 'Comment';
+  String get dbType => 'Comment';
   
   User get user => getLinkedObject('user');
   set user (User value) => setLinkedObject('user',value);
