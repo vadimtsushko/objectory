@@ -6,7 +6,7 @@ import 'objectory_base.dart';
 import 'package:logging/logging.dart';
 import 'package:mongo_dart/bson.dart';
 import 'package:mongo_dart/src/bson/json_ext.dart';
-import 'log_helper.dart';
+import 'vm_log_config.dart';
 
 const IP = '127.0.0.1';
 const PORT = 8080;
@@ -47,7 +47,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     };
     
     webSocket.onmessage = (m) {
-      var jdata = JSON.parse(m.data);
+      var jdata = JSON_EXT.parse(m.data);
       log.info('onmessage: $jdata');
       var message = new ObjectoryMessage.fromList(jdata);
       int receivedRequestId = message.command['requestId'];
@@ -68,7 +68,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
   Future postMessage(Map command, Map content) {    
     requestId++;
     command['requestId'] = requestId;  
-    webSocket.send(JSON.stringify([command,content]));    
+    webSocket.send(JSON_EXT.stringify([command,content]));    
     var completer = new Completer();
     awaitedRequests[requestId] = completer;    
     return completer.future;    
@@ -155,13 +155,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     webSocket.close(1, 'Normal close');
   }
   Future dropCollections() {
-    List futures = [];    
-    factories.forEach( (key, value) {      
-      var obj = value(); 
-      if (obj is PersistentObject) {    
-        futures.add(postMessage(createCommand('dropCollection',key),{}));
-       }
-    });
-    return Futures.wait(futures);
+    return Futures.wait(getCollections().map(
+          (collection) => postMessage(createCommand('dropCollection',collection),{})));
   }
 }

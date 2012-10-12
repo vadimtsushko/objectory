@@ -1,4 +1,4 @@
-##Objectory - thin object persistency layer built on top of Mongo-dart
+##Objectory - object document mapper for server-side and client side Dart applications
 
 Objectory provides typed, checked environment to model, save and query data persisted on MongoDb.
 

@@ -9,7 +9,6 @@ dependencies:
  args:
   sdk: args  
  log4dart:
-  git: git://github.com/Solvr/log4dart.git  
+  git: git://github.com/Solvr/log4dart.git
  mongo_dart:
   git: git://github.com/vadimtsushko/mongo_dart.git
-  
