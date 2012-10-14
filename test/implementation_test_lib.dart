@@ -7,6 +7,23 @@ import 'package:unittest/unittest.dart';
 import 'domain_model.dart';
 
 
+void simpleTestInsertionAndUpdate(){
+  objectory.initDomainModel().then(expectAsync1((_) {
+    Author author = new Author();  
+    author.name = 'Dan';
+    author.age = 3;
+    author.email = 'who@cares.net';
+    author.save();
+    author.age = 4;
+    author.save();
+    objectory.findOne($Author.id(author.id)).then(expectAsync1((authFromDb){      
+      expect(authFromDb.age,4);
+      objectory.close();
+    }));
+  }));
+}
+
+
 void testInsertionAndUpdate(){
   objectory.initDomainModel().then(expectAsync1((_) {
     Author author = new Author();  
@@ -18,7 +35,7 @@ void testInsertionAndUpdate(){
     author.save();
     objectory.find($Author).then(expectAsync1((coll){      
       expect(coll.length,1);
-      Author authFromMongo = coll[0];
+      var authFromMongo = coll[0];
       expect(authFromMongo.age,4);
       objectory.close();
     }));
@@ -104,7 +121,7 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   User joe;
   User lisa;
   Author author;
-  objectory.initDomainModel().chain(expectAsync1((_) {    
+  objectory.initDomainModel().chain(expectAsync1((_) {  
     author = new Author();
     author.name = 'Vadim';
     author.save();
@@ -130,9 +147,10 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
     comment.body = 'It is lame, sweety';
     comment.user = lisa;    
     article.comments.add(comment);
-    objectory.save(article);
-    return objectory.findOne($Article.sortBy('title'));
-  })).chain(expectAsync1((artcl) {
+    objectory.save(article);    
+    return objectory.find($Article.sortBy('title'));
+  })).chain(expectAsync1((articles) {    
+    var artcl = articles[0];
     expect(artcl.comments[0] is EmbeddedPersistentObject);    
     for (var each in artcl.comments) {
       expect(each is EmbeddedPersistentObject);     
@@ -159,6 +177,7 @@ testPropertyNameChecks() {
 }
 
 allImplementationTests(){
+    test('simpleTestInsertionAndUpdate',simpleTestInsertionAndUpdate);  
     test('testInsertionAndUpdate',testInsertionAndUpdate);
     test('testCompoundObject',testCompoundObject);                  
     test('testObjectWithExternalRefs',testObjectWithExternalRefs);    

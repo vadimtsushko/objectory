@@ -47,10 +47,10 @@ class Article extends PersistentObject {
   Author get author => getLinkedObject('author');
   set author (Author value) => setLinkedObject('author',value);
 
-  List<Comment> get comments => new PersistentList<Comment>(this,'Comment','comments');
+  List<BlogComment> get comments => new PersistentList<BlogComment>(this,'Comment','comments');
 }
 
-class Comment extends EmbeddedPersistentObject {
+class BlogComment extends EmbeddedPersistentObject {
   String get dbType => 'Comment';
   
   User get user => getLinkedObject('user');
@@ -71,7 +71,7 @@ void registerClasses() {
   objectory.registerClass('Author',()=>new Author());
   objectory.registerClass('User',()=>new User());
   objectory.registerClass('Article',()=>new Article());
-  objectory.registerClass('Comment',()=>new Comment());
+  objectory.registerClass('Comment',()=>new BlogComment());
 }
 
 

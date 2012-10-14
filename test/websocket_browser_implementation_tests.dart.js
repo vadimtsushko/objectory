@@ -247,7 +247,7 @@ $$.HashMapImplementation = {"":
     numberOfProbes = numberOfProbes0;
   }
 },
- _probeForAdding$1$bailout: function(state, key, t1) {
+ _probeForAdding$1$bailout: function(state0, key, t1) {
   var hash = $.and(t1, this._keys.length - 1);
   for (var numberOfProbes = 1, insertionIndex = -1; true;) {
     t1 = this._keys;
@@ -289,7 +289,7 @@ $$.HashMapImplementation = {"":
     numberOfProbes = numberOfProbes0;
   }
 },
- _probeForLookup$1$bailout: function(state, key, hash) {
+ _probeForLookup$1$bailout: function(state0, key, hash) {
   for (var numberOfProbes = 1; true;) {
     var t1 = this._keys;
     if (hash !== (hash | 0))
@@ -1216,7 +1216,7 @@ $$.ObjectoryWebsocketBrowserImpl = {"":
   $.add$1(this.webSocket.get$on().get$message(), new $.ObjectoryWebsocketBrowserImpl_setupWebsocket_anon1(this));
   return completer.get$future();
 },
- postMessage$2: function(command, content$) {
+ _postMessage$2: function(command, content$) {
   this.requestId = this.requestId + 1;
   $.indexSet(command, 'requestId', this.requestId);
   this.webSocket.send$1($.JSON_EXT_stringify([command, content$]));
@@ -1224,27 +1224,25 @@ $$.ObjectoryWebsocketBrowserImpl = {"":
   this.awaitedRequests.operator$indexSet$2(this.requestId, completer);
   return completer.get$future();
 },
- createCommand$2: function(command, collection) {
+ _createCommand$2: function(command, collection) {
   return $.makeLiteralMap(['command', command, 'collection', collection]);
 },
- save$1: function(persistentObject) {
-  if (persistentObject.get$id() == null) {
-    persistentObject.set$id($.ObjectId$(true));
-    $.indexSet(persistentObject.get$map(), '_id', persistentObject.get$id());
-    $.objectory0().addToCache$1(persistentObject);
-    this.postMessage$2(this.createCommand$2('insert', persistentObject.get$dbType()), persistentObject.get$map());
-  } else
-    this.postMessage$2(this.createCommand$2('update', persistentObject.get$dbType()), persistentObject.get$map());
+ generateId$0: function() {
+  return $.ObjectId$(true);
+},
+ update$1: function(persistentObject) {
+  return this._postMessage$2(this._createCommand$2('update', persistentObject.get$dbType()), persistentObject.get$map());
+},
+ insert$1: function(persistentObject) {
+  return this._postMessage$2(this._createCommand$2('insert', persistentObject.get$dbType()), persistentObject.get$map());
 },
  remove$1: function(persistentObject) {
-  if (persistentObject.get$id() == null)
-    return;
-  this.postMessage$2(this.createCommand$2('remove', persistentObject.get$dbType()), persistentObject.get$map());
+  return this._postMessage$2(this._createCommand$2('remove', persistentObject.get$dbType()), persistentObject.get$map());
 },
  find$1: function(selector) {
   var completer = $.Completer_Completer();
   var result = $.ListImplementation_List(null);
-  this.postMessage$2(this.createCommand$2('find', selector.get$className()), selector.get$map()).then$1(new $.ObjectoryWebsocketBrowserImpl_find_anon(result, completer, selector));
+  this._postMessage$2(this._createCommand$2('find', selector.get$className()), selector.get$map()).then$1(new $.ObjectoryWebsocketBrowserImpl_find_anon(result, completer, selector));
   return completer.get$future();
 },
  findOne$1: function(selector) {
@@ -1257,7 +1255,7 @@ $$.ObjectoryWebsocketBrowserImpl = {"":
   if (!(t2 == null))
     completer.complete$1(t2);
   else
-    this.postMessage$2(this.createCommand$2('findOne', selector.get$className()), selector.get$map()).then$1(new $.ObjectoryWebsocketBrowserImpl_findOne_anon(this, completer, t1, selector));
+    this._postMessage$2(this._createCommand$2('findOne', selector.get$className()), selector.get$map()).then$1(new $.ObjectoryWebsocketBrowserImpl_findOne_anon(this, completer, t1, selector));
   return completer.get$future();
 },
  close$0: function() {
@@ -1441,7 +1439,7 @@ $$._ChildrenElementList = {"":
   }
   return output;
 },
- _toList$0$bailout: function(state, t1) {
+ _toList$0$bailout: function(state0, t1) {
   var output = $.ListImplementation_List($.get$length(t1));
   for (var len = $.get$length(t1), i = 0; $.ltB(i, len); ++i) {
     var t2 = $.index(t1, i);
@@ -1637,7 +1635,7 @@ $$._FrozenElementListIterator = {"":
     return this.hasNext$0$bailout(1, t1, t2);
   return t1 < t2;
 },
- hasNext$0$bailout: function(state, t1, t2) {
+ hasNext$0$bailout: function(state0, t1, t2) {
   return $.lt(t1, t2);
 }
 };
@@ -1670,7 +1668,7 @@ $$._ElementAttributeMap = {"":
     this.remove$1(attributes[i].get$name());
   }
 },
- clear$0$bailout: function(state, attributes) {
+ clear$0$bailout: function(state0, attributes) {
   for (var i = $.sub($.get$length(attributes), 1); $.geB(i, 0); i = $.sub(i, 1))
     this.remove$1($.index(attributes, i).get$name());
 },
@@ -1685,7 +1683,7 @@ $$._ElementAttributeMap = {"":
     f.call$2(item.get$name(), item.get$value());
   }
 },
- forEach$1$bailout: function(state, f, attributes) {
+ forEach$1$bailout: function(state0, f, attributes) {
   for (var len = $.get$length(attributes), i = 0; $.ltB(i, len); ++i) {
     var item = $.index(attributes, i);
     f.call$2(item.get$name(), item.get$value());
@@ -1707,7 +1705,7 @@ $$._ElementAttributeMap = {"":
   }
   return keys;
 },
- getKeys$0$bailout: function(state, attributes) {
+ getKeys$0$bailout: function(state0, attributes) {
   var keys = $.ListImplementation_List($.get$length(attributes));
   for (var len = $.get$length(attributes), i = 0; $.ltB(i, len); ++i) {
     var t1 = $.index(attributes, i).get$name();
@@ -1733,7 +1731,7 @@ $$._ElementAttributeMap = {"":
   }
   return values;
 },
- getValues$0$bailout: function(state, attributes) {
+ getValues$0$bailout: function(state0, attributes) {
   var values = $.ListImplementation_List($.get$length(attributes));
   for (var len = $.get$length(attributes), i = 0; $.ltB(i, len); ++i) {
     var t1 = $.index(attributes, i).get$value();
@@ -2272,7 +2270,7 @@ $$._FixedSizeListIterator = {"":
     return this.hasNext$0$bailout(1, t1);
   return t1 > this._pos;
 },
- hasNext$0$bailout: function(state, t1) {
+ hasNext$0$bailout: function(state0, t1) {
   return $.gt(t1, this._pos);
 }
 };
@@ -2286,7 +2284,7 @@ $$._VariableSizeListIterator = {"":
     return this.hasNext$0$bailout(1, t1);
   return t1 > this._pos;
 },
- hasNext$0$bailout: function(state, t1) {
+ hasNext$0$bailout: function(state0, t1) {
   return $.gt(t1, this._pos);
 },
  next$0: function() {
@@ -2301,7 +2299,7 @@ $$._VariableSizeListIterator = {"":
     throw $.ioore(t3);
   return t1[t3];
 },
- next$0$bailout: function(state, t1) {
+ next$0$bailout: function(state0, t1) {
   var t3 = this._pos;
   this._pos = t3 + 1;
   return $.index(t1, t3);
@@ -2667,7 +2665,7 @@ $$._JsVisitedMap = {"":
     this._clearAttachedInfo$1($.index(this.tagged, i));
   this.tagged = null;
 },
- cleanup$0$bailout: function(state, length$) {
+ cleanup$0$bailout: function(state0, length$) {
   var i = 0;
   for (; $.ltB(i, length$); ++i)
     this._clearAttachedInfo$1($.index(this.tagged, i));
@@ -2753,7 +2751,7 @@ $$._Copier = {"":
   }
   return copy;
 },
- visitList$1$bailout: function(state, list) {
+ visitList$1$bailout: function(state0, list) {
   var copy = $.index(this._visited, list);
   if (!(copy == null))
     return copy;
@@ -2817,7 +2815,7 @@ $$._Serializer = {"":
   }
   return result;
 },
- _serializeList$1$bailout: function(state, list) {
+ _serializeList$1$bailout: function(state0, list) {
   var len = $.get$length(list);
   var result = $.ListImplementation_List(len);
   for (var i = 0; $.ltB(i, len); ++i) {
@@ -2876,7 +2874,7 @@ $$._Deserializer = {"":
   }
   return dartList;
 },
- _deserializeList$1$bailout: function(state, dartList, id) {
+ _deserializeList$1$bailout: function(state0, dartList, id) {
   $.indexSet(this._deserialized, id, dartList);
   var len = $.get$length(dartList);
   for (var i = 0; $.ltB(i, len); ++i)
@@ -2904,8 +2902,8 @@ $$._Deserializer = {"":
   }
   return result;
 },
- _deserializeMap$1$bailout: function(state, env0, env1, env2) {
-  switch (state) {
+ _deserializeMap$1$bailout: function(state0, env0, env1, env2) {
+  switch (state0) {
     case 1:
       var x = env0;
       result = env1;
@@ -2917,17 +2915,17 @@ $$._Deserializer = {"":
       keys = env2;
       break;
   }
-  switch (state) {
+  switch (state0) {
     case 0:
       var result = $.HashMapImplementation$();
       var id = $.index(x, 1);
       $.indexSet(this._deserialized, id, result);
       var keys = $.index(x, 2);
     case 1:
-      state = 0;
+      state0 = 0;
       var values = $.index(x, 3);
     case 2:
-      state = 0;
+      state0 = 0;
       var len = $.get$length(keys);
       for (var i = 0; $.ltB(i, len); ++i)
         result.operator$indexSet$2(this._deserializeHelper$1($.index(keys, i)), this._deserializeHelper$1($.index(values, i)));
@@ -3561,6 +3559,19 @@ $$.Objectory = {"":
   this.factories.forEach$1(new $.Objectory_getCollections_anon(result));
   return result;
 },
+ save$1: function(persistentObject) {
+  if (!(persistentObject.get$id() == null))
+    return this.update$1(persistentObject);
+  else {
+    persistentObject.set$id(this.generateId$0());
+    $.indexSet(persistentObject.get$map(), '_id', persistentObject.get$id());
+    $.objectory0().addToCache$1(persistentObject);
+    return this.insert$1(persistentObject);
+  }
+},
+ generateId$0: function() {
+  return $.ObjectId$(false);
+},
  registerClass$2: function(className, factory) {
   this.factories.operator$indexSet$2(className, factory);
 },
@@ -3577,7 +3588,10 @@ $$.Objectory = {"":
  find$1: function(selector) {
   throw $.$$throw('Must be implemented');
 },
- save$1: function(persistentObject) {
+ insert$1: function(persistentObject) {
+  throw $.$$throw('Must be implemented');
+},
+ update$1: function(persistentObject) {
   throw $.$$throw('Must be implemented');
 },
  remove$1: function(persistentObject) {
@@ -3691,8 +3705,8 @@ $$._JsonParser = {"":
     return $.BsonRegexp$(pattern, false, false, false, false, this.parseString$0());
   }
 },
- parseBsonExtensionValue$1$bailout: function(state, env0, env1) {
-  switch (state) {
+ parseBsonExtensionValue$1$bailout: function(state0, env0, env1) {
+  switch (state0) {
     case 1:
       var key = env0;
       break;
@@ -3721,53 +3735,53 @@ $$._JsonParser = {"":
       t1 = env1;
       break;
   }
-  switch (state) {
+  switch (state0) {
     case 0:
     case 1:
-      state = 0;
+      state0 = 0;
       if ($.eqB(key, '$date'))
         return $.Date_Date$fromMillisecondsSinceEpoch(this.parseNumber$0(), false);
       if ($.eqB(key, '$oid'))
         return $.ObjectId_ObjectId$fromHexString(this.parseString$0());
     default:
-      if (state === 4 || state === 3 || state === 2 || state === 0 && $.eqB(key, '$ref'))
-        switch (state) {
+      if (state0 === 4 || state0 === 3 || state0 === 2 || state0 === 0 && $.eqB(key, '$ref'))
+        switch (state0) {
           case 0:
             var collection = this.parseString$0();
             var t1 = this.position;
           case 2:
-            state = 0;
+            state0 = 0;
             this.position = $.add(t1, 1);
             var oidKey = this.parseString$0();
           case 3:
-            state = 0;
+            state0 = 0;
             if (!$.eqB(oidKey, '$oid') || this.isToken$1(58) !== true)
               this.error$1('Expected \'$oid:\' when parsing DbRef');
             t1 = this.position;
           case 4:
-            state = 0;
+            state0 = 0;
             this.position = $.add(t1, 1);
             return $.DbRef$(collection, $.ObjectId_ObjectId$fromHexString(this.parseString$0()));
         }
     case 5:
     case 6:
     case 7:
-      if (state === 7 || state === 6 || state === 5 || state === 0 && $.eqB(key, '$regex'))
-        switch (state) {
+      if (state0 === 7 || state0 === 6 || state0 === 5 || state0 === 0 && $.eqB(key, '$regex'))
+        switch (state0) {
           case 0:
             var pattern = this.parseString$0();
             t1 = this.position;
           case 5:
-            state = 0;
+            state0 = 0;
             this.position = $.add(t1, 1);
             var optkey = this.parseString$0();
           case 6:
-            state = 0;
+            state0 = 0;
             if (!$.eqB(optkey, '$options') || this.isToken$1(58) !== true)
               this.error$1('Expected \'$options:\' when parsing BsonRegexp');
             t1 = this.position;
           case 7:
-            state = 0;
+            state0 = 0;
             this.position = $.add(t1, 1);
             return $.BsonRegexp$(pattern, false, false, false, false, this.parseString$0());
         }
@@ -3807,7 +3821,7 @@ $$._JsonParser = {"":
   this.position = $.add(this.position, 1);
   return object;
 },
- parseObject$0$bailout: function(state, object) {
+ parseObject$0$bailout: function(state0, object) {
   this.position = $.add(this.position, 1);
   if (this.isToken$1(125) !== true) {
     for (; true;) {
@@ -3962,7 +3976,7 @@ $$._JsonParser = {"":
     return this.isDigit$1$bailout(1, char$);
   return char$ >= 48 && char$ <= 57;
 },
- isDigit$1$bailout: function(state, char$) {
+ isDigit$1$bailout: function(state0, char$) {
   return $.geB(char$, 48) && $.leB(char$, 57);
 },
  isToken$1: function(tokenKind) {
@@ -3971,7 +3985,7 @@ $$._JsonParser = {"":
     return this.isToken$1$bailout(1, tokenKind, t1);
   return t1 === tokenKind;
 },
- isToken$1$bailout: function(state, tokenKind, t1) {
+ isToken$1$bailout: function(state0, tokenKind, t1) {
   return $.eq(t1, tokenKind);
 },
  char$0: function() {
@@ -3985,8 +3999,8 @@ $$._JsonParser = {"":
     this.error$1('Unexpected end of JSON stream');
   return $.charCodeAt(this.json, this.position);
 },
- char$0$bailout: function(state, env0, env1) {
-  switch (state) {
+ char$0$bailout: function(state0, env0, env1) {
+  switch (state0) {
     case 1:
       t1 = env0;
       break;
@@ -3995,14 +4009,14 @@ $$._JsonParser = {"":
       t3 = env1;
       break;
   }
-  switch (state) {
+  switch (state0) {
     case 0:
       var t1 = this.position;
     case 1:
-      state = 0;
+      state0 = 0;
       var t3 = $.get$length(this);
     case 2:
-      state = 0;
+      state0 = 0;
       if ($.geB(t1, t3))
         this.error$1('Unexpected end of JSON stream');
       return $.charCodeAt(this.json, this.position);
@@ -4023,8 +4037,8 @@ $$._JsonParser = {"":
     return 0;
   return $.charCodeAt(this.json, this.position);
 },
- nextChar$0$bailout: function(state, env0, env1) {
-  switch (state) {
+ nextChar$0$bailout: function(state0, env0, env1) {
+  switch (state0) {
     case 1:
       t1 = env0;
       break;
@@ -4036,18 +4050,18 @@ $$._JsonParser = {"":
       t3 = env1;
       break;
   }
-  switch (state) {
+  switch (state0) {
     case 0:
       var t1 = this.position;
     case 1:
-      state = 0;
+      state0 = 0;
       this.position = $.add(t1, 1);
       t1 = this.position;
     case 2:
-      state = 0;
+      state0 = 0;
       var t3 = $.get$length(this);
     case 3:
-      state = 0;
+      state0 = 0;
       if ($.geB(t1, t3))
         return 0;
       return $.charCodeAt(this.json, this.position);
@@ -4198,83 +4212,83 @@ $$._JsonStringifier = {"":
   } else
     return false;
 },
- stringifyJsonValue$1$bailout: function(state, env0) {
-  switch (state) {
+ stringifyJsonValue$1$bailout: function(state0, env0) {
+  switch (state0) {
     case 1:
       var object = env0;
       break;
   }
-  switch (state) {
+  switch (state0) {
     case 0:
       var t1 = {};
     case 1:
-      if (state === 0 && typeof object === 'number') {
+      if (state0 === 0 && typeof object === 'number') {
         $.add$1(this.sb, $.toString(object));
         return true;
       } else
-        switch (state) {
+        switch (state0) {
           case 0:
           case 1:
-            if (state === 0 && object === true) {
+            if (state0 === 0 && object === true) {
               $.add$1(this.sb, 'true');
               return true;
             } else
-              switch (state) {
+              switch (state0) {
                 case 0:
                 case 1:
-                  if (state === 0 && object === false) {
+                  if (state0 === 0 && object === false) {
                     $.add$1(this.sb, 'false');
                     return true;
                   } else
-                    switch (state) {
+                    switch (state0) {
                       case 0:
                       case 1:
-                        if (state === 0 && object == null) {
+                        if (state0 === 0 && object == null) {
                           $.add$1(this.sb, 'null');
                           return true;
                         } else
-                          switch (state) {
+                          switch (state0) {
                             case 0:
                             case 1:
-                              if (state === 0 && typeof object === 'string') {
+                              if (state0 === 0 && typeof object === 'string') {
                                 t1 = this.sb;
                                 $.add$1(t1, '"');
                                 $._JsonStringifier_escape(t1, object);
                                 $.add$1(t1, '"');
                                 return true;
                               } else
-                                switch (state) {
+                                switch (state0) {
                                   case 0:
                                   case 1:
-                                    if (state === 0 && typeof object === 'object' && object !== null && !!object.is$Date)
+                                    if (state0 === 0 && typeof object === 'object' && object !== null && !!object.is$Date)
                                       return this.stringifyJsonValue$1($.makeLiteralMap(['$date', object.get$millisecondsSinceEpoch()]));
                                     else
-                                      switch (state) {
+                                      switch (state0) {
                                         case 0:
                                         case 1:
-                                          if (state === 0 && typeof object === 'object' && object !== null && !!object.is$ObjectId)
+                                          if (state0 === 0 && typeof object === 'object' && object !== null && !!object.is$ObjectId)
                                             return this.stringifyJsonValue$1($.makeLiteralMap(['$oid', object.toHexString$0()]));
                                           else
-                                            switch (state) {
+                                            switch (state0) {
                                               case 0:
                                               case 1:
-                                                if (state === 0 && typeof object === 'object' && object !== null && !!object.is$DbRef)
+                                                if (state0 === 0 && typeof object === 'object' && object !== null && !!object.is$DbRef)
                                                   return this.stringifyJsonValue$1($.makeLiteralMap(['$ref', object.collection, '$oid', object.id.toHexString$0()]));
                                                 else
-                                                  switch (state) {
+                                                  switch (state0) {
                                                     case 0:
                                                     case 1:
-                                                      if (state === 0 && typeof object === 'object' && object !== null && !!object.is$BsonRegexp)
+                                                      if (state0 === 0 && typeof object === 'object' && object !== null && !!object.is$BsonRegexp)
                                                         return this.stringifyJsonValue$1($.makeLiteralMap(['$regex', object.pattern, '$options', object.options]));
                                                       else
-                                                        switch (state) {
+                                                        switch (state0) {
                                                           case 0:
                                                           case 1:
-                                                            if (state === 1 || state === 0 && typeof object === 'object' && object !== null && (object.constructor === Array || object.is$List()))
-                                                              switch (state) {
+                                                            if (state0 === 1 || state0 === 0 && typeof object === 'object' && object !== null && (object.constructor === Array || object.is$List()))
+                                                              switch (state0) {
                                                                 case 0:
                                                                 case 1:
-                                                                  state = 0;
+                                                                  state0 = 0;
                                                                   this.checkCycle$1(object);
                                                                   var t2 = this.sb;
                                                                   $.add$1(t2, '[');
@@ -4535,7 +4549,7 @@ $$.Configuration = {"":
  onInit$0: function() {
 },
  onStart$0: function() {
-  this._postMessage$1('unittest-suite-wait-for-done');
+  this._lib1_postMessage$1('unittest-suite-wait-for-done');
 },
  onTestStart$1: function(testCase) {
   this.currentTestCase = testCase;
@@ -4566,7 +4580,7 @@ $$.Configuration = {"":
     success = false;
   }
   if (success)
-    this._postMessage$1('unittest-suite-success');
+    this._lib1_postMessage$1('unittest-suite-success');
   else
     throw $.$$throw($.ExceptionImplementation$('Some tests failed.'));
 },
@@ -4576,7 +4590,7 @@ $$.Configuration = {"":
  handleExternalError$2: function(e, message) {
   return $._reportTestError(message + '\nCaught ' + $.S(e), '');
 },
- _postMessage$1: function(message) {
+ _lib1_postMessage$1: function(message) {
   $.print(message);
 }
 };
@@ -4672,7 +4686,7 @@ $$._DeepMatcher = {"":
     $.add$1($.add$1(reason, ' '), location$);
   return reason;
 },
- _recursiveMatch$4$bailout: function(state, expected, actual, location$, depth) {
+ _recursiveMatch$4$bailout: function(state0, expected, actual, location$, depth) {
   var canRecurse = depth === 0 || this._limit > 1;
   if ($.eqB(expected, actual))
     var reason = null;
@@ -4784,7 +4798,7 @@ $$.StringDescription = {"":
   else
     return ch;
 },
- _escape$1$bailout: function(state, ch) {
+ _escape$1$bailout: function(state0, ch) {
   if ($.eqB(ch, '\''))
     return '\'';
   else if ($.eqB(ch, '\n'))
@@ -5011,7 +5025,7 @@ $$.HtmlEnhancedConfiguration = {"":
   if (!(test_.get$stackTrace() == null))
     t2.call$3('', '', '<pre>' + $.S(t1.call$1(test_.get$stackTrace())) + '</pre>');
 },
- _buildRow$4$bailout: function(state, test_, te, groupID, isVisible, t1) {
+ _buildRow$4$bailout: function(state0, test_, te, groupID, isVisible, t1) {
   var background = 'unittest-row-' + ($.eqB($.mod(t1, 2), 0) ? 'even' : 'odd');
   var display = isVisible ? 'unittest-row' : 'unittest-row-hidden';
   t1 = new $.HtmlEnhancedConfiguration__buildRow__htmlEscape();
@@ -5111,7 +5125,7 @@ $$._convertDartToNative_PrepareForStructuredClone_findSlot = {"":
   $.add$1(this.copies_3, null);
   return length$;
 },
- call$1$bailout: function(state, value, t1) {
+ call$1$bailout: function(state0, value, t1) {
   var length$ = $.get$length(t1);
   for (var i = 0; $.ltB(i, length$); ++i) {
     var t2 = $.index(t1, i);
@@ -5266,8 +5280,8 @@ $$._convertDartToNative_PrepareForStructuredClone_walk = {"":
   }
   throw $.$$throw($.CTC9);
 },
- call$1$bailout: function(state, env0, env1, env2, env3, env4, env5, env6) {
-  switch (state) {
+ call$1$bailout: function(state0, env0, env1, env2, env3, env4, env5, env6) {
+  switch (state0) {
     case 1:
       var e = env0;
       break;
@@ -5287,7 +5301,7 @@ $$._convertDartToNative_PrepareForStructuredClone_walk = {"":
       length$ = env3;
       break;
   }
-  switch (state) {
+  switch (state0) {
     case 0:
       var t1 = {};
       if (e == null)
@@ -5336,11 +5350,11 @@ $$._convertDartToNative_PrepareForStructuredClone_walk = {"":
         return t1.copy_1;
       }
     default:
-      if (state === 3 || state === 2 || state === 1 || state === 0 && typeof e === 'object' && e !== null && (e.constructor === Array || e.is$List()))
-        switch (state) {
+      if (state0 === 3 || state0 === 2 || state0 === 1 || state0 === 0 && typeof e === 'object' && e !== null && (e.constructor === Array || e.is$List()))
+        switch (state0) {
           case 0:
           case 1:
-            state = 0;
+            state0 = 0;
             var length$ = $.get$length(e);
             slot = this.findSlot_8.call$1(e);
             t2 = this.readSlot_7;
@@ -5355,23 +5369,23 @@ $$._convertDartToNative_PrepareForStructuredClone_walk = {"":
             t1 = e instanceof Array && !!!(e.immutable$list);
             var t3 = this.writeSlot_6;
           case 2:
-            if (state === 2 || state === 0 && t1)
-              switch (state) {
+            if (state0 === 2 || state0 === 0 && t1)
+              switch (state0) {
                 case 0:
                   t3.call$2(slot, true);
                   var i = 0;
                 case 2:
                   L0:
                     while (true)
-                      switch (state) {
+                      switch (state0) {
                         case 0:
                           if (!$.ltB(i, length$))
                             break L0;
                           var element = $.index(e, i);
                           var elementCopy = this.call$1(element);
                         case 2:
-                          if (state === 2 || state === 0 && !(elementCopy == null ? element == null : elementCopy === element))
-                            switch (state) {
+                          if (state0 === 2 || state0 === 0 && !(elementCopy == null ? element == null : elementCopy === element))
+                            switch (state0) {
                               case 0:
                                 copy = t2.call$1(slot);
                                 if (true === copy) {
@@ -5379,7 +5393,7 @@ $$._convertDartToNative_PrepareForStructuredClone_walk = {"":
                                   t3.call$2(slot, copy);
                                 }
                               case 2:
-                                state = 0;
+                                state0 = 0;
                                 for (var j = 0; j < i; ++j)
                                   $.indexSet(copy, j, $.index(e, j));
                                 $.indexSet(copy, i, elementCopy);
@@ -5399,7 +5413,7 @@ $$._convertDartToNative_PrepareForStructuredClone_walk = {"":
               i = 0;
             }
           case 3:
-            state = 0;
+            state0 = 0;
             for (; $.ltB(i, length$); ++i)
               $.indexSet(copy, i, this.call$1($.index(e, i)));
             return copy;
@@ -5467,7 +5481,7 @@ $$._convertNativeToDart_AcceptStructuredClone_findSlot = {"":
   $.add$1(this.copies_1, null);
   return length$;
 },
- call$1$bailout: function(state, value, t1) {
+ call$1$bailout: function(state0, value, t1) {
   var length$ = $.get$length(t1);
   for (var i = 0; $.ltB(i, length$); ++i) {
     var t2 = $.index(t1, i);
@@ -5551,8 +5565,8 @@ $$._convertNativeToDart_AcceptStructuredClone_walk = {"":
   }
   return e;
 },
- call$1$bailout: function(state, env0, env1, env2, env3) {
-  switch (state) {
+ call$1$bailout: function(state0, env0, env1, env2, env3) {
+  switch (state0) {
     case 1:
       var e = env0;
       break;
@@ -5568,10 +5582,10 @@ $$._convertNativeToDart_AcceptStructuredClone_walk = {"":
       slot = env3;
       break;
   }
-  switch (state) {
+  switch (state0) {
     case 0:
     case 1:
-      state = 0;
+      state0 = 0;
       if (e == null)
         return e;
       if (typeof e === 'boolean')
@@ -5585,8 +5599,8 @@ $$._convertNativeToDart_AcceptStructuredClone_walk = {"":
       if (e instanceof RegExp)
         throw $.$$throw($.CTC3);
     case 2:
-      if (state === 2 || state === 0 && $._isJavaScriptSimpleObject(e))
-        switch (state) {
+      if (state0 === 2 || state0 === 0 && $._isJavaScriptSimpleObject(e))
+        switch (state0) {
           case 0:
             var slot = this.findSlot_6.call$1(e);
             var copy = this.readSlot_5.call$1(slot);
@@ -5594,7 +5608,7 @@ $$._convertNativeToDart_AcceptStructuredClone_walk = {"":
               return copy;
             copy = $.makeLiteralMap([]);
           case 2:
-            state = 0;
+            state0 = 0;
             this.writeSlot_4.call$2(slot, copy);
             for (var t1 = $.iterator(Object.keys(e)); t1.hasNext$0() === true;) {
               var t2 = t1.next$0();
@@ -5603,8 +5617,8 @@ $$._convertNativeToDart_AcceptStructuredClone_walk = {"":
             return copy;
         }
     case 3:
-      if (state === 3 || state === 0 && e instanceof Array)
-        switch (state) {
+      if (state0 === 3 || state0 === 0 && e instanceof Array)
+        switch (state0) {
           case 0:
             slot = this.findSlot_6.call$1(e);
             copy = this.readSlot_5.call$1(slot);
@@ -5613,7 +5627,7 @@ $$._convertNativeToDart_AcceptStructuredClone_walk = {"":
             var length$ = $.get$length(e);
             copy = this.mustCopy_7 === true ? new Array(length$) : e;
           case 3:
-            state = 0;
+            state0 = 0;
             this.writeSlot_4.call$2(slot, copy);
             for (var i = 0; $.ltB(i, length$); ++i)
               $.indexSet(copy, i, this.call$1($.index(e, i)));
@@ -5639,22 +5653,22 @@ $$._convertNativeToDart_IDBKey_containsDate = {"":
   }
   return false;
 },
- call$1$bailout: function(state, env0) {
-  switch (state) {
+ call$1$bailout: function(state0, env0) {
+  switch (state0) {
     case 1:
       var object = env0;
       break;
   }
-  switch (state) {
+  switch (state0) {
     case 0:
       if (object instanceof Date)
         return true;
     case 1:
-      if (state === 1 || state === 0 && typeof object === 'object' && object !== null && (object.constructor === Array || object.is$List()))
-        switch (state) {
+      if (state0 === 1 || state0 === 0 && typeof object === 'object' && object !== null && (object.constructor === Array || object.is$List()))
+        switch (state0) {
           case 0:
           case 1:
-            state = 0;
+            state0 = 0;
             for (var i = 0; $.ltB(i, $.get$length(object)); ++i)
               if (this.call$1($.index(object, i)) === true)
                 return true;
@@ -6378,7 +6392,7 @@ $$.ObjectoryWebsocketBrowserImpl_dropCollections_anon = {"":
  "super": "Closure",
  call$1: function(collection) {
   var t1 = this.this_0;
-  return t1.postMessage$2(t1.createCommand$2('dropCollection', collection), $.makeLiteralMap([]));
+  return t1._postMessage$2(t1._createCommand$2('dropCollection', collection), $.makeLiteralMap([]));
 }
 };
 
@@ -6465,7 +6479,7 @@ $$.ObjectId_createId_getOctet = {"":
     res = '0' + res;
   return res;
 },
- call$1$bailout: function(state, res) {
+ call$1$bailout: function(state0, res) {
   for (; $.ltB($.get$length(res), 8);)
     res = '0' + $.S(res);
   return res;
@@ -6635,6 +6649,30 @@ $$.ObjectoryWebsocketBrowserImpl_find_anon = {"":
     $.add$1(t3, $.objectory0().map2Object$2(t2.get$className(), t4));
   }
   this.completer_1.complete$1(t3);
+}
+};
+
+$$.simpleTestInsertionAndUpdate_anon = {"":
+ [],
+ "super": "Closure",
+ call$1: function(_) {
+  var author = $.Author$();
+  author.set$name('Dan');
+  author.set$age(3);
+  author.set$email('who@cares.net');
+  author.save$0();
+  author.set$age(4);
+  author.save$0();
+  $.objectory0().findOne$1($.$$Author().id$1(author.get$id())).then$1($.expectAsync1(new $.simpleTestInsertionAndUpdate_anon0(), 1));
+}
+};
+
+$$.simpleTestInsertionAndUpdate_anon0 = {"":
+ [],
+ "super": "Closure",
+ call$1: function(authFromDb) {
+  $.expect(authFromDb.get$age(), 4, null, null, false);
+  $.objectory0().close$0();
 }
 };
 
@@ -7141,6 +7179,14 @@ $._convertNativeToDart_IDBKey = function(nativeKey) {
   return nativeKey;
 };
 
+$.solo_test = function(spec, body) {
+  if (!($._soloTest == null))
+    throw $.$$throw($.ExceptionImplementation$('Only one test can be soloed right now.'));
+  $.ensureInitialized();
+  $._soloTest = $.TestCase$($.add($.get$length($._tests), 1), $._fullSpec(spec), body, 0);
+  $.add$1($._tests, $._soloTest);
+};
+
 $.BsonRegexp$ = function(pattern, multiLine, caseInsensitive, dotAll, extended, options) {
   var t1 = new $.BsonRegexp(pattern, options, null, null, multiLine, caseInsensitive, null, dotAll, extended);
   t1.BsonRegexp$6(pattern, multiLine, caseInsensitive, dotAll, extended, options);
@@ -7445,10 +7491,6 @@ $.Author$ = function() {
   return t1;
 };
 
-$._PersistentIterator$ = function(persistentList, _it, valueConverter) {
-  return new $._PersistentIterator(_it, valueConverter, persistentList);
-};
-
 $.main = function() {
   $.useHtmlEnhancedConfiguration(false);
   var t1 = $.ObjectoryWebsocketBrowserImpl$('127.0.0.1:8080', $.registerClasses, true);
@@ -7533,6 +7575,10 @@ $.ListIterator$ = function(list) {
 $.dynamicSetMetadata = function(inputTable) {
   var t1 = $.buildDynamicMetadata(inputTable);
   $._dynamicMetadata(t1);
+};
+
+$.simpleTestInsertionAndUpdate = function() {
+  $.objectory0().initDomainModel$0().then$1($.expectAsync1(new $.simpleTestInsertionAndUpdate_anon(), 1));
 };
 
 $.checkNum = function(value) {
@@ -7694,6 +7740,10 @@ $.runTests = function() {
   $._defer(new $.runTests_anon0());
 };
 
+$._PersistentIterator$ = function(persistentList, _it, valueConverter) {
+  return new $._PersistentIterator(_it, valueConverter, persistentList);
+};
+
 $.checkNumbers = function(a, b) {
   if (typeof a === 'number')
     if (typeof b === 'number')
@@ -7830,6 +7880,7 @@ $._MediaStreamTrackListEventsImpl$ = function(_ptr) {
 };
 
 $.allImplementationTests = function() {
+  $.solo_test('simpleTestInsertionAndUpdate', $.simpleTestInsertionAndUpdate);
   $.test('testInsertionAndUpdate', $.testInsertionAndUpdate);
   $.test('testCompoundObject', $.testCompoundObject);
   $.test('testObjectWithExternalRefs', $.testObjectWithExternalRefs);
@@ -10068,7 +10119,7 @@ $.testMap2ObjectWithListtOfInternalObjectsWithExternalRefs = function() {
   $.objectory0().initDomainModel$0().chain$1($.expectAsync1(new $.testMap2ObjectWithListtOfInternalObjectsWithExternalRefs_anon(t1), 1)).chain$1($.expectAsync1(new $.testMap2ObjectWithListtOfInternalObjectsWithExternalRefs_anon0(), 1)).then$1($.expectAsync1(new $.testMap2ObjectWithListtOfInternalObjectsWithExternalRefs_anon1(), 1));
 };
 
-$.Arrays_copy$bailout = function(state, src, srcStart, dst, dstStart, count) {
+$.Arrays_copy$bailout = function(state0, src, srcStart, dst, dstStart, count) {
   if (srcStart < dstStart)
     for (var i = srcStart + count - 1, j = dstStart + count - 1; i >= srcStart; --i, --j)
       $.indexSet(dst, j, $.index(src, i));
@@ -10077,7 +10128,7 @@ $.Arrays_copy$bailout = function(state, src, srcStart, dst, dstStart, count) {
       $.indexSet(dst, j, $.index(src, i));
 };
 
-$.DualPivotQuicksort_insertionSort_$bailout = function(state, a, left, right, compare) {
+$.DualPivotQuicksort_insertionSort_$bailout = function(state0, a, left, right, compare) {
   for (var i = left + 1; $.leB(i, right); ++i) {
     var el = $.index(a, i);
     var j = i;
@@ -10092,7 +10143,7 @@ $.DualPivotQuicksort_insertionSort_$bailout = function(state, a, left, right, co
   }
 };
 
-$.Arrays_indexOf$bailout = function(state, a, element, startIndex, endIndex) {
+$.Arrays_indexOf$bailout = function(state0, a, element, startIndex, endIndex) {
   if ($.geB(startIndex, $.get$length(a)))
     return -1;
   if (startIndex < 0)
@@ -10103,8 +10154,8 @@ $.Arrays_indexOf$bailout = function(state, a, element, startIndex, endIndex) {
   return -1;
 };
 
-$.DualPivotQuicksort__dualPivotQuicksort$bailout = function(state, env0, env1, env2, env3, env4, env5, env6, env7, env8, env9, env10, env11, env12, env13) {
-  switch (state) {
+$.DualPivotQuicksort__dualPivotQuicksort$bailout = function(state0, env0, env1, env2, env3, env4, env5, env6, env7, env8, env9, env10, env11, env12, env13) {
+  switch (state0) {
     case 1:
       var a = env0;
       var left = env1;
@@ -10128,10 +10179,10 @@ $.DualPivotQuicksort__dualPivotQuicksort$bailout = function(state, env0, env1, e
       el4 = env13;
       break;
   }
-  switch (state) {
+  switch (state0) {
     case 0:
     case 1:
-      state = 0;
+      state0 = 0;
       var sixth = $.tdiv($.add($.sub(right, left), 1), 6);
       if (typeof sixth !== 'number')
         throw $.iae(sixth);
@@ -10201,25 +10252,25 @@ $.DualPivotQuicksort__dualPivotQuicksort$bailout = function(state, env0, env1, e
       var great = right - 1;
       var pivots_are_equal = $.eqB(compare.call$2(el2, el4), 0);
     case 2:
-      if (state === 2 || state === 0 && pivots_are_equal)
-        switch (state) {
+      if (state0 === 2 || state0 === 0 && pivots_are_equal)
+        switch (state0) {
           case 0:
             var k = less;
           case 2:
             L0:
               while (true)
-                switch (state) {
+                switch (state0) {
                   case 0:
                     if (!(k <= great))
                       break L0;
                   case 2:
                     c$0: {
-                      switch (state) {
+                      switch (state0) {
                         case 0:
                           var ak = $.index(a, k);
                           var comp = compare.call$2(ak, el2);
                         case 2:
-                          state = 0;
+                          state0 = 0;
                           if ($.eqB(comp, 0))
                             break c$0;
                           if ($.ltB(comp, 0)) {
@@ -10340,7 +10391,7 @@ $.DualPivotQuicksort__dualPivotQuicksort$bailout = function(state, env0, env1, e
   }
 };
 
-$._Lists_indexOf$bailout = function(state, a, element, startIndex, endIndex) {
+$._Lists_indexOf$bailout = function(state0, a, element, startIndex, endIndex) {
   if ($.geB(startIndex, $.get$length(a)))
     return -1;
   if (startIndex < 0)
@@ -10351,7 +10402,7 @@ $._Lists_indexOf$bailout = function(state, a, element, startIndex, endIndex) {
   return -1;
 };
 
-$._Lists_getRange$bailout = function(state, a, start, length$, accumulator) {
+$._Lists_getRange$bailout = function(state0, a, start, length$, accumulator) {
   if ($.ltB(length$, 0))
     throw $.$$throw($.ArgumentError$('length'));
   if ($.ltB(start, 0))
@@ -10364,7 +10415,7 @@ $._Lists_getRange$bailout = function(state, a, start, length$, accumulator) {
   return accumulator;
 };
 
-$.StringImplementation__toJsStringArray$bailout = function(state, strings) {
+$.StringImplementation__toJsStringArray$bailout = function(state0, strings) {
   $.checkNull(strings);
   var length$ = $.get$length(strings);
   if ($.isJsArray(strings)) {
@@ -10390,7 +10441,7 @@ $.StringImplementation__toJsStringArray$bailout = function(state, strings) {
   return array;
 };
 
-$.Futures_wait$bailout = function(state, futures, t1) {
+$.Futures_wait$bailout = function(state0, futures, t1) {
   if ($.isEmpty(futures) === true)
     return $.Future_Future$immediate($.CTC0);
   var completer = $.Completer_Completer();
@@ -10407,6 +10458,8 @@ $.Futures_wait$bailout = function(state, futures, t1) {
 
 $.dynamicBind.call$4 = $.dynamicBind;
 $.dynamicBind.$name = "dynamicBind";
+$.typeNameInChrome.call$1 = $.typeNameInChrome;
+$.typeNameInChrome.$name = "typeNameInChrome";
 $.typeNameInOpera.call$1 = $.typeNameInOpera;
 $.typeNameInOpera.$name = "typeNameInOpera";
 $.testInsertionAndUpdate.call$0 = $.testInsertionAndUpdate;
@@ -10427,18 +10480,18 @@ $._nextBatch.call$0 = $._nextBatch;
 $._nextBatch.$name = "_nextBatch";
 $.invokeClosure.call$5 = $.invokeClosure;
 $.invokeClosure.$name = "invokeClosure";
-$.testCompoundObject.call$0 = $.testCompoundObject;
-$.testCompoundObject.$name = "testCompoundObject";
 $.toStringWrapper.call$0 = $.toStringWrapper;
 $.toStringWrapper.$name = "toStringWrapper";
+$.testCompoundObject.call$0 = $.testCompoundObject;
+$.testCompoundObject.$name = "testCompoundObject";
 $.typeNameInSafari.call$1 = $.typeNameInSafari;
 $.typeNameInSafari.$name = "typeNameInSafari";
 $._defaultErrorFormatter.call$5 = $._defaultErrorFormatter;
 $._defaultErrorFormatter.$name = "_defaultErrorFormatter";
 $.testObjectWithCollectionOfExternalRefs.call$0 = $.testObjectWithCollectionOfExternalRefs;
 $.testObjectWithCollectionOfExternalRefs.$name = "testObjectWithCollectionOfExternalRefs";
-$.typeNameInChrome.call$1 = $.typeNameInChrome;
-$.typeNameInChrome.$name = "typeNameInChrome";
+$.simpleTestInsertionAndUpdate.call$0 = $.simpleTestInsertionAndUpdate;
+$.simpleTestInsertionAndUpdate.$name = "simpleTestInsertionAndUpdate";
 $.registerClasses.call$0 = $.registerClasses;
 $.registerClasses.$name = "registerClasses";
 $.testMap2ObjectWithListtOfInternalObjectsWithExternalRefs.call$0 = $.testMap2ObjectWithListtOfInternalObjectsWithExternalRefs;
@@ -11480,8 +11533,8 @@ return this.defaultView;
   } else
     return $._FrozenElementList$_wrap(this.$dom_querySelectorAll$1(selectors));
 },
- queryAll$1$bailout: function(state, env0) {
-  switch (state) {
+ queryAll$1$bailout: function(state0, env0) {
+  switch (state0) {
     case 1:
       mutableMatches = env0;
       break;
@@ -11489,15 +11542,15 @@ return this.defaultView;
       mutableMatches = env0;
       break;
   }
-  switch (state) {
+  switch (state0) {
     case 0:
     default:
-      if (state === 1 || state === 0 && $.CTC23.hasMatch$1(selectors) === true)
-        switch (state) {
+      if (state0 === 1 || state0 === 0 && $.CTC23.hasMatch$1(selectors) === true)
+        switch (state0) {
           case 0:
             var mutableMatches = this.$dom_getElementsByName$1($.substring$2(selectors, 7, selectors.length - 2));
           case 1:
-            state = 0;
+            state0 = 0;
             var len = $.get$length(mutableMatches);
             var copyOfMatches = $.ListImplementation_List(len);
             for (var i = 0; $.ltB(i, len); ++i) {
@@ -11509,15 +11562,15 @@ return this.defaultView;
             return $._FrozenElementList$_wrap(copyOfMatches);
         }
       else
-        switch (state) {
+        switch (state0) {
           case 0:
           case 2:
-            if (state === 2 || state === 0 && $.CTC24.hasMatch$1(selectors) === true)
-              switch (state) {
+            if (state0 === 2 || state0 === 0 && $.CTC24.hasMatch$1(selectors) === true)
+              switch (state0) {
                 case 0:
                   mutableMatches = this.$dom_getElementsByTagName$1(selectors);
                 case 2:
-                  state = 0;
+                  state0 = 0;
                   len = $.get$length(mutableMatches);
                   copyOfMatches = $.ListImplementation_List(len);
                   for (i = 0; $.ltB(i, len); ++i) {

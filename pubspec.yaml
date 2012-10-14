@@ -1,5 +1,7 @@
 name: objectory
-description: Object persistency layer
+description: Object document mapper/persistency layer for server-side and browser apps
+author: Vadim Tsushko <vadimtsushko@gmail.com>
+homepage: https://github.com/vadimtsushko/mongo_dart
 version: 0.0.2
 dependencies:
  unittest:
@@ -7,8 +9,8 @@ dependencies:
  logging:
   sdk: logging
  args:
-  sdk: args  
- log4dart:
-  git: git://github.com/Solvr/log4dart.git
+  sdk: args
  mongo_dart:
   git: git://github.com/vadimtsushko/mongo_dart.git
+ lawndart:
+  git: git://github.com/vadimtsushko/lawndart.git

@@ -1,12 +1,8 @@
 library blog_example;
-import 'package:objectory/src/objectory_websocket_browser_impl.dart';
-import 'package:objectory/src/objectory_base.dart';
-import 'package:objectory/src/persistent_object.dart';
-import 'package:objectory/src/objectory_query_builder.dart';
-import 'package:mongo_dart/bson.dart';
+import 'package:objectory/objectory_browser.dart';
 import 'domain_model.dart';
-import 'package:mongo_dart/src/bson/json_ext.dart';
 import 'dart:html' as html;
+
 const DefaultUri = '127.0.0.1:8080';
 main(){
   objectory = new ObjectoryWebsocketBrowserImpl(DefaultUri,registerClasses,true);
@@ -59,13 +55,13 @@ main(){
     article.title = 'Caminando por Buenos Aires';
     article.body = 'Las callecitas de Buenos Aires tienen ese no se que...';
     article.author = authors['Jorge Luis Borges'];
-    var comment = new Comment();
+    var comment = new BlogComment();
     comment.date = new Date.fromMillisecondsSinceEpoch(new Date.now().millisecondsSinceEpoch - 780987497);
     comment.body = "Well, you may do better...";
     comment.user = users['lsmith'];
     article.comments.add(comment);
     objectory.save(article);            
-    comment = new Comment();
+    comment = new BlogComment();
     comment.date = new Date.fromMillisecondsSinceEpoch(new Date.now().millisecondsSinceEpoch - 90987497);
     comment.body = "I love this article!";
     comment.user = users['jdoe'];
@@ -76,7 +72,7 @@ main(){
     article.title = 'I must have seen thy face before';
     article.body = 'Thine eyes call me in a new way';
     article.author = authors['William Shakespeare'];
-    comment = new Comment();
+    comment = new BlogComment();
     comment.date = new Date.fromMillisecondsSinceEpoch(new Date.now().millisecondsSinceEpoch - 20987497);
     comment.body = "great article!";
     comment.user = users['jdoe'];

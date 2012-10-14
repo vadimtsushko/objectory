@@ -8,25 +8,22 @@ class ObjectoryDirectConnectionImpl extends Objectory{
   Db db;
   ObjectoryDirectConnectionImpl(String uri,Function registerClassesCallback,bool dropCollectionsOnStartup):
     super(uri, registerClassesCallback, dropCollectionsOnStartup);
-  Future<bool> open(){
+  Future open(){
     if (db !== null){
       db.close();
     }    
     db = new Db(uri);
     return db.open();
   }
+  Future insert(PersistentObject persistentObject) => 
+      db.collection(persistentObject.dbType).insert(persistentObject.map);
   
-  void save(PersistentObject persistentObject){    
-    db.collection(persistentObject.dbType).save(persistentObject.map);
-    persistentObject.id = persistentObject.map["_id"];
-  }
+  Future update(PersistentObject persistentObject) => 
+        db.collection(persistentObject.dbType).update({"_id": persistentObject.id},persistentObject.map);
+    
+  Future remove(PersistentObject persistentObject) => 
+      db.collection(persistentObject.dbType).remove({"_id":persistentObject.id});
   
-  void remove(PersistentObject persistentObject){
-    if (persistentObject.id === null){
-      return;
-    }
-    db.collection(persistentObject.dbType).remove({"_id":persistentObject.id});
-  }
   
   Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){    
     Completer completer = new Completer();

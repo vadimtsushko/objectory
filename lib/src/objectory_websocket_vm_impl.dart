@@ -29,7 +29,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
   ObjectoryWebsocketConnectionImpl(String uri,Function registerClassesCallback,bool dropCollectionsOnStartup):
     super(uri, registerClassesCallback, dropCollectionsOnStartup);
   
-  Future<bool> open(){
+  Future open(){
     return setupWebsocket(uri);
   }
   
@@ -65,7 +65,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     };
     return completer.future;
   }
-  Future postMessage(Map command, Map content) {    
+  Future _postMessage(Map command, Map content) {    
     requestId++;
     command['requestId'] = requestId;  
     webSocket.send(JSON_EXT.stringify([command,content]));    
@@ -73,33 +73,26 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     awaitedRequests[requestId] = completer;    
     return completer.future;    
   }
-  Map createCommand(String command, String collection){
+  Map _createCommand(String command, String collection){
     return {'command': command, 'collection': collection}; 
   }
-  save(PersistentObject persistentObject){
-    if (persistentObject.id === null) {      
-      persistentObject.id = new ObjectId(clientMode:true);
-      persistentObject.map["_id"] = persistentObject.id;
-      objectory.addToCache(persistentObject);
-      postMessage(createCommand('insert',persistentObject.dbType),persistentObject.map);
-      log.fine('$persistentObject saved to cache');
-    } else {
-      postMessage(createCommand('update',persistentObject.dbType),persistentObject.map);
-    }
-    
-  }
-  void remove(PersistentObject persistentObject){
-    if (persistentObject.id === null){
-      log.severe('Attempt to remove not saved object: $persistentObject');
-      return;
-    }
-    postMessage(createCommand('remove',persistentObject.dbType),persistentObject.map);    
-  }
+  
+  ObjectId generateId() => new ObjectId(clientMode: true);
+  
+  Future update(PersistentObject persistentObject) =>
+      _postMessage(_createCommand('update',persistentObject.dbType),persistentObject.map);
+
+  
+  Future insert(PersistentObject persistentObject) =>
+      _postMessage(_createCommand('insert',persistentObject.dbType),persistentObject.map);
+  
+  Future remove(PersistentObject persistentObject) =>
+    _postMessage(_createCommand('remove',persistentObject.dbType),persistentObject.map);
   
   Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){    
     Completer completer = new Completer();
     var result = new List<PersistentObject>();
-    postMessage(createCommand('find',selector.className),selector.map).then((list) {
+    _postMessage(_createCommand('find',selector.className),selector.map).then((list) {
       for (var map in list) {
         PersistentObject obj = objectory.map2Object(selector.className,map);
         result.add(obj);
@@ -119,7 +112,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
       completer.complete(obj);
     }  
     else {
-      postMessage(createCommand('findOne',selector.className),selector.map)
+      _postMessage(_createCommand('findOne',selector.className),selector.map)
       .then((map){
         if (map === null) {
          completer.complete(null); 
@@ -140,11 +133,11 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
   }
   
   Future<Map> dropDb() {
-    return postMessage(createCommand('dropDb',null),{});    
+    return _postMessage(_createCommand('dropDb',null),{});    
   }
 
   Future<Map> queryDb(Map map) {    
-    return postMessage(createCommand('queryDb',null),map);
+    return _postMessage(_createCommand('queryDb',null),map);
   }
   
   Future<Map> wait(){
@@ -156,6 +149,6 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
   }
   Future dropCollections() {
     return Futures.wait(getCollections().map(
-          (collection) => postMessage(createCommand('dropCollection',collection),{})));
+          (collection) => _postMessage(_createCommand('dropCollection',collection),{})));
   }
 }

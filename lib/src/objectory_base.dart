@@ -90,29 +90,39 @@ class Objectory{
     });
     return result;
   }
-  
-  
-  List<BasePersistentObject> list2listOfObjects(){}
-  
+  Future save(PersistentObject persistentObject){    
+    if (persistentObject.id != null){            
+      return update(persistentObject);
+    } 
+    else{
+      persistentObject.id = generateId();
+      persistentObject.map["_id"] = persistentObject.id;
+      objectory.addToCache(persistentObject);      
+      return insert(persistentObject);
+    }
+  }
+
+  ObjectId generateId() => new ObjectId();
   
   void registerClass(String className,FactoryMethod factory){
     factories[className] = factory;    
   }
   Future dropCollections() { throw 'Must be implemented'; }
-  Future<bool> open() { throw 'Must be implemented'; }
+  
+  Future open() { throw 'Must be implemented'; }
 
   
   Future<PersistentObject> findOne(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
   Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
-  save(PersistentObject persistentObject) { throw 'Must be implemented'; }
-  remove(BasePersistentObject persistentObject) { throw 'Must be implemented'; }
-
+  Future insert(PersistentObject persistentObject) { throw 'Must be implemented'; }
+  Future update(PersistentObject persistentObject) { throw 'Must be implemented'; }
+  Future remove(BasePersistentObject persistentObject) { throw 'Must be implemented'; }
   Future<Map> dropDb() { throw 'Must be implemented'; }
   Future<Map> wait() { throw 'Must be implemented'; }  
   void close() { throw 'Must be implemented'; }
   Future<bool> initDomainModel() {
     var res = new Completer();  
-    open().then((_){
+    open().then((_){      
       registerClassesCallback();
       if (dropCollectionsOnStartup) {
         objectory.dropCollections().then((_) =>  res.complete(true));
