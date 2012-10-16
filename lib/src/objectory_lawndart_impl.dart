@@ -15,36 +15,25 @@ const INDEXEDDB = 3;
 const LOCALSTORAGE = 4;
 
 class ObjectoryLawndartImpl extends Objectory{    
-  int _dbVersion;
+
   bool isConnected;  
-  Map<int,Completer> awaitedRequests = new Map<int,Completer>();
-  Map<String,Store> stores;
-  int _storageType;  
+  int _storageType;
+  IndexedDb<String,String> db;
   ObjectoryLawndartImpl(String uri,Function registerClassesCallback,
-      {bool dropCollectionsOnStartup: false, dbVersion: 1, storageType: WEBSQL}):
+      {bool dropCollectionsOnStartup: false, storageType: INDEXEDDB}):
     super(uri, registerClassesCallback, dropCollectionsOnStartup) {
-    _storageType = storageType;
-    _dbVersion = dbVersion;
-    stores = new Map<String,Store>();
+    _storageType = storageType;      
   }
   
   Future open(){
     configureBrowserLogger(Level.ALL);    
     return setupDb(uri);
   }
-  Future _createStore(String dbName, String collectionName) {
-    Store store;
-    if (_storageType == WEBSQL) {      
-      store = new WebSqlAdapter<String,String>({'dbName': dbName, 'storeName': collectionName});
-    }
-    if (store == null) throw 'Error creating Store';
-    stores[collectionName] = store;    
-    return store.open();
-  }
   
   Future setupDb(String uri) {
     registerClassesCallback();
-    return Futures.wait(getCollections().map((collection) =>  _createStore(uri,collection)));
+    db = new IndexedDb<String,String>(uri,getCollections());
+    return db.open();
   }    
    
   void _onError(e) {
@@ -60,21 +49,21 @@ class ObjectoryLawndartImpl extends Objectory{
 
   
   Future insert(PersistentObject persistentObject) =>
-      stores[persistentObject.dbType].save(JSON_EXT.stringify(persistentObject.map), persistentObject.id.toHexString());
+      db.store(persistentObject.dbType).save(JSON_EXT.stringify(persistentObject.map), persistentObject.id.toHexString());
 
   Future remove(PersistentObject persistentObject) =>
-      stores[persistentObject.dbType].removeByKey(persistentObject.id.toHexString());
+      db.store(persistentObject.dbType).removeByKey(persistentObject.id.toHexString());
   
   PersistentObject lawndartRecord2Object(String className,String value) {
-    var map = JSON_EXT.parse(JSON_EXT.parse(value));
+    var map = JSON_EXT.parse(value);
     return objectory.map2Object(className, map); 
   }
   
   Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){    
     Completer completer = new Completer();
     var result = new List<PersistentObject>();    
-    stores[selector.className].all().then((list) {    
-      for (var map in list) {        
+    db.store(selector.className).all().then((list) {    
+      for (var map in list) {
         PersistentObject obj = lawndartRecord2Object(selector.className,map);
         result.add(obj);
       }        
@@ -98,7 +87,7 @@ class ObjectoryLawndartImpl extends Objectory{
       
     }  
     else {      
-      stores[selector.className].getByKey(selector.map["_id"].toHexString()).then((map) {
+      db.store(selector.className).getByKey(selector.map["_id"].toHexString()).then((map) {
         if (map === null) {
          completer.complete(null); 
         }
@@ -122,24 +111,8 @@ class ObjectoryLawndartImpl extends Objectory{
   
   Future dropCollections() {    
     return Futures.wait(getCollections().map(
-        (collection) => stores[collection].nuke()));
+        (collection) => db.store(collection).nuke()));
   }
-  
-  Future<bool> initDomainModel() {
-    registerClassesCallback();    
-    var res = new Completer();  
-    open().then((_){  
-      if (dropCollectionsOnStartup) {
-        objectory.dropCollections().then((_) =>  res.complete(true));
-      }
-      else
-      {
-        res.complete(true);
-      }
-    });    
-    return res.future;
-  }
-  
   
 }
 
