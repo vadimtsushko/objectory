@@ -1,7 +1,5 @@
 library domain_model;
-import 'package:objectory/src/objectory_base.dart';
-import 'package:objectory/src/persistent_object.dart';
-import 'package:objectory/src/objectory_query_builder.dart';
+import 'package:objectory/objectory.dart';
 
 const DefaultUri = '127.0.0.1:8080';
 

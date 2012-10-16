@@ -1,8 +1,6 @@
 library domain_model;
 
-import 'package:objectory/src/objectory_base.dart';
-import 'package:objectory/src/persistent_object.dart';
-import 'package:objectory/src/objectory_query_builder.dart';
+import 'package:objectory/objectory.dart';
 
 class Author extends PersistentObject  {
   String get dbType => 'Author';
