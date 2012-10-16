@@ -7,7 +7,8 @@
 abstract class BasePersistentObject {
   LinkedHashMap map;
   Set<String> _dirtiFields;
-  Map<String,Dynamic> _compoundProperties; 
+  Map<String,Dynamic> _compoundProperties;
+  bool saveOnUpdate = false;
   BasePersistentObject() {
     map = new LinkedHashMap();
     setMap(map);
@@ -76,7 +77,7 @@ abstract class BasePersistentObject {
   
   void setProperty(String property, value){
     onValueChanging(property, value);
-    this.map[property] = value;    
+    this.map[property] = value;
   }
   
   Dynamic getProperty(String property){          
@@ -142,6 +143,13 @@ abstract class PersistentObject extends BasePersistentObject{
   save() {
     objectory.save(this);
   }
+  void setProperty(String property, value){    
+    super.setProperty(property,value);
+    if (saveOnUpdate) {
+      save();
+    }
+  }  
+  
   Future<bool> fetch() {
     Completer completer = new Completer();
     objectory.findOne(new ObjectoryQueryBuilder(dbType).id(id)).then((res){        
@@ -158,7 +166,7 @@ abstract class EmbeddedPersistentObject extends BasePersistentObject{
     if (_parent !== null) {
       _parent.setDirty(_pathToMe);
     }
-  }  
+  }
   remove() {
     throw 'Must not be invoked';
   }    
