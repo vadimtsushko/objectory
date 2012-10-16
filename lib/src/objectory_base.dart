@@ -121,9 +121,9 @@ class Objectory{
   Future<Map> wait() { throw 'Must be implemented'; }  
   void close() { throw 'Must be implemented'; }
   Future<bool> initDomainModel() {
-    var res = new Completer();  
+    var res = new Completer();
+    registerClassesCallback();        
     open().then((_){      
-      registerClassesCallback();
       if (dropCollectionsOnStartup) {
         objectory.dropCollections().then((_) =>  res.complete(true));
       }

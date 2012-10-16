@@ -11,6 +11,7 @@ import 'package:unittest/html_enhanced_config.dart';
 
 main() {
   useHtmlEnhancedConfiguration();
-  objectory = new ObjectoryLawndartImpl('objectory_lawndart', registerClasses, dropCollectionsOnStartup: true);  
+  objectory = new ObjectoryLawndartImpl('objectory_lawndart', registerClasses, 
+        dropCollectionsOnStartup: true);  
   group('VM implementation tests', () => allImplementationTests());
 }
