@@ -1,10 +1,10 @@
-#library('persistent_object');
-#import('objectory_query_builder.dart');
-#import('package:mongo_dart/bson.dart');
-#import('objectory_base.dart');
-#source('persistent_list.dart');
+library persistent_object;
+import 'objectory_query_builder.dart';
+import 'package:mongo_dart/bson.dart';
+import 'objectory_base.dart';
+part 'persistent_list.dart';
 
-abstract class BasePersistentObject {
+class BasePersistentObject {
   LinkedHashMap map;
   Set<String> _dirtiFields;
   Map<String,Dynamic> _compoundProperties;
@@ -87,9 +87,8 @@ abstract class BasePersistentObject {
   String toString()=>"$dbType($map)";
   
   void init(){}
-  
-  //TODO use runtimeType.toString() when dart2js undertand this
-  String get dbType => 'PersistentObject';
+    
+  String get dbType => this.runtimeType.toString();
   
   Future<PersistentObject> fetchLinks(){
     var dbRefs = new List<DbRef>();    
@@ -128,7 +127,7 @@ abstract class BasePersistentObject {
   }
   
 }
-abstract class PersistentObject extends BasePersistentObject{
+class PersistentObject extends BasePersistentObject{
   ObjectId get id => map['_id'];
   DbRef get dbRef => new DbRef(this.dbType,this.id);  
   set id (ObjectId value) => map['_id'] = value;
@@ -158,7 +157,7 @@ abstract class PersistentObject extends BasePersistentObject{
     return completer.future;
   }
 }
-abstract class EmbeddedPersistentObject extends BasePersistentObject{
+class EmbeddedPersistentObject extends BasePersistentObject{
   BasePersistentObject _parent;
   String _pathToMe;  
   void setDirty(String fieldName){

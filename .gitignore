@@ -1,5 +1,5 @@
 /null/
 packages
-*.js
-*.js.map
+*.dart.js
+*dart.js.map
 /*.lock
