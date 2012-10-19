@@ -21,4 +21,6 @@ Now you may run server side objectory tests: *test/base_objectory_tests.dart* an
 
 Now you may run browser tests and blog example (port of server-side example to browser) both in Dartium and as JavaScript. JavaScript launches do not require any special setup.
 
+See also clone of Dart WebComponents [TodoMVC sample application with added by Objectory persistency](https://github.com/vadimtsushko/todomvc_objectory_indexeddb)  
+
 See [Quick tour](https://github.com/vadimtsushko/objectory/blob/master/doc/quick_tour.md) for futher information
