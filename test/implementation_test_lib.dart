@@ -12,7 +12,7 @@ void simpleTestInsertionAndUpdate(){
     author.email = 'who@cares.net';
     author.save();
     author.age = 4;
-    author.save();
+    author.save();    
     objectory.findOne($Author.id(author.id)).then(expectAsync1((authFromDb){      
       expect(authFromDb.age,4);
       objectory.close();
@@ -30,7 +30,7 @@ void testInsertionAndUpdate(){
     author.save();
     author.age = 4;
     author.save();
-    objectory.find($Author).then(expectAsync1((coll){      
+    objectory.find($Author).then(expectAsync1((coll){            
       expect(coll.length,1);
       var authFromMongo = coll[0];
       expect(authFromMongo.age,4);

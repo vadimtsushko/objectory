@@ -3,8 +3,6 @@ library domain_model;
 import 'package:objectory/objectory.dart';
 
 class Author extends PersistentObject  {
-  String get dbType => 'Author';
-  
   String get name() => getProperty('name');
   set name(String value) => setProperty('name',value.toUpperCase());
   
@@ -19,8 +17,6 @@ class Author extends PersistentObject  {
 }
 
 class Address extends EmbeddedPersistentObject {
-  String get dbType => 'Address';
-  
   String get cityName() => getProperty('cityName');
   set cityName(String value) => setProperty('cityName',value);
   
@@ -32,19 +28,14 @@ class Address extends EmbeddedPersistentObject {
 }
 
 class Customer extends PersistentObject {
-  String get dbType => 'Customer';
-  
   String get name() => getProperty('name');
   set name(String value) => setProperty('name',value);
-
-  List<Address> get addresses => new PersistentList<Address>(this,'Address','addresses');  
   
+  List<Address> get addresses => new PersistentList<Address>(this,'Address','addresses');  
 }
 
 
 class Person extends PersistentObject {
-  String get dbType => 'Person';
-  
   String get firstName() => getProperty('firstName');
   set firstName(String value) => setProperty('firstName',value);
   
@@ -63,8 +54,6 @@ class Person extends PersistentObject {
 }
 
 class User extends PersistentObject {
-  String get dbType => 'User';
-  
   String get name() => getProperty('name');
   set name(String value) => setProperty('name',value);
   
@@ -76,8 +65,6 @@ class User extends PersistentObject {
 }
 
 class Article extends PersistentObject {
-  String get dbType => 'Article';
-  
   String get title() => getProperty('title');
   set title(String value) => setProperty('title',value);
   
@@ -91,8 +78,6 @@ class Article extends PersistentObject {
 }
 
 class Comment extends EmbeddedPersistentObject {
-  String get dbType => 'Comment';  
-  
   User get user => getLinkedObject('user');
   set user (User value) => setLinkedObject('user',value);
     
@@ -112,7 +97,6 @@ void registerClasses() {
   objectory.registerClass('Article',()=>new Article());
   objectory.registerClass('Comment',()=>new Comment());
 }
-
 
 ObjectoryQueryBuilder get $Person => new ObjectoryQueryBuilder('Person');
 ObjectoryQueryBuilder get $Author => new ObjectoryQueryBuilder('Author');

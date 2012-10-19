@@ -4,7 +4,6 @@ import 'package:objectory/objectory.dart';
 const DefaultUri = '127.0.0.1:8080';
 
 class Author extends PersistentObject  {
-  String get dbType => 'Author';
   String get name() => getProperty('name');
   set name(String value) => setProperty('name',value);
   
@@ -21,8 +20,6 @@ class Author extends PersistentObject  {
 
 
 class User extends PersistentObject {  
-  String get dbType => 'User';
-  
   String get name() => getProperty('name');
   set name(String value) => setProperty('name',value);
   
@@ -34,8 +31,6 @@ class User extends PersistentObject {
 }
 
 class Article extends PersistentObject {
-  String get dbType => 'Article';
-  
   String get title() => getProperty('title');
   set title(String value) => setProperty('title',value);
   
@@ -49,8 +44,6 @@ class Article extends PersistentObject {
 }
 
 class BlogComment extends EmbeddedPersistentObject {
-  String get dbType => 'Comment';
-  
   User get user => getLinkedObject('user');
   set user (User value) => setLinkedObject('user',value);
     
@@ -61,17 +54,12 @@ class BlogComment extends EmbeddedPersistentObject {
   set date(Date value) => setProperty('date',value);  
 }
 
-
-
-
-
 void registerClasses() {
   objectory.registerClass('Author',()=>new Author());
   objectory.registerClass('User',()=>new User());
   objectory.registerClass('Article',()=>new Article());
   objectory.registerClass('Comment',()=>new BlogComment());
 }
-
 
 ObjectoryQueryBuilder get $Author => new ObjectoryQueryBuilder('Author');
 ObjectoryQueryBuilder get $User => new ObjectoryQueryBuilder('User');

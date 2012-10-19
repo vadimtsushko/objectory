@@ -125,8 +125,6 @@ class PersistentList<T> implements List<T>{
   
   T last() => _list.last();
   
-  void sort(int compare(a, b)) => _list.sort(compare);
-  
   void insertRange(int start, int length, [T initialValue]){
     _list.insertRange(start, length, initialValue);
     setDirty(null);

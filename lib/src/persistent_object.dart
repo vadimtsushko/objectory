@@ -87,7 +87,9 @@ class BasePersistentObject {
   String toString()=>"$dbType($map)";
   
   void init(){}
-    
+  
+  // TODO Apparently [this] part is redundant, but dart2js compilation breaks up without it
+  // TODO get rid of it when possible
   String get dbType => this.runtimeType.toString();
   
   Future<PersistentObject> fetchLinks(){

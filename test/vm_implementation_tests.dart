@@ -5,7 +5,7 @@ import 'domain_model.dart';
 import 'implementation_test_lib.dart';
 
 
-const DefaultUri = 'mongodb://127.0.0.1/objectory_vm_tests';
+const DefaultUri = 'mongodb://127.0.0.1/objectory_vm1_tests';
 
 main() {
   
