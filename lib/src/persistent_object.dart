@@ -6,7 +6,7 @@ part 'persistent_list.dart';
 
 class BasePersistentObject {
   LinkedHashMap map;
-  Set<String> _dirtiFields;
+  Set<String> _dirtyFields;
   Map<String,Dynamic> _compoundProperties;
   bool saveOnUpdate = false;
   BasePersistentObject() {
@@ -18,9 +18,9 @@ class BasePersistentObject {
     map = newValue;
     _initMap();
     init();
-    _dirtiFields = new Set<String>();    
+    _dirtyFields = new Set<String>();    
   }
-  
+  get dirtyFields() => _dirtyFields;
   EmbeddedPersistentObject getEmbeddedObject(String className, String property) {
     EmbeddedPersistentObject result = _compoundProperties[property];
     if (result == null) {
@@ -56,14 +56,14 @@ class BasePersistentObject {
   }  
   
   void setDirty(String fieldName) {
-    if (_dirtiFields === null){
+    if (_dirtyFields === null){
       return;
     }
-    _dirtiFields.add(fieldName);
+    _dirtyFields.add(fieldName);
   }
   
   void clearDirtyStatus() {
-    _dirtiFields.clear();
+    _dirtyFields.clear();
   }
   
   void onValueChanging(String fieldName, newValue) {
@@ -71,7 +71,7 @@ class BasePersistentObject {
   }
   
   isDirty() {
-    return !_dirtiFields.isEmpty();
+    return !_dirtyFields.isEmpty();
   }
   
   
@@ -165,7 +165,7 @@ class EmbeddedPersistentObject extends BasePersistentObject{
   void setDirty(String fieldName){
     super.setDirty(fieldName);
     if (_parent !== null) {
-      _parent.setDirty(_pathToMe);
+      _parent.setDirty('${_pathToMe}.${fieldName}');
     }
   }
   remove() {
