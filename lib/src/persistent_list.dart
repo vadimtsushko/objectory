@@ -16,16 +16,16 @@ class _ValueConverter{
     }
   }
 }
-class _PersistentIterator<T> implements Iterator<T> {
+class _PersistentIterator<E> implements Iterator<E> {
   Iterator _it;
   _ValueConverter valueConverter;
   PersistentList persistentList;
   _PersistentIterator(this.persistentList,this._it, this.valueConverter);  
-  T next() => valueConverter.convertValue(_it.next());
+  E next() => valueConverter.convertValue(_it.next());
   bool hasNext() => _it.hasNext();
 }
 
-class PersistentList<T> implements List<T>{
+class PersistentList<E> implements List<E>{
   bool isEmbeddedObject = false;
   BasePersistentObject _parent;
   String pathToMe;
@@ -59,7 +59,7 @@ class PersistentList<T> implements List<T>{
   }
   
   
-  internValue(T value) {  
+  internValue(E value) {  
     if (value is EmbeddedPersistentObject) {
       value._parent = _parent;
       value._pathToMe = pathToMe;
@@ -76,85 +76,90 @@ class PersistentList<T> implements List<T>{
   
   void forEach(void f(element)) => _list.forEach(f);
   
-  Collection map(f(T element)) => _list.map(f);
+  Collection map(f(E element)) => _list.map(f);
   
-  Collection<T> filter(bool f(T element)) => _list.filter(f);
+  Collection<E> filter(bool f(E element)) => _list.filter(f);
   
-  bool every(bool f(T element)) => _list.every(f);
+  bool every(bool f(E element)) => _list.every(f);
   
-  bool some(bool f(T element)) => _list.some(f);
+  bool some(bool f(E element)) => _list.some(f);
   
-  Iterator<T> iterator() => new _PersistentIterator(this,_list.iterator(),valueConverter);
+  Iterator<E> iterator() => new _PersistentIterator(this,_list.iterator(),valueConverter);
   
-  int indexOf(T element, [int start = 0]) => _list.indexOf(element, start);
+  int indexOf(E element, [int start = 0]) => _list.indexOf(element, start);
   
-  int lastIndexOf(T element, [int start]) => _list.lastIndexOf(element, start);
+  int lastIndexOf(E element, [int start]) => _list.lastIndexOf(element, start);
   
   int get length => _list.length;
   
+//  void sort([Comparator compare = Comparable.compare]) {
+//    _list.sort(compare);
+//  }   
+  
   List getRange(int start, int length) => _list.getRange(start, length);
   
-  void add(T element){
+  void add(E element){
     _list.add(internValue(element));
     setDirty(null);
   }
   
-  void remove(T element){
+  void remove(E element){
     if (_list.indexOf(element) == -1) return;
     _list.removeRange(_list.indexOf(element), 1);
     setDirty(null);
   }
   
-  void addAll(Collection<T> elements){
+  void addAll(Collection<E> elements){
     _list.addAll(elements);
     setDirty(null);    
   }
   
   void clear(){
-    Collection<T> c = _list;
+    Collection<E> c = _list;
     _list.clear();
     setDirty(null);
   }
   
-  T removeLast(){
-    T item = _list.last();    
+  E removeLast(){
+    E item = _list.last();    
     _list.removeLast();
     setDirty(null);
     return item;
   }
   
-  T last() => _list.last();
+  E last() => _list.last();
   
-  void insertRange(int start, int length, [T initialValue]){
+  void insertRange(int start, int length, [E initialValue]){
     _list.insertRange(start, length, initialValue);
     setDirty(null);
   }
   
-  void addLast(T value) => _list.addLast(value);
+  void addLast(E value) => _list.addLast(value);
   
   void removeRange(int start, int length){    
     _list.removeRange(start, length);    
     setDirty(null);
   }
+  bool contains(E element) => _list.contains(element);
   
-  void setRange(int start, int length, List<T> from, [int startFrom]){    
+  void setRange(int start, int length, List<E> from, [int startFrom]){    
     _list.setRange(start, length, from, startFrom);    
     setDirty(null);
   }
   void set length(int newLength) {   
     _list.length = newLength;
   }
-  T removeAt(int index) => _list.removeAt(index);
+  E removeAt(int index) => _list.removeAt(index);
   Dynamic reduce(Dynamic initialValue,
-                 Dynamic combine(Dynamic previousValue, T element)) => _list.reduce(initialValue, combine);
+                 Dynamic combine(Dynamic previousValue, E element)) => _list.reduce(initialValue, combine);
 
   
-  void operator[]=(int index, T value){
+  void operator[]=(int index, E value){
     _list[index] = internValue(value);
     setDirty(null);
   }
   
-  T operator[](int index) {
+  E operator[](int index) {
     return valueConverter.convertValue(_list[index]);
   }
   

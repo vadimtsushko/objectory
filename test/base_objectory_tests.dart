@@ -1,4 +1,4 @@
-import 'package:objectory/objectory_vm.dart';
+import 'package:objectory/objectory_console.dart';
 import 'domain_model.dart';
 import 'package:unittest/unittest.dart';
 

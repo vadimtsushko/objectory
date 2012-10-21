@@ -1,5 +1,5 @@
 library objectory_test;
-import 'package:objectory/objectory_vm.dart';
+import 'package:objectory/objectory_console.dart';
 import 'package:unittest/unittest.dart';
 import 'domain_model.dart';
 import 'implementation_test_lib.dart';
