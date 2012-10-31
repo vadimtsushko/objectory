@@ -66,8 +66,8 @@ testObjectWithExternalRefs(){
       // Links must be fetched before use.
       //Do not know yet how to test throws in async tests
       //Expect.throws(()=>sonFromObjectory.father.firstName);      
-      expect(sonFromObjectory.map['father'] is DbRef, reason: 'Unfetched links are of type ObjectId');
-      expect(sonFromObjectory.mother,isNull, reason: 'Unassigned link');
+      expect(sonFromObjectory.map['father'] is DbRef,isTrue, 'Unfetched links are of type ObjectId');
+      expect(sonFromObjectory.mother,isNull, 'Unassigned link');
       sonFromObjectory.fetchLinks().then(expectAsync1((__){  
         expect(sonFromObjectory.father.firstName,'Father');
         expect(sonFromObjectory.mother,isNull);

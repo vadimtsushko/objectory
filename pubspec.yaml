@@ -12,5 +12,4 @@ dependencies:
   sdk: args
  mongo_dart:
   git: git://github.com/vadimtsushko/mongo_dart.git
- lawndart:
-  git: git://github.com/vadimtsushko/lawndart.git
+ lawndart: 

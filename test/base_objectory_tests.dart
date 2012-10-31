@@ -7,8 +7,8 @@ testAuthorCreation(){
   author.name = 'vadim';
   author.age = 99;
   author.email = 'sdf';  
-  expect((author.map.getKeys() as List)[0],"_id");
-  expect(author.name,'VADIM', reason: 'converted to uppercase by custom  setter');
+  expect((author.map.keys as List)[0],"_id");
+  expect(author.name,'VADIM', 'converted to uppercase by custom  setter');
   author.address.cityName = 'Tyumen';
   author.address.streetName = 'Elm tree street';
   expect(author.map['address']['cityName'],'Tyumen');
@@ -36,11 +36,11 @@ testFailOnSettingUnsavedLinkObject(){
   var son = new Person();  
   var father = new Person();  
   ;
-  Expect.throws(()=>son.father = father,reason:"Link object must be saved (have ObjectId)");
+  expect(()=>son.father = father,throws,'Link object must be saved (have ObjectId)');
 }  
 testFailOnAbsentProperty(){
-  Dynamic author = new Author();
-  Expect.throws(()=>author.sdfsdfsdfgdfgdf,reason:"Must fail on missing property getter");
+  dynamic author = new Author();
+  expect(()=>author.sdfsdfsdfgdfgdf,throws,'Must fail on missing property getter');
 }
 testNewInstanceMethod(){
   var author = objectory.newInstance('Author');
@@ -51,7 +51,7 @@ testMap2ObjectMethod() {
     "name": "Vadim",
     "age": 300,
     "email": "nobody@know.it"};
-  var author = objectory.map2Object("Author",map);
+  Author author = objectory.map2Object("Author",map);
   //Not converted to upperCase because setter has not been invoked
   expect(author.name,"Vadim"); 
   expect(author.age,300);

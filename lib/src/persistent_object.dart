@@ -7,14 +7,14 @@ part 'persistent_list.dart';
 class BasePersistentObject {
   LinkedHashMap map;
   Set<String> _dirtyFields;
-  Map<String,Dynamic> _compoundProperties;
+  Map<String,dynamic> _compoundProperties;
   bool saveOnUpdate = false;
   BasePersistentObject() {
     map = new LinkedHashMap();
     setMap(map);
   }
   void setMap(Map newValue) {
-    _compoundProperties = new Map<String,Dynamic>();
+    _compoundProperties = new Map<String,dynamic>();
     map = newValue;
     _initMap();
     init();
@@ -71,7 +71,7 @@ class BasePersistentObject {
   }
   
   isDirty() {
-    return !_dirtyFields.isEmpty();
+    return !_dirtyFields.isEmpty;
   }
   
   
@@ -80,7 +80,7 @@ class BasePersistentObject {
     this.map[property] = value;
   }
   
-  Dynamic getProperty(String property){          
+  dynamic getProperty(String property){          
     return this.map[property];
   }
   
@@ -102,7 +102,7 @@ class BasePersistentObject {
   }  
 
   getDbRefsFromMap(Map map, List result){
-    for(var each in map.getValues()){
+    for(var each in map.values){
       if (each is DbRef) {
         result.add(each);
       }
