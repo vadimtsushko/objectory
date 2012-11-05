@@ -92,9 +92,9 @@ class PersistentList<E> implements List<E>{
 
   int get length => _list.length;
 
-//  void sort([Comparator compare = Comparable.compare]) {
-//    _list.sort(compare);
-//  }
+  void sort([Comparator compare = Comparable.compare]) {
+    _list.sort(compare);
+  }
 
   List getRange(int start, int length) => _list.getRange(start, length);
 
