@@ -4,39 +4,39 @@ import 'package:objectory/objectory.dart';
 const DefaultUri = '127.0.0.1:8080';
 
 class Author extends PersistentObject  {
-  String get name() => getProperty('name');
+  String get name => getProperty('name');
   set name(String value) => setProperty('name',value);
-  
-  String get email() => getProperty('email');
+
+  String get email => getProperty('email');
   set email(String value) => setProperty('email',value);
-  
-  int get age() => getProperty('age');
+
+  int get age => getProperty('age');
   set age(int value) => setProperty('age',value);
-    
+
 }
 
 
 
 
 
-class User extends PersistentObject {  
-  String get name() => getProperty('name');
+class User extends PersistentObject {
+  String get name => getProperty('name');
   set name(String value) => setProperty('name',value);
-  
-  String get email() => getProperty('email');
+
+  String get email => getProperty('email');
   set email(String value) => setProperty('email',value);
 
-  String get login() => getProperty('login');
-  set login(String value) => setProperty('login',value);  
+  String get login => getProperty('login');
+  set login(String value) => setProperty('login',value);
 }
 
 class Article extends PersistentObject {
-  String get title() => getProperty('title');
+  String get title => getProperty('title');
   set title(String value) => setProperty('title',value);
-  
-  String get body() => getProperty('body');
+
+  String get body => getProperty('body');
   set body(String value) => setProperty('body',value);
-  
+
   Author get author => getLinkedObject('author');
   set author (Author value) => setLinkedObject('author',value);
 
@@ -46,12 +46,12 @@ class Article extends PersistentObject {
 class BlogComment extends EmbeddedPersistentObject {
   User get user => getLinkedObject('user');
   set user (User value) => setLinkedObject('user',value);
-    
-  String get body() => getProperty('body');
+
+  String get body => getProperty('body');
   set body(String value) => setProperty('body',value);
-  
-  Date get date() => getProperty('date');
-  set date(Date value) => setProperty('date',value);  
+
+  Date get date => getProperty('date');
+  set date(Date value) => setProperty('date',value);
 }
 
 void registerClasses() {

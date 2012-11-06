@@ -20,7 +20,7 @@ class BasePersistentObject {
     init();
     _dirtyFields = new Set<String>();    
   }
-  get dirtyFields() => _dirtyFields;
+  get dirtyFields => _dirtyFields;
   EmbeddedPersistentObject getEmbeddedObject(String className, String property) {
     EmbeddedPersistentObject result = _compoundProperties[property];
     if (result == null) {

@@ -3,74 +3,74 @@ library domain_model;
 import 'package:objectory/objectory.dart';
 
 class Author extends PersistentObject  {
-  String get name() => getProperty('name');
+  String get name => getProperty('name');
   set name(String value) => setProperty('name',value.toUpperCase());
-  
-  String get email() => getProperty('email');
+
+  String get email => getProperty('email');
   set email(String value) => setProperty('email',value);
-  
-  int get age() => getProperty('age');
+
+  int get age => getProperty('age');
   set age(int value) => setProperty('age',value);
 
-  Address get address() => getEmbeddedObject('Address', 'address');  
-    
+  Address get address => getEmbeddedObject('Address', 'address');
+
 }
 
 class Address extends EmbeddedPersistentObject {
-  String get cityName() => getProperty('cityName');
+  String get cityName => getProperty('cityName');
   set cityName(String value) => setProperty('cityName',value);
-  
-  String get zipCode() => getProperty('zipCode');
+
+  String get zipCode => getProperty('zipCode');
   set zipCode(String value) => setProperty('zipCode',value);
-  
-  String get streetName() => getProperty('streetName');
+
+  String get streetName => getProperty('streetName');
   set streetName(String value) => setProperty('streetName',value);
 }
 
 class Customer extends PersistentObject {
-  String get name() => getProperty('name');
+  String get name => getProperty('name');
   set name(String value) => setProperty('name',value);
-  
-  List<Address> get addresses => new PersistentList<Address>(this,'Address','addresses');  
+
+  List<Address> get addresses => new PersistentList<Address>(this,'Address','addresses');
 }
 
 
 class Person extends PersistentObject {
-  String get firstName() => getProperty('firstName');
+  String get firstName => getProperty('firstName');
   set firstName(String value) => setProperty('firstName',value);
-  
-  String get lastName() => getProperty('lastName');
+
+  String get lastName => getProperty('lastName');
   set lastName(String value) => setProperty('lastName',value);
-  
-  Address get address() => getEmbeddedObject('Address', 'address');
-  
+
+  Address get address => getEmbeddedObject('Address', 'address');
+
   Person get father => getLinkedObject('father');
   set father (PersistentObject value) => setLinkedObject('father',value);
 
   Person get mother => getLinkedObject('mother');
   set mother (PersistentObject value) => setLinkedObject('mother',value);
 
-  List<Person> get children => new PersistentList<Person>(this,'Person','children');  
+  List<Person> get children => new PersistentList<Person>(this,'Person','children');
 }
 
 class User extends PersistentObject {
-  String get name() => getProperty('name');
+  String get name => getProperty('name');
   set name(String value) => setProperty('name',value);
-  
-  String get email() => getProperty('email');
+
+  String get email => getProperty('email');
   set email(String value) => setProperty('email',value);
 
-  String get login() => getProperty('login');
-  set login(String value) => setProperty('login',value);  
+  String get login => getProperty('login');
+  set login(String value) => setProperty('login',value);
 }
 
 class Article extends PersistentObject {
-  String get title() => getProperty('title');
+  String get title => getProperty('title');
   set title(String value) => setProperty('title',value);
-  
-  String get body() => getProperty('body');
+
+  String get body => getProperty('body');
   set body(String value) => setProperty('body',value);
-  
+
   Author get author => getLinkedObject('author');
   set author (Author value) => setLinkedObject('author',value);
 
@@ -80,12 +80,12 @@ class Article extends PersistentObject {
 class Comment extends EmbeddedPersistentObject {
   User get user => getLinkedObject('user');
   set user (User value) => setLinkedObject('user',value);
-    
-  String get body() => getProperty('body');
+
+  String get body => getProperty('body');
   set body(String value) => setProperty('body',value);
-  
-  Date get date() => getProperty('date');
-  set date(Date value) => setProperty('date',value);  
+
+  Date get date => getProperty('date');
+  set date(Date value) => setProperty('date',value);
 }
 
 void registerClasses() {

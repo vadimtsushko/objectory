@@ -8,7 +8,7 @@ testAuthorCreation(){
   author.age = 99;
   author.email = 'sdf';  
   expect((author.map.keys as List)[0],"_id");
-  expect(author.name,'VADIM', 'converted to uppercase by custom  setter');
+  expect(author.name,'VADIM', reason: 'converted to uppercase by custom  setter');
   author.address.cityName = 'Tyumen';
   author.address.streetName = 'Elm tree street';
   expect(author.map['address']['cityName'],'Tyumen');
@@ -19,7 +19,7 @@ testSetDirty(){
   var author = new Author();
   author.name = "Vadim";
   //expect(author.dirtyFields.length,1);
-  expect(author.isDirty());  
+  expect(author.isDirty(), isTrue);  
 }
 testCompoundObject(){
   var person = new Person();  
@@ -30,21 +30,21 @@ testCompoundObject(){
   expect(map["address"]["streetName"],"Elm");
 //  expect(person.address._parent,person);
 //  expect(person.address.pathToMe,"address");
-  expect(person.isDirty());
+  expect(person.isDirty(), isTrue);
 }
 testFailOnSettingUnsavedLinkObject(){
   var son = new Person();  
   var father = new Person();  
   ;
-  expect(()=>son.father = father,throws,'Link object must be saved (have ObjectId)');
+  expect(()=>son.father = father, throws, reason: 'Link object must be saved (have ObjectId)');
 }  
 testFailOnAbsentProperty(){
   dynamic author = new Author();
-  expect(()=>author.sdfsdfsdfgdfgdf,throws,'Must fail on missing property getter');
+  expect(()=>author.sdfsdfsdfgdfgdf, throws, reason: 'Must fail on missing property getter');
 }
 testNewInstanceMethod(){
   var author = objectory.newInstance('Author');
-  expect(author is Author);       
+  expect(author is Author, isTrue);       
 }
 testMap2ObjectMethod() {
   Map map = {
@@ -76,7 +76,7 @@ testObjectWithListOfInternalObjects2Map() {
   
   expect(map["name"],"Tequila corporation");  
   expect(map["addresses"].length,2);
-  expect(map["addresses"][0] is! PersistentObject);
+  expect(map["addresses"][0] is! PersistentObject, isTrue);
   expect(map["addresses"][0]["cityName"],"Mexico");
   expect(map["addresses"][1]["cityName"],"Moscow");  
 }

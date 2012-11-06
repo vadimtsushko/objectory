@@ -66,8 +66,8 @@ testObjectWithExternalRefs(){
       // Links must be fetched before use.
       //Do not know yet how to test throws in async tests
       //Expect.throws(()=>sonFromObjectory.father.firstName);      
-      expect(sonFromObjectory.map['father'] is DbRef,isTrue, 'Unfetched links are of type ObjectId');
-      expect(sonFromObjectory.mother,isNull, 'Unassigned link');
+      expect(sonFromObjectory.map['father'] is DbRef,isTrue, reason: 'Unfetched links are of type ObjectId');
+      expect(sonFromObjectory.mother,isNull, reason: 'Unassigned link');
       sonFromObjectory.fetchLinks().then(expectAsync1((__){  
         expect(sonFromObjectory.father.firstName,'Father');
         expect(sonFromObjectory.mother,isNull);
@@ -148,9 +148,9 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
     return objectory.find($Article.sortBy('title'));
   })).chain(expectAsync1((articles) {    
     var artcl = articles[0];
-    expect(artcl.comments[0] is EmbeddedPersistentObject);    
+    expect(artcl.comments[0] is EmbeddedPersistentObject, isTrue);    
     for (var each in artcl.comments) {
-      expect(each is EmbeddedPersistentObject);     
+      expect(each is EmbeddedPersistentObject, isTrue);     
     }
     //Do not know yet how to test throws in async tests
     //expect(()=>artcl.comments[0].user,throws);
