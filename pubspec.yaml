@@ -1,7 +1,7 @@
 name: objectory
 description: Object document mapper/persistency layer for server-side and browser apps
 author: Vadim Tsushko <vadimtsushko@gmail.com>
-homepage: https://github.com/vadimtsushko/mongo_dart
+homepage: https://github.com/vadimtsushko/objectory
 version: 0.0.6-dev
 dependencies:
  unittest:
