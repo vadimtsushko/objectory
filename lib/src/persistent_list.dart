@@ -60,13 +60,16 @@ class PersistentList<E> implements List<E>{
 
 
   internValue(E value) {
-    if (value is EmbeddedPersistentObject) {
-      value._parent = _parent;
-      value._pathToMe = pathToMe;
-      return value.map;
+    // get rid of warnings (Type inferring does not work in code below)
+    //TODO revert when possible 
+    var el = value;
+    if (el is EmbeddedPersistentObject) {
+      el._parent = _parent;
+      el._pathToMe = pathToMe;
+      return el.map;
     }
     if (value is PersistentObject) {
-      return value.dbRef;
+      return el.dbRef;
     }
     return value;
   }
