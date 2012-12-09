@@ -4,12 +4,9 @@ author: Vadim Tsushko <vadimtsushko@gmail.com>
 homepage: https://github.com/vadimtsushko/objectory
 version: 0.0.6-dev
 dependencies:
- unittest:
-  sdk: unittest
- logging:
-  sdk: logging
- args:
-  sdk: args
+ unittest: any
+ logging: any  
+ args: any  
  mongo_dart:
   git: git://github.com/vadimtsushko/mongo_dart.git   
  lawndart: any
