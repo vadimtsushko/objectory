@@ -5,29 +5,29 @@ import 'package:mongo_dart/bson.dart';
 
 typedef Object FactoryMethod();
 
-set objectory(Objectory impl) => Objectory.objectoryImpl = impl; 
-Objectory get objectory => Objectory.objectoryImpl; 
+set objectory(Objectory impl) => Objectory.objectoryImpl = impl;
+Objectory get objectory => Objectory.objectoryImpl;
 
 class Objectory{
-    
+
   static Objectory objectoryImpl;
   String uri;
   Function registerClassesCallback;
-  bool dropCollectionsOnStartup;  
+  bool dropCollectionsOnStartup;
   Map<String,BasePersistentObject> cache;
-  Map<String,FactoryMethod> factories;    
+  Map<String,FactoryMethod> factories;
 
   Objectory(this.uri,this.registerClassesCallback,this.dropCollectionsOnStartup){
     factories = new  Map<String,FactoryMethod>();
     cache = new Map<String,BasePersistentObject>();
   }
-  
+
   void addToCache(PersistentObject obj) {
     cache[obj.id.toString()] = obj;
   }
-  
+
   PersistentObject findInCache(var id) {
-    if (id === null) {
+    if (id == null) {
       return null;
     }
     return cache[id.toString()];
@@ -52,78 +52,78 @@ class Objectory{
   }
   PersistentObject dbRef2Object(DbRef dbRef) {
     return findInCacheOrGetProxy(dbRef.id, dbRef.collection);
-  }  
+  }
   BasePersistentObject map2Object(String className, Map map){
-    if (map === null) {
+    if (map == null) {
       map = new LinkedHashMap();
     }
     if (map.containsKey("_id")) {
       var id = map["_id"];
-      if (id !== null) {
+      if (id != null) {
         var res = cache[id.toHexString()];
-        if (res !== null) {
+        if (res != null) {
           print("Object from cache:  $res");
           return res;
         }
-      }        
+      }
     }
     var result = newInstance(className);
     result.map = map;
     if (result is PersistentObject){
-      result.id = map["_id"];    
+      result.id = map["_id"];
     }
     if (result is PersistentObject) {
-      if (result.id !== null) {
+      if (result.id != null) {
         objectory.addToCache(result);
-      }          
-    }        
+      }
+    }
     return result;
   }
 
   List<String> getCollections() {
     var result = new List<String>();
-    factories.forEach( (key, value) {      
-      var obj = value(); 
-      if (obj is PersistentObject) {    
+    factories.forEach( (key, value) {
+      var obj = value();
+      if (obj is PersistentObject) {
         result.add(key);
        }
     });
     return result;
   }
-  Future save(PersistentObject persistentObject){    
-    if (persistentObject.id != null){            
+  Future save(PersistentObject persistentObject){
+    if (persistentObject.id != null){
       return update(persistentObject);
-    } 
+    }
     else{
       persistentObject.id = generateId();
       persistentObject.map["_id"] = persistentObject.id;
-      objectory.addToCache(persistentObject);      
+      objectory.addToCache(persistentObject);
       return insert(persistentObject);
     }
   }
 
   ObjectId generateId() => new ObjectId();
-  
+
   void registerClass(String className,FactoryMethod factory){
-    factories[className] = factory;    
+    factories[className] = factory;
   }
   Future dropCollections() { throw 'Must be implemented'; }
-  
+
   Future open() { throw 'Must be implemented'; }
 
-  
+
   Future<PersistentObject> findOne(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
   Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
   Future insert(PersistentObject persistentObject) { throw 'Must be implemented'; }
   Future update(PersistentObject persistentObject) { throw 'Must be implemented'; }
   Future remove(BasePersistentObject persistentObject) { throw 'Must be implemented'; }
   Future<Map> dropDb() { throw 'Must be implemented'; }
-  Future<Map> wait() { throw 'Must be implemented'; }  
+  Future<Map> wait() { throw 'Must be implemented'; }
   void close() { throw 'Must be implemented'; }
   Future<bool> initDomainModel() {
     var res = new Completer();
-    registerClassesCallback();        
-    open().then((_){      
+    registerClassesCallback();
+    open().then((_){
       if (dropCollectionsOnStartup) {
         objectory.dropCollections().then((_) =>  res.complete(true));
       }
@@ -131,9 +131,9 @@ class Objectory{
       {
         res.complete(true);
       }
-    });    
+    });
     return res.future;
   }
 
-  
+
 }

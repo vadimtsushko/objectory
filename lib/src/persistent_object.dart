@@ -18,7 +18,7 @@ class BasePersistentObject {
     map = newValue;
     _initMap();
     init();
-    _dirtyFields = new Set<String>();    
+    _dirtyFields = new Set<String>();
   }
   get dirtyFields => _dirtyFields;
   EmbeddedPersistentObject getEmbeddedObject(String className, String property) {
@@ -35,71 +35,71 @@ class BasePersistentObject {
     return result;
   }
   PersistentObject getLinkedObject(String property) {
-    DbRef dbRef = map[property];    
+    DbRef dbRef = map[property];
     if (dbRef == null) {
       return null;
-    }    
+    }
     return objectory.findInCacheOrGetProxy(dbRef.id,dbRef.collection);
-  }  
-  
+  }
+
   setLinkedObject(String property, PersistentObject value) {
     if (value == null) {
-      map[property] = null;      
+      map[property] = null;
     } else {
       if (value.id == null) {
         throw 'Attemt to set link to unsaved object: $value';
       }
       map[property] = value.dbRef;
     }
-  }  
+  }
   void _initMap() {
-  }  
-  
+  }
+
   void setDirty(String fieldName) {
-    if (_dirtyFields === null){
+    if (_dirtyFields == null){
       return;
     }
     _dirtyFields.add(fieldName);
   }
-  
+
   void clearDirtyStatus() {
     _dirtyFields.clear();
   }
-  
+
   void onValueChanging(String fieldName, newValue) {
     setDirty(fieldName);
   }
-  
+
   isDirty() {
     return !_dirtyFields.isEmpty;
   }
-  
-  
+
+
   void setProperty(String property, value){
     onValueChanging(property, value);
     this.map[property] = value;
   }
-  
-  dynamic getProperty(String property){          
+
+  dynamic getProperty(String property){
     return this.map[property];
   }
-  
+
   String toString()=>"$dbType($map)";
-  
+
   void init(){}
-  
+
   // TODO Apparently [this] part is redundant, but dart2js compilation breaks up without it
   // TODO get rid of it when possible
   String get dbType => this.runtimeType.toString();
-  
+
   Future<PersistentObject> fetchLinks(){
-    var dbRefs = new List<DbRef>();    
-    getDbRefsFromMap(map, dbRefs);    
-    var objects = dbRefs.map((each) => objectory.dbRef2Object(each));    
+    var dbRefs = new List<DbRef>();
+    getDbRefsFromMap(map, dbRefs);
+    var objects = dbRefs.map((each) => objectory.dbRef2Object(each));
     Completer completer = new Completer();
     Futures.wait(objects.map((each) => each.fetch())).then((_) => completer.complete(this));
-    return completer.future;    
-  }  
+    return completer.future;
+  }
 
   getDbRefsFromMap(Map map, List result){
     for(var each in map.values){
@@ -111,7 +111,7 @@ class BasePersistentObject {
       }
       if (each is List) {
         getDbRefsFromList(each, result);
-      } 
+      }
     }
   }
   getDbRefsFromList(List list, List result){
@@ -127,13 +127,13 @@ class BasePersistentObject {
       }
     }
   }
-  
+
 }
 class PersistentObject extends BasePersistentObject{
   ObjectId get id => map['_id'];
-  DbRef get dbRef => new DbRef(this.dbType,this.id);  
+  DbRef get dbRef => new DbRef(this.dbType,this.id);
   set id (ObjectId value) => map['_id'] = value;
-  bool notFetched = false;  
+  bool notFetched = false;
   void _initMap() {
     map["_id"] = null;
     super._initMap();
@@ -144,16 +144,16 @@ class PersistentObject extends BasePersistentObject{
   save() {
     objectory.save(this);
   }
-  void setProperty(String property, value){    
+  void setProperty(String property, value){
     super.setProperty(property,value);
     if (saveOnUpdate) {
       save();
     }
-  }  
-  
+  }
+
   Future<bool> fetch() {
     Completer completer = new Completer();
-    objectory.findOne(new ObjectoryQueryBuilder(dbType).id(id)).then((res){        
+    objectory.findOne(new ObjectoryQueryBuilder(dbType).id(id)).then((res){
       completer.complete(true);
     });
     return completer.future;
@@ -161,17 +161,17 @@ class PersistentObject extends BasePersistentObject{
 }
 class EmbeddedPersistentObject extends BasePersistentObject{
   BasePersistentObject _parent;
-  String _pathToMe;  
+  String _pathToMe;
   void setDirty(String fieldName){
     super.setDirty(fieldName);
-    if (_parent !== null) {
+    if (_parent != null) {
       _parent.setDirty('${_pathToMe}.${fieldName}');
     }
   }
   remove() {
     throw 'Must not be invoked';
-  }    
+  }
   save() {
     throw 'Must not be invoked';
-  } 
+  }
 }

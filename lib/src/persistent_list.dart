@@ -61,7 +61,7 @@ class PersistentList<E> implements List<E>{
 
   internValue(E value) {
     // get rid of warnings (Type inferring does not work in code below)
-    //TODO revert when possible 
+    //TODO revert when possible
     var el = value;
     if (el is EmbeddedPersistentObject) {
       el._parent = _parent;

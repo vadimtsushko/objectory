@@ -4,24 +4,24 @@ import 'objectory_base.dart';
 
 class ObjectoryQueryBuilder {
   Map map;
-  ObjectoryQueryBuilder(this.className){    
+  ObjectoryQueryBuilder(this.className){
     map = new LinkedHashMap();
   }
-  
+
   toString() => "ObjectoryQueryBuilder($className $map)";
-  
+
   String className;
-  
+
   void testPropertyName(String propertyName) {
 //    var propertyChain = propertyName.split('.');
-//    var currentProperty = propertyChain[0]; 
+//    var currentProperty = propertyChain[0];
 //    var propertySchema = schema.properties[currentProperty];
 //    if (propertySchema === null) {
 //      throw "Unknown property $currentProperty in class ${schema.className}";
 //    }
 //    if (propertyChain.length > 1) {
 //      if (!propertySchema.embeddedObject)
-//      {  
+//      {
 //        throw "$currentProperty is not an embedded object in class ${schema.className}. Dot notation of $propertyName is not applicable";
 //      }
 //      propertyChain.removeRange(0, 1);
@@ -29,91 +29,91 @@ class ObjectoryQueryBuilder {
 //      new ObjectoryQueryBuilder(propertySchema.type).testPropertyName(currentProperty);
 //    }
   }
-  
+
   ObjectoryQueryBuilder eq(String propertyName,value){
     //testPropertyName(propertyName);
     map[propertyName] = value;
     return this;
   }
-  
-  ObjectoryQueryBuilder id(value){    
+
+  ObjectoryQueryBuilder id(value){
     map["_id"] = value;
     return this;
   }
-  
+
   ObjectoryQueryBuilder ne(String propertyName, value){
     testPropertyName(propertyName);
     map[propertyName] = {"\$ne":value};
     return this;
   }
-  
+
   ObjectoryQueryBuilder gt(String propertyName,value){
     testPropertyName(propertyName);
     map[propertyName] = {"\$gt":value};
     return this;
   }
-  
+
   ObjectoryQueryBuilder lt(String propertyName,value){
     testPropertyName(propertyName);
     map[propertyName] = {"\$lt":value};
     return this;
   }
-  
+
   ObjectoryQueryBuilder gte(String propertyName,value){
     testPropertyName(propertyName);
     map[propertyName] = {"\$gte":value};
     return this;
   }
-  
+
   ObjectoryQueryBuilder lte(String propertyName,value){
     testPropertyName(propertyName);
     map[propertyName] = {"\$lte":value};
     return this;
   }
-  
+
   ObjectoryQueryBuilder all(String propertyName, List values){
     testPropertyName(propertyName);
     map[propertyName] = {"\$all":values};
     return this;
   }
-  
+
   ObjectoryQueryBuilder nin(String propertyName, List values){
     testPropertyName(propertyName);
     map[propertyName] = {"\$nin":values};
     return this;
   }
-  
+
   ObjectoryQueryBuilder oneFrom(String propertyName, List values){
     testPropertyName(propertyName);
     map[propertyName] = {"\$in":values};
     return this;
   }
-  
+
   ObjectoryQueryBuilder exists(String propertyName){
     testPropertyName(propertyName);
     map[propertyName] = {"\$exists":true};
-    return this;    
+    return this;
   }
-  
+
   ObjectoryQueryBuilder notExists(String propertyName){
     testPropertyName(propertyName);
     map[propertyName] = {"\$exists":false};
-    return this;    
+    return this;
   }
-  
+
   ObjectoryQueryBuilder mod(String propertyName, int value){
     testPropertyName(propertyName);
     map[propertyName] = {"\$mod":[value,0]};
-    return this;    
+    return this;
   }
-  
+
   ObjectoryQueryBuilder match(String propertyName, String pattern,[bool multiLine, bool caseInsensitive, bool dotAll, bool extended]){
     testPropertyName(propertyName);
     map[propertyName] = {'\$regex': new BsonRegexp(pattern,multiLine:multiLine, caseInsensitive:caseInsensitive,
         dotAll:dotAll,extended:extended)};
-    return this;    
+    return this;
   }
-  
+
   ObjectoryQueryBuilder range(String propertyName, min, max, [bool minInclude=true, bool maxInclude=true]){
     testPropertyName(propertyName);
     Map rangeMap = {};
@@ -130,61 +130,61 @@ class ObjectoryQueryBuilder {
       rangeMap["\$gt"] = max;
     }
     map[propertyName] = rangeMap;
-    return this;    
+    return this;
   }
-  
+
   _internQueryMap(){
     if (!map.containsKey("query")){
       LinkedHashMap queryMap = new LinkedHashMap.from(map);
       map.clear();
       map["query"] = queryMap;
-    }    
+    }
   }
-  
+
   ObjectoryQueryBuilder sortBy(String propertyName, [bool descending=false]){
-    testPropertyName(propertyName);  
+    testPropertyName(propertyName);
     _internQueryMap();
     if (!map.containsKey("orderby")){
-      map["orderby"] = new LinkedHashMap();  
+      map["orderby"] = new LinkedHashMap();
     }
     int order = 1;
     if (descending){
       order = -1;
     }
-    map["orderby"][propertyName] = order;      
-    return this;    
+    map["orderby"][propertyName] = order;
+    return this;
   }
-  
+
   ObjectoryQueryBuilder comment(String commentStr){
-    _internQueryMap();  
-    map["\$comment"] = commentStr;      
-    return this;    
+    _internQueryMap();
+    map["\$comment"] = commentStr;
+    return this;
   }
-  
+
   ObjectoryQueryBuilder explain(){
-    _internQueryMap();  
-    map["\$explain"] = true;      
-    return this;    
+    _internQueryMap();
+    map["\$explain"] = true;
+    return this;
   }
-  
+
   ObjectoryQueryBuilder snapshot(){
-    _internQueryMap();  
-    map["\$snapshot"] = true;      
-    return this;    
+    _internQueryMap();
+    map["\$snapshot"] = true;
+    return this;
   }
-  
+
   ObjectoryQueryBuilder showDiskLoc(){
-    _internQueryMap();  
-    map["\$showDiskLoc"] = true;      
-    return this;    
+    _internQueryMap();
+    map["\$showDiskLoc"] = true;
+    return this;
   }
-  
+
   ObjectoryQueryBuilder returnKey(){
-    _internQueryMap();  
-    map["\$sreturnKey"] = true;      
-    return this;    
+    _internQueryMap();
+    map["\$sreturnKey"] = true;
+    return this;
   }
-  
+
   ObjectoryQueryBuilder where(String javaScriptCode){
     map["\$where"] = new BsonCode(javaScriptCode);
     return this;
