@@ -5,8 +5,9 @@ import 'package:mongo_dart/bson.dart';
 
 typedef Object FactoryMethod();
 
-set objectory(Objectory impl) => Objectory.objectoryImpl = impl;
 Objectory get objectory => Objectory.objectoryImpl;
+set objectory(Objectory impl) => Objectory.objectoryImpl = impl;
+
 
 class Objectory{
 

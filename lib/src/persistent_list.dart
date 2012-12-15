@@ -156,12 +156,13 @@ class PersistentList<E> implements List<E>{
   dynamic reduce(dynamic initialValue,
                  dynamic combine(dynamic previousValue, E element)) => _list.reduce(initialValue, combine);
 
-
+  E get first => _list.first;
+  
   void operator[]=(int index, E value){
     _list[index] = internValue(value);
     setDirty(null);
   }
-
+ 
   E operator[](int index) {
     return valueConverter.convertValue(_list[index]);
   }
