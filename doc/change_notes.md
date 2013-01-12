@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.0.7
+
+- dart.js bootstrap file is moving to pub
+
 ###0.0.6
 
 - Minor fixes
