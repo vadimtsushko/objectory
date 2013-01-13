@@ -81,7 +81,7 @@ testObjectWithCollectionOfExternalRefs(){
   Person son;
   Person daughter;
   Person sonFromObjectory;
-  objectory.initDomainModel().chain(expectAsync1((_) {
+  objectory.initDomainModel().then(expectAsync1((_) {
     father = new Person();  
     father.firstName = 'Father';
     father.save();
@@ -97,13 +97,13 @@ testObjectWithCollectionOfExternalRefs(){
     father.children.add(daughter);
     father.save();
     return objectory.findOne($Person.id(father.id));
-  })).chain(expectAsync1((fatherFromObjectory){
+  })).then(expectAsync1((fatherFromObjectory){
       // Links must be fetched before use.   
     expect(fatherFromObjectory.children.length,2);
     //Do not know yet how to test throws in async tests    
     //expect(()=>father.children[0],throws);      
     return father.fetchLinks();
-  })).chain(expectAsync1((_) {
+  })).then(expectAsync1((_) {
     sonFromObjectory = father.children[0];    
     expect(sonFromObjectory.mother,isNull);
     return sonFromObjectory.fetchLinks();
@@ -118,7 +118,7 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   User joe;
   User lisa;
   Author author;
-  objectory.initDomainModel().chain(expectAsync1((_) {  
+  objectory.initDomainModel().then(expectAsync1((_) {  
     author = new Author();
     author.name = 'Vadim';
     author.save();
@@ -146,7 +146,7 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
     article.comments.add(comment);
     objectory.save(article);    
     return objectory.find($Article.sortBy('title'));
-  })).chain(expectAsync1((articles) {    
+  })).then(expectAsync1((articles) {    
     var artcl = articles[0];
     expect(artcl.comments[0] is EmbeddedPersistentObject, isTrue);    
     for (var each in artcl.comments) {

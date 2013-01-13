@@ -21,8 +21,8 @@ class _PersistentIterator<E> implements Iterator<E> {
   _ValueConverter valueConverter;
   PersistentList persistentList;
   _PersistentIterator(this.persistentList,this._it, this.valueConverter);
-  E next() => valueConverter.convertValue(_it.next());
-  bool get hasNext => _it.hasNext;
+  E get current => valueConverter.convertValue(_it.current);
+  bool moveNext() => _it.moveNext();
 }
 
 class PersistentList<E> implements List<E>{
@@ -79,15 +79,15 @@ class PersistentList<E> implements List<E>{
 
   void forEach(void f(element)) => _list.forEach(f);
 
-  Collection map(f(E element)) => _list.map(f);
+  Collection mappedBy(f(E element)) => _list.mappedBy(f);
 
-  Collection<E> filter(bool f(E element)) => _list.filter(f);
+  Collection<E> where(bool f(E element)) => _list.where(f);
 
   bool every(bool f(E element)) => _list.every(f);
 
-  bool some(bool f(E element)) => _list.some(f);
+  bool any(bool f(E element)) => _list.any(f);
 
-  Iterator<E> iterator() => new _PersistentIterator(this,_list.iterator(),valueConverter);
+  Iterator<E> get iterator => new _PersistentIterator(this,_list.iterator,valueConverter);
 
   int indexOf(E element, [int start = 0]) => _list.indexOf(element, start);
 

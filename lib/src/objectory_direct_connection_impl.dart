@@ -1,5 +1,6 @@
 library objectory_direct_connection;
 import 'package:mongo_dart/mongo_dart.dart';
+import 'dart:async';
 import 'persistent_object.dart';
 import 'objectory_query_builder.dart';
 import 'objectory_base.dart';
@@ -81,7 +82,7 @@ class ObjectoryDirectConnectionImpl extends Objectory{
     db.close();
   }
   Future dropCollections() {
-    return Futures.wait(getCollections().map(
+    return Future.wait(getCollections().mappedBy(
         (collection) => db.collection(collection).drop()));
   }
 }

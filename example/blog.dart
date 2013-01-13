@@ -8,7 +8,7 @@ main(){
   objectory = new ObjectoryWebsocketBrowserImpl(DefaultUri,registerClasses,true);
   var authors = new Map<String,Author>();
   var users = new Map<String,User>();  
-  objectory.initDomainModel().chain((_) {
+  objectory.initDomainModel().then((_) {
     print("===================================================================================");
     print(">> Adding Authors");
     var author = new Author();
@@ -22,7 +22,7 @@ main(){
     author.age = 123;
     author.save();    
     return objectory.find($Author.sortBy('age'));
-  }).chain((auths){  
+  }).then((auths){  
     print("===================================================================================");
     print(">> Authors ordered by age ascending");
     for (var auth in auths) {
@@ -42,7 +42,7 @@ main(){
     user.email = 'lucy@smith.com';
     user.save();
     return objectory.find($User.sortBy('login'));
-  }).chain((usrs){  
+  }).then((usrs){  
     print("===================================================================================");
     print(">> >> Users ordered by login ascending");
     for (var user in usrs) {
@@ -79,8 +79,8 @@ main(){
     article.comments.add(comment);
     article.save();
     return objectory.find($Article);  
-  }).chain((articles){    
-    return Futures.wait(articles.map((article) => printArticle(article)));
+  }).then((articles){    
+    return Future.wait(articles.mappedBy((article) => printArticle(article)));
   }).then((_) {
    objectory.close();
   });      
@@ -88,7 +88,7 @@ main(){
 
 print(message) {
   var textElement = html.query('#text');
-  textElement.innerHTML = '${textElement.innerHTML}<br>\n${message.toString()}';
+  textElement.innerHtml = '${textElement.innerHtml}<br>\n${message.toString()}';
 }
 
 Future printArticle(article) { 

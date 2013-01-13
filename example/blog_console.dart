@@ -2,12 +2,13 @@ library blog_example;
 import 'package:objectory/objectory_console.dart';
 import 'domain_model.dart';
 
+
 const Uri = 'mongodb://127.0.0.1/objectory_blog';
 main(){
   objectory = new ObjectoryDirectConnectionImpl(Uri,registerClasses,true);
   var authors = new Map<String,Author>();
   var users = new Map<String,User>();  
-  objectory.initDomainModel().chain((_) {
+  objectory.initDomainModel().then((_) {
     print("===================================================================================");
     print(">> Adding Authors");
     var author = new Author();
@@ -21,7 +22,7 @@ main(){
     author.age = 123;
     author.save();    
     return objectory.find($Author.sortBy('age'));
-  }).chain((auths){  
+  }).then((auths){  
     print("===================================================================================");
     print(">> Authors ordered by age ascending");
     for (var auth in auths) {
@@ -41,7 +42,7 @@ main(){
     user.email = 'lucy@smith.com';
     user.save();
     return objectory.find($User.sortBy('login'));
-  }).chain((usrs){  
+  }).then((usrs){  
     print("===================================================================================");
     print(">> >> Users ordered by login ascending");
     for (var user in usrs) {
@@ -78,11 +79,11 @@ main(){
     article.comments.add(comment);
     article.save();
     return objectory.find($Article);  
-  }).chain((articles){
+  }).then((articles){
     print("===================================================================================");
     print(">> Printing articles");
-    return Futures.wait(articles.map((article) => printArticle(article)));     
-  }).chain((_) {
+    return Future.wait(articles.mappedBy((article) => printArticle(article)));     
+  }).then((_) {
     return objectory.dropCollections();
   }).then((_) {
    objectory.close();

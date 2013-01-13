@@ -1,6 +1,7 @@
 library objectory_impl;
 import 'dart:html';
 import 'persistent_object.dart';
+import 'dart:async';
 import 'objectory_query_builder.dart';
 import 'objectory_base.dart';
 import 'package:mongo_dart/bson.dart';
@@ -110,7 +111,7 @@ class ObjectoryLawndartImpl extends Objectory{
   }
 
   Future dropCollections() {
-    return Futures.wait(getCollections().map(
+    return Future.wait(getCollections().mappedBy(
         (collection) => db.store(collection).nuke()));
   }
 

@@ -7,6 +7,7 @@ import 'package:logging/logging.dart';
 import 'package:mongo_dart/bson.dart';
 import 'package:mongo_dart/src/bson/json_ext.dart';
 import 'vm_log_config.dart';
+import 'dart:async';
 
 const IP = '127.0.0.1';
 const PORT = 8080;
@@ -148,7 +149,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     webSocket.close(1, 'Normal close');
   }
   Future dropCollections() {
-    return Futures.wait(getCollections().map(
+    return Future.wait(getCollections().mappedBy(
           (collection) => _postMessage(_createCommand('dropCollection',collection),{})));
   }
 }

@@ -5,6 +5,7 @@ import 'objectory_query_builder.dart';
 import 'objectory_base.dart';
 import 'package:mongo_dart/bson.dart';
 import 'package:mongo_dart/src/bson/JSON_ext.dart';
+import 'dart:async';
 
 const IP = '127.0.0.1';
 const PORT = 8080;
@@ -144,7 +145,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     webSocket.close();
   }
   Future dropCollections() {
-    return Futures.wait(getCollections().map(
+    return Future.wait(getCollections().mappedBy(
         (collection) => _postMessage(_createCommand('dropCollection',collection),{})));
   }
 }
