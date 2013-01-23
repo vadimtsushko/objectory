@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.0.8
+
+- Ready for M3, run in version 0.3.1_r17328
+
 ###0.0.7
 
 - dart.js bootstrap file is moving to pub
