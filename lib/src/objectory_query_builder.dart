@@ -1,6 +1,7 @@
 library objectory_query;
 import 'package:mongo_dart/bson.dart';
 import 'objectory_base.dart';
+import 'dart:collection';
 
 class ObjectoryQueryBuilder {
   Map map;
