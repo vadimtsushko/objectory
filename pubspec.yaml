@@ -1,12 +1,12 @@
 name: objectory
-version: 0.0.9-dev
+version: 0.0.9
 author: Vadim Tsushko <vadimtsushko@gmail.com>
 description: Object document mapper/persistency layer for server-side and browser apps
 homepage: https://github.com/vadimtsushko/objectory
 dependencies:
-  lawndart: any
-  mongo_dart: any
   unittest: any
+  mongo_dart: any
+  lawndart: any
   args: any
   browser: any
   logging: any
