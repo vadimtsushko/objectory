@@ -35,6 +35,7 @@ class ObjectoryClient {
       var jdata = JSON_EXT.parse(message);
       var header = new RequestHeader.fromMap(jdata[0]);
       Map content = jdata[1];
+      Map extParams = jdata[2];
       if (header.command == "insert") {
         save(header,content);
         return;
@@ -44,11 +45,11 @@ class ObjectoryClient {
         return;
       }
       if (header.command == "findOne") {
-        findOne(header,content);
+        findOne(header, content, extParams);
         return;
       }
       if (header.command == "find") {
-        find(header,content);
+        find(header, content, extParams);
         return;
       }
       if (header.command == "queryDb") {
@@ -100,15 +101,23 @@ class ObjectoryClient {
       sendResult(header, responseData);
     });
   }
-  find(RequestHeader header, Map selector) {
-    db.collection(header.collection).find(selector).toList().
+  find(RequestHeader header, Map selector, Map extParams) {
+    SelectorBuilder selectorBuilder = new SelectorBuilder();
+    selectorBuilder.map = selector;        
+    selectorBuilder.extParams.limit = extParams['limit'];
+    selectorBuilder.extParams.skip = extParams['skip'];    
+    db.collection(header.collection).find(selectorBuilder).toList().
     then((responseData) {
       sendResult(header, responseData);
     });
   }
 
-  findOne(RequestHeader header, Map selector) {
-    db.collection(header.collection).findOne(selector).
+  findOne(RequestHeader header, Map selector , Map extParams) {
+    SelectorBuilder selectorBuilder = new SelectorBuilder();
+    selectorBuilder.map = selector;        
+    selectorBuilder.extParams.limit = extParams['limit'];
+    selectorBuilder.extParams.skip = extParams['skip'];
+    db.collection(header.collection).findOne(selectorBuilder).
     then((responseData) {
       sendResult(header, responseData);
     });

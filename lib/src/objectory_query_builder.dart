@@ -6,7 +6,6 @@ import 'dart:collection';
 class _ExtParams {
   int skip = 0;
   int limit = 0;
-  Map fields;
 }
 class ObjectoryQueryBuilder {
   Map map = new LinkedHashMap();
@@ -19,6 +18,8 @@ class ObjectoryQueryBuilder {
 
   String className;
 
+  Map get extParamsMap => {'skip': extParams.skip, 'limit': extParams.limit};
+  
   void testPropertyName(String propertyName) {
 //    var propertyChain = propertyName.split('.');
 //    var currentProperty = propertyChain[0];
@@ -197,27 +198,7 @@ class ObjectoryQueryBuilder {
     return this;
   }
   
-  ObjectoryQueryBuilder fields(List<String> fields) {
-     if (extParams.fields != null) {
-       throw 'Fields parameter may be set only once for selector';
-     }
-     extParams.fields = {};
-     for (var field in fields) {
-       extParams.fields[field] = 1;
-     }
-     return this;
-  }
-  ObjectoryQueryBuilder excludeFields(List<String> fields) {
-    if (extParams.fields != null) {
-      throw 'Fields parameter may be set only once for selector';
-    }
-    extParams.fields = {};
-    for (var field in fields) {
-      extParams.fields[field] = -1;
-    }
-    return this;
-  }
-
+  
   ObjectoryQueryBuilder limit(int limit) {
     extParams.limit = limit;
     return this;

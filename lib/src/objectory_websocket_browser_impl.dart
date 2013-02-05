@@ -63,10 +63,10 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     });
     return completer.future;
   }
-  Future _postMessage(Map command, Map content) {
+  Future _postMessage(Map command, Map content, [Map contentExt]) {
     requestId++;
     command['requestId'] = requestId;
-    webSocket.send(JSON_EXT.stringify([command,content]));
+    webSocket.send(JSON_EXT.stringify([command,content,contentExt]));
     var completer = new Completer();
     awaitedRequests[requestId] = completer;
     return completer.future;
@@ -89,7 +89,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){
     Completer completer = new Completer();
     var result = new List<PersistentObject>();
-    _postMessage(_createCommand('find',selector.className),selector.map).then((list) {
+    _postMessage(_createCommand('find',selector.className), selector.map, selector.extParamsMap).then((list) {
       for (var map in list) {
         PersistentObject obj = objectory.map2Object(selector.className,map);
         result.add(obj);
@@ -109,7 +109,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
       completer.complete(obj);
     }
     else {
-      _postMessage(_createCommand('findOne',selector.className),selector.map)
+      _postMessage(_createCommand('findOne',selector.className), selector.map, selector.extParamsMap)
       .then((map){
         if (map == null) {
          completer.complete(null);
