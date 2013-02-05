@@ -173,6 +173,25 @@ testPropertyNameChecks() {
   expect(() => $Person.eq('address.cityName1', 'Tyumen'),throws);  
 }
 
+void testLimit(){
+  objectory.initDomainModel().then(expectAsync1((_) {
+    for (int n=0; n < 30; n++) {
+      Author author = new Author();
+      author.age = n;      
+      author.save();        
+    }    
+    objectory.wait().then(expectAsync1((coll){
+     return objectory.find($Author.skip(20).limit(10));
+    })).then(expectAsync1((coll){            
+      expect(coll.length,10);
+      var authFromMongo = coll[0];
+      expect(authFromMongo.age,20);
+      objectory.close();
+    }));
+  }));
+}
+
+
 allImplementationTests(){
     test('simpleTestInsertionAndUpdate',simpleTestInsertionAndUpdate);  
     test('testInsertionAndUpdate',testInsertionAndUpdate);
@@ -180,4 +199,5 @@ allImplementationTests(){
     test('testObjectWithExternalRefs',testObjectWithExternalRefs);    
     test('testObjectWithCollectionOfExternalRefs',testObjectWithCollectionOfExternalRefs);
     test('testMap2ObjectWithListtOfInternalObjectsWithExternalRefs',testMap2ObjectWithListtOfInternalObjectsWithExternalRefs);
+    test('testLimit',testLimit);    
 }

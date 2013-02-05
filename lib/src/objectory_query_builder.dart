@@ -3,8 +3,14 @@ import 'package:mongo_dart/bson.dart';
 import 'objectory_base.dart';
 import 'dart:collection';
 
+class _ExtParams {
+  int skip = 0;
+  int limit = 0;
+  Map fields;
+}
 class ObjectoryQueryBuilder {
-  Map map;
+  Map map = new LinkedHashMap();
+  _ExtParams extParams = new _ExtParams();  
   ObjectoryQueryBuilder(this.className){
     map = new LinkedHashMap();
   }
@@ -190,4 +196,36 @@ class ObjectoryQueryBuilder {
     map["\$where"] = new BsonCode(javaScriptCode);
     return this;
   }
+  
+  ObjectoryQueryBuilder fields(List<String> fields) {
+     if (extParams.fields != null) {
+       throw 'Fields parameter may be set only once for selector';
+     }
+     extParams.fields = {};
+     for (var field in fields) {
+       extParams.fields[field] = 1;
+     }
+     return this;
+  }
+  ObjectoryQueryBuilder excludeFields(List<String> fields) {
+    if (extParams.fields != null) {
+      throw 'Fields parameter may be set only once for selector';
+    }
+    extParams.fields = {};
+    for (var field in fields) {
+      extParams.fields[field] = -1;
+    }
+    return this;
+  }
+
+  ObjectoryQueryBuilder limit(int limit) {
+    extParams.limit = limit;
+    return this;
+  }
+
+  ObjectoryQueryBuilder skip(int skip) {
+    extParams.skip = skip;
+    return this;
+  }
+  
 }

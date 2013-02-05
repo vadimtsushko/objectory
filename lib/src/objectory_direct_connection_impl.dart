@@ -27,10 +27,15 @@ class ObjectoryDirectConnectionImpl extends Objectory{
 
 
   Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){
-    Completer completer = new Completer();
+    Completer completer = new Completer();    
+    SelectorBuilder selectorBuilder = new SelectorBuilder();
+    selectorBuilder.map = selector.map;
+    selectorBuilder.extParams.fields = selector.extParams.fields;    
+    selectorBuilder.extParams.limit = selector.extParams.limit;
+    selectorBuilder.extParams.skip = selector.extParams.skip;
     var result = new List<PersistentObject>();
     db.collection(selector.className)
-      .find(selector.map)
+      .find(selectorBuilder)
       .each((map){
         PersistentObject obj = objectory.map2Object(selector.className,map);
         result.add(obj);
