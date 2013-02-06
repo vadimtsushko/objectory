@@ -1,5 +1,13 @@
 #Recent change notes
 
+###0.0.11
+
+- Support for near and within geospatial queries in QueryBuilder (Thanks to Jesse https://github.com/FreakTheMighty)
+
+###0.0.10
+
+- Support for limit and skip operation in QueryBuilder.
+
 ###0.0.8
 
 - Ready for M3, run in version 0.3.1_r17328

@@ -209,4 +209,19 @@ class ObjectoryQueryBuilder {
     return this;
   }
   
+  ObjectoryQueryBuilder near(String propertyName, var value, [double maxDistance]){ 
+    testPropertyName(propertyName);
+    if (maxDistance != null){
+      map[propertyName] = {"\$near":value};
+    } else {
+      map[propertyName] = {"\$near":value,"\$maxDistance":maxDistance};
+    }
+    return this;
+  }
+  
+  ObjectoryQueryBuilder within(String propertyName, value){
+    testPropertyName(propertyName);
+    map[propertyName] = {"\$within":{"\$box":value}};
+    return this;
+  }
 }
