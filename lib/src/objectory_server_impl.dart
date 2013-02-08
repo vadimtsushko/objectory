@@ -182,7 +182,7 @@ class ObjectoryServerImpl {
         var c = new ObjectoryClient('objectory_client_${token}', token, conn);
         log.info('adding connection token = ${token}');
       };
-      print('listing on http://$hostName:$port\n');
+      print('Listening on http://$hostName:$port\n');
       log.fine('MongoDB connection: ${db.serverConfig.host}:${db.serverConfig.port}');
       server.listen(hostName, port);
     });
