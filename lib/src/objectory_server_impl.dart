@@ -26,60 +26,62 @@ class RequestHeader {
 class ObjectoryClient {
   int token;
   String name;
-  WebSocketConnection conn;
+  WebSocket socket;
   bool closed = false;
-  ObjectoryClient(this.name, this.token, this.conn) {
-    conn.send(JSON_EXT.stringify([{'command':'hello'}, {'connection':this.name}]));
-    conn.onMessage = (message) {
-      log.fine('message is $message');
-      var jdata = JSON_EXT.parse(message);
-      var header = new RequestHeader.fromMap(jdata[0]);
-      Map content = jdata[1];
-      Map extParams = jdata[2];
-      if (header.command == "insert") {
-        save(header,content);
-        return;
-      }
-      if (header.command == "update") {
-        save(header,content);
-        return;
-      }
-      if (header.command == "findOne") {
-        findOne(header, content, extParams);
-        return;
-      }
-      if (header.command == "find") {
-        find(header, content, extParams);
-        return;
-      }
-      if (header.command == "queryDb") {
-        queryDb(header,content);
-        return;
-      }
-      if (header.command == "dropDb") {
-        dropDb(header);
-        return;
-      }
-      if (header.command == "dropCollection") {
-        dropCollection(header);
-        return;
-      }
+  ObjectoryClient(this.name, this.token, this.socket) {
+    socket.send(JSON_EXT.stringify([{'command':'hello'}, {'connection':this.name}]));
+    socket.listen((event) {
+      if (event is MessageEvent) {
+        log.fine('message is $event');
+        var jdata = JSON_EXT.parse(event.data);
+        var header = new RequestHeader.fromMap(jdata[0]);
+        Map content = jdata[1];
+        Map extParams = jdata[2];
+        if (header.command == "insert") {
+          save(header,content);
+          return;
+        }
+        if (header.command == "update") {
+          save(header,content);
+          return;
+        }
+        if (header.command == "findOne") {
+          findOne(header, content, extParams);
+          return;
+        }
+        if (header.command == "find") {
+          find(header, content, extParams);
+          return;
+        }
+        if (header.command == "queryDb") {
+          queryDb(header,content);
+          return;
+        }
+        if (header.command == "dropDb") {
+          dropDb(header);
+          return;
+        }
+        if (header.command == "dropCollection") {
+          dropCollection(header);
+          return;
+        }
 
-      log.shout('Unexpected message: $message');
-      sendResult(header,content);
-    };
-
-    conn.onClosed = (int status, String reason) {
-      log.info('closed with $status for $reason');
-      closed = true;
-    };
+        log.shout('Unexpected message: $event');
+        sendResult(header,content);
+        
+      } else if (event is CloseEvent) {
+        /* Handle closed. */
+        log.info('closed with ${event.code} for ${event.reason}');
+        closed = true;
+      }
+    });
   }
   sendResult(RequestHeader header, content) {
     log.fine('sendResult($header, $content) ');
     if (closed) {
       log.shout('ERROR: trying send on closed connection. $header, $content');
     } else {
-      conn.send(JSON_EXT.stringify([header.toMap(),content]));
+      socket.send(JSON_EXT.stringify([header.toMap(),content]));
     }
   }
   save(RequestHeader header, Map mapToSave) {
@@ -103,9 +105,9 @@ class ObjectoryClient {
   }
   find(RequestHeader header, Map selector, Map extParams) {
     SelectorBuilder selectorBuilder = new SelectorBuilder();
-    selectorBuilder.map = selector;        
+    selectorBuilder.map = selector;
     selectorBuilder.extParams.limit = extParams['limit'];
-    selectorBuilder.extParams.skip = extParams['skip'];    
+    selectorBuilder.extParams.skip = extParams['skip'];
     db.collection(header.collection).find(selectorBuilder).toList().
     then((responseData) {
       sendResult(header, responseData);
@@ -114,7 +116,7 @@ class ObjectoryClient {
 
   findOne(RequestHeader header, Map selector , Map extParams) {
     SelectorBuilder selectorBuilder = new SelectorBuilder();
-    selectorBuilder.map = selector;        
+    selectorBuilder.map = selector;
     selectorBuilder.extParams.limit = extParams['limit'];
     selectorBuilder.extParams.skip = extParams['skip'];
     db.collection(header.collection).findOne(selectorBuilder).
@@ -149,7 +151,7 @@ class ObjectoryClient {
 
   protocolError(String errorMessage) {
     log.shout('PROTOCOL ERROR: $errorMessage');
-    conn.send(JSON_EXT.stringify({'error': errorMessage}));
+    socket.send(JSON_EXT.stringify({'error': errorMessage}));
   }
 
 
@@ -162,29 +164,26 @@ class ObjectoryServerImpl {
   String hostName;
   int port;
   String mongoUri;
+  int _token = 0;
   ObjectoryServerImpl(this.hostName,this.port,this.mongoUri, bool verbose){
     chatText = [];
-    int token = 0;
-    HttpServer server;
+    if (verbose) {
+      configureConsoleLogger(Level.ALL);
+    }
+    else {
+      configureConsoleLogger(Level.INFO);
+    }    
     db = new Db(mongoUri);
     db.open().then((_) {
-      server = new HttpServer();
-      WebSocketHandler wsHandler = new WebSocketHandler();
-      server.addRequestHandler((req) => req.path == '/ws', wsHandler.onRequest);
-      if (verbose) {
-        configureConsoleLogger(Level.ALL);
-      }
-      else {
-        configureConsoleLogger(Level.INFO);
-      }
-      wsHandler.onOpen = (WebSocketConnection conn) {
-        token+=1;
-        var c = new ObjectoryClient('objectory_client_${token}', token, conn);
-        log.info('adding connection token = ${token}');
-      };
-      print('Listening on http://$hostName:$port\n');
-      log.fine('MongoDB connection: ${db.serverConfig.host}:${db.serverConfig.port}');
-      server.listen(hostName, port);
+      HttpServer.bind(hostName, port).then((server) {
+        server.transform(new WebSocketTransformer()).listen((WebSocket webSocket) {
+          _token+=1;
+          var c = new ObjectoryClient('objectory_client_${_token}', _token, webSocket);
+          log.info('adding connection token = ${_token}');
+       });
+      });
     });
+    print('Listening on http://$hostName:$port\n');
+    log.fine('MongoDB connection: ${db.serverConfig.host}:${db.serverConfig.port}');         
   }
 }

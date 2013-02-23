@@ -84,8 +84,8 @@ class Comment extends EmbeddedPersistentObject {
   String get body => getProperty('body');
   set body(String value) => setProperty('body',value);
 
-  Date get date => getProperty('date');
-  set date(Date value) => setProperty('date',value);
+  DateTime get date => getProperty('date');
+  set date(DateTime value) => setProperty('date',value);
 }
 
 void registerClasses() {

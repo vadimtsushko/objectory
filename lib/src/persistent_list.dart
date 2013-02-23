@@ -79,7 +79,7 @@ class PersistentList<E> implements List<E>{
 
   void forEach(void f(element)) => _list.forEach(f);
 
-  Collection mappedBy(f(E element)) => _list.mappedBy(f);
+  Collection map(f(E element)) => _list.map(f);
 
   Collection<E> where(bool f(E element)) => _list.where(f);
 
@@ -157,12 +157,12 @@ class PersistentList<E> implements List<E>{
                  dynamic combine(dynamic previousValue, E element)) => _list.reduce(initialValue, combine);
 
   E get first => _list.first;
-  
+
   void operator[]=(int index, E value){
     _list[index] = internValue(value);
     setDirty(null);
   }
- 
+
   E operator[](int index) {
     return valueConverter.convertValue(_list[index]);
   }

@@ -12,6 +12,6 @@ void main() {
   if (args["help"] == true) {
     print(parser.getUsage());
     return;
-  }  
+  }
   var server = new ObjectoryServerImpl(args['ip'],int.parse(args['port']),args['uri'],args['verbose']);
 }

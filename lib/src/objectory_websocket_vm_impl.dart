@@ -36,34 +36,34 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
 
   Future<bool> setupWebsocket(String uri) {
     Completer completer = new Completer();
-    webSocket = new WebSocket("ws://$uri/ws");
-    webSocket.onopen = () {
+    WebSocket.connect("ws://$uri/ws")
+    .then((WebSocket _webSocket) {
+      webSocket = _webSocket;
       isConnected = true;
-      completer.complete(true);
-    };
+      completer.complete(true);      
+      webSocket.listen((event) {
+        if (event is MessageEvent) {
+          var jdata = JSON_EXT.parse(event.data);
+          log.info('onmessage: $jdata');
+          var message = new ObjectoryMessage.fromList(jdata);
+          int receivedRequestId = message.command['requestId'];
+          if (receivedRequestId == null) {
+            return;
+          }
+          var completer = awaitedRequests[receivedRequestId];
+          if (completer != null) {
+            log.fine("Complete request: $receivedRequestId message: $message");
+            completer.complete(message.content);
+          } else {
+            log.shout('Not found completer for request: $receivedRequestId');
+          }
 
-    webSocket.onclose = (c) {
-      log.fine('close ${c.code} ${c.reason} ${c.wasClean}');
-      isConnected = false;
-    };
-
-    webSocket.onmessage = (m) {
-      var jdata = JSON_EXT.parse(m.data);
-      log.info('onmessage: $jdata');
-      var message = new ObjectoryMessage.fromList(jdata);
-      int receivedRequestId = message.command['requestId'];
-      if (receivedRequestId == null) {
-        return;
-      }
-      var completer = awaitedRequests[receivedRequestId];
-      if (completer != null) {
-        log.fine("Complete request: $receivedRequestId message: $message");
-        completer.complete(message.content);
-      } else {
-        log.shout('Not found completer for request: $receivedRequestId');
-      }
-
-    };
+        } else if (event is CloseEvent) {
+          log.fine('close ${event.code} ${event.reason} ${event.wasClean}');
+          isConnected = false;
+        }
+      });
+    });
     return completer.future;
   }
   Future _postMessage(Map command, Map content, [Map contentExt]) {
@@ -149,7 +149,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     webSocket.close(1, 'Normal close');
   }
   Future dropCollections() {
-    return Future.wait(getCollections().mappedBy(
+    return Future.wait(getCollections().map(
           (collection) => _postMessage(_createCommand('dropCollection',collection),{})));
   }
 }

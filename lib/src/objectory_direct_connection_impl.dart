@@ -27,9 +27,9 @@ class ObjectoryDirectConnectionImpl extends Objectory{
 
 
   Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){
-    Completer completer = new Completer();    
+    Completer completer = new Completer();
     SelectorBuilder selectorBuilder = new SelectorBuilder();
-    selectorBuilder.map = selector.map;        
+    selectorBuilder.map = selector.map;
     selectorBuilder.extParams.limit = selector.extParams.limit;
     selectorBuilder.extParams.skip = selector.extParams.skip;
     var result = new List<PersistentObject>();
@@ -45,7 +45,7 @@ class ObjectoryDirectConnectionImpl extends Objectory{
   Future<PersistentObject> findOne(ObjectoryQueryBuilder selector){
     SelectorBuilder selectorBuilder = new SelectorBuilder();
     selectorBuilder.map = selector.map;
-    selectorBuilder.extParams.skip = selector.extParams.skip;    
+    selectorBuilder.extParams.skip = selector.extParams.skip;
     Completer completer = new Completer();
     var obj;
     if (selector.map.containsKey("_id")) {
@@ -89,7 +89,7 @@ class ObjectoryDirectConnectionImpl extends Objectory{
     db.close();
   }
   Future dropCollections() {
-    return Future.wait(getCollections().mappedBy(
+    return Future.wait(getCollections().map(
         (collection) => db.collection(collection).drop()));
   }
 }

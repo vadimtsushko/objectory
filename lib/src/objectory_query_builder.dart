@@ -9,7 +9,7 @@ class _ExtParams {
 }
 class ObjectoryQueryBuilder {
   Map map = new LinkedHashMap();
-  _ExtParams extParams = new _ExtParams();  
+  _ExtParams extParams = new _ExtParams();
   ObjectoryQueryBuilder(this.className){
     map = new LinkedHashMap();
   }
@@ -19,7 +19,7 @@ class ObjectoryQueryBuilder {
   String className;
 
   Map get extParamsMap => {'skip': extParams.skip, 'limit': extParams.limit};
-  
+
   void testPropertyName(String propertyName) {
 //    var propertyChain = propertyName.split('.');
 //    var currentProperty = propertyChain[0];
@@ -197,8 +197,8 @@ class ObjectoryQueryBuilder {
     map["\$where"] = new BsonCode(javaScriptCode);
     return this;
   }
-  
-  
+
+
   ObjectoryQueryBuilder limit(int limit) {
     extParams.limit = limit;
     return this;
@@ -208,8 +208,8 @@ class ObjectoryQueryBuilder {
     extParams.skip = skip;
     return this;
   }
-  
-  ObjectoryQueryBuilder near(String propertyName, var value, [double maxDistance]){ 
+
+  ObjectoryQueryBuilder near(String propertyName, var value, [double maxDistance]){
     testPropertyName(propertyName);
     if (maxDistance != null){
       map[propertyName] = {"\$near":value};
@@ -218,7 +218,7 @@ class ObjectoryQueryBuilder {
     }
     return this;
   }
-  
+
   ObjectoryQueryBuilder within(String propertyName, value){
     testPropertyName(propertyName);
     map[propertyName] = {"\$within":{"\$box":value}};

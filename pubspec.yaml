@@ -5,7 +5,8 @@ description: Object document mapper/persistency layer for server-side and browse
 homepage: https://github.com/vadimtsushko/objectory
 dependencies:
   unittest: any
-  mongo_dart: any
+  mongo_dart: 
+    git: git://github.com/vadimtsushko/mongo_dart
   args: any
   browser: any
   logging: any

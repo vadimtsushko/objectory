@@ -98,9 +98,9 @@ class BasePersistentObject {
   Future<PersistentObject> fetchLinks(){
     var dbRefs = new List<DbRef>();
     getDbRefsFromMap(map, dbRefs);
-    var objects = dbRefs.mappedBy((each) => objectory.dbRef2Object(each));
+    var objects = dbRefs.map((each) => objectory.dbRef2Object(each));
     Completer completer = new Completer();
-    Future.wait(objects.mappedBy((each) => each.fetch())).then((_) => completer.complete(this));
+    Future.wait(objects.map((each) => each.fetch())).then((_) => completer.complete(this));
     return completer.future;
   }
 
