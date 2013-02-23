@@ -80,7 +80,7 @@ main(){
     article.save();
     return objectory.find($Article);
   }).then((articles){
-    return Future.wait(articles.mappedBy((article) => printArticle(article)));
+    return Future.wait(articles.map((article) => printArticle(article)));
   }).then((_) {
    objectory.close();
   });

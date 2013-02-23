@@ -33,33 +33,34 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
 
   Future<bool> setupWebsocket(String uri) {
     Completer completer = new Completer();
-    WebSocket.connect("ws://$uri/ws")
-    .then((WebSocket _webSocket) {
-      webSocket = _webSocket;
+    webSocket = new WebSocket("ws://$uri/ws");
+    webSocket.onOpen.listen((event) {
+    
       isConnected = true;
-      completer.complete(true);      
-      webSocket.listen((event) {
-        if (event is MessageEvent) {
-          var jdata = JSON_EXT.parse(event.data);
-          log.info('onmessage: $jdata');
-          var message = new ObjectoryMessage.fromList(jdata);
-          int receivedRequestId = message.command['requestId'];
-          if (receivedRequestId == null) {
-            return;
-          }
-          var completer = awaitedRequests[receivedRequestId];
-          if (completer != null) {
-            log.fine("Complete request: $receivedRequestId message: $message");
-            completer.complete(message.content);
-          } else {
-            log.shout('Not found completer for request: $receivedRequestId');
-          }
+      completer.complete(true);
+    });
 
-        } else if (event is CloseEvent) {
-          log.fine('close ${event.code} ${event.reason} ${event.wasClean}');
-          isConnected = false;
-        }
-      });
+    webSocket.onClose.listen((e) {
+      //log.fine('close $e');
+      isConnected = false;
+    });
+
+    webSocket.onMessage.listen((m) {
+      var jdata = JSON_EXT.parse(m.data);
+      //log.info('onmessage: $jdata');
+      var message = new ObjectoryMessage.fromList(jdata);
+      int receivedRequestId = message.command['requestId'];
+      if (receivedRequestId == null) {
+        return;
+      }
+      var completer = awaitedRequests[receivedRequestId];
+      if (completer != null) {
+        //log.fine("Complete request: $receivedRequestId message: $message");
+        completer.complete(message.content);
+      } else {
+        //log.shout('Not found completer for request: $receivedRequestId');
+      }
+
     });
     return completer.future;
   }
