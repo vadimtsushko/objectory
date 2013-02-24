@@ -6,6 +6,8 @@ import 'dart:collection';
 class _ExtParams {
   int skip = 0;
   int limit = 0;
+  bool fetchLinksMode = false;
+  bool countMode = false;
 }
 class ObjectoryQueryBuilder {
   Map map = new LinkedHashMap();
@@ -18,7 +20,7 @@ class ObjectoryQueryBuilder {
 
   String className;
 
-  Map get extParamsMap => {'skip': extParams.skip, 'limit': extParams.limit};
+  Map get extParamsMap => {'skip': extParams.skip, 'limit': extParams.limit, 'countMode': extParams.countMode, 'fetchLinksMode': extParams.fetchLinksMode};
 
   void testPropertyName(String propertyName) {
 //    var propertyChain = propertyName.split('.');
@@ -216,6 +218,14 @@ class ObjectoryQueryBuilder {
     } else {
       map[propertyName] = {"\$near":value,"\$maxDistance":maxDistance};
     }
+    return this;
+  }
+  ObjectoryQueryBuilder count() {
+    extParams.countMode = true;
+    return this;
+  }
+  ObjectoryQueryBuilder fetchLinks() {
+    extParams.fetchLinksMode = true;
     return this;
   }
 

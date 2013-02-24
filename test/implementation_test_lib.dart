@@ -119,32 +119,7 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   User lisa;
   Author author;
   objectory.initDomainModel().then(expectAsync1((_) {
-    author = new Author();
-    author.name = 'Vadim';
-    author.save();
-    joe = new User();
-    joe.login = 'joe';
-    joe.name = 'Joe Great';
-    joe.save();
-    lisa = new User();
-    lisa.login = 'lisa';
-    lisa.name = 'Lisa Fine';
-    lisa.save();
-    var article = new Article();
-    article.title = 'My first article';
-    article.body = "It's been a hard days night";
-    var comment = new Comment();
-    comment.body = 'great article, dude';
-    comment.user = joe;
-    comment.date = new DateTime(2012,10,5,9,9,20);
-    article.comments.add(comment);
-    article.author = author;
-    comment.date = new DateTime(2012,10,6,10,15,20);
-    comment = new Comment();
-    comment.body = 'It is lame, sweety';
-    comment.user = lisa;
-    article.comments.add(comment);
-    objectory.save(article);
+    _setupArticle(objectory);
     return objectory.find($Article.sortBy('title'));
   })).then(expectAsync1((articles) {
     var artcl = articles[0];
@@ -191,7 +166,63 @@ void testLimit(){
   }));
 }
 
+testFindWithFetchLinksMode() {
+  objectory.initDomainModel().then(expectAsync1((_) {
+    _setupArticle(objectory);
+    return objectory.find($Article.sortBy('title').fetchLinks());
+  })).then(expectAsync1((artciles) {
+    var artcl = artciles[0];
+    expect(artcl.comments[0].user.name,'Joe Great');
+    expect(artcl.comments[1].user.name,'Lisa Fine');
+    expect(artcl.author.name,'VADIM');
+    objectory.close();
+  }));
+}
 
+testFindOneWithFetchLinksMode() {
+  objectory.initDomainModel().then(expectAsync1((_) {
+    _setupArticle(objectory);
+    return objectory.findOne($Article.sortBy('title').fetchLinks());
+  })).then(expectAsync1((artcl) {
+    expect(artcl.comments[0].user.name,'Joe Great');
+    expect(artcl.comments[1].user.name,'Lisa Fine');
+    expect(artcl.author.name,'VADIM');
+    objectory.close();
+  }));
+}
+
+_setupArticle(objectory) {
+  User joe;
+  User lisa;
+  Author author;    
+  author = new Author();
+  author.name = 'Vadim';
+  author.save();
+  joe = new User();
+  joe.login = 'joe';
+  joe.name = 'Joe Great';
+  joe.save();
+  lisa = new User();
+  lisa.login = 'lisa';
+  lisa.name = 'Lisa Fine';
+  lisa.save();
+  var article = new Article();
+  article.title = 'My first article';
+  article.body = "It's been a hard days night";
+  var comment = new Comment();
+  comment.body = 'great article, dude';
+  comment.user = joe;
+  comment.date = new DateTime(2012,10,5,9,9,20);
+  article.comments.add(comment);
+  article.author = author;
+  comment.date = new DateTime(2012,10,6,10,15,20);
+  comment = new Comment();
+  comment.body = 'It is lame, sweety';
+  comment.user = lisa;
+  article.comments.add(comment);
+  objectory.save(article);
+  objectory.cache.clear();
+}
 allImplementationTests(){
     test('simpleTestInsertionAndUpdate',simpleTestInsertionAndUpdate);
     test('testInsertionAndUpdate',testInsertionAndUpdate);
@@ -200,4 +231,6 @@ allImplementationTests(){
     test('testObjectWithCollectionOfExternalRefs',testObjectWithCollectionOfExternalRefs);
     test('testMap2ObjectWithListtOfInternalObjectsWithExternalRefs',testMap2ObjectWithListtOfInternalObjectsWithExternalRefs);
     test('testLimit',testLimit);
+    test('testFindWithFetchLinksMode',testFindWithFetchLinksMode);
+    test('testFindOneWithFetchLinksMode',testFindOneWithFetchLinksMode);    
 }

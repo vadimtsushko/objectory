@@ -25,27 +25,38 @@ class ObjectoryDirectConnectionImpl extends Objectory{
   Future remove(PersistentObject persistentObject) =>
       db.collection(persistentObject.dbType).remove({"_id":persistentObject.id});
 
-
+  SelectorBuilder convertSelector(ObjectoryQueryBuilder selector) {
+    return new SelectorBuilder()
+      ..map = selector.map
+      ..extParams.limit = selector.extParams.limit
+      ..extParams.skip = selector.extParams.skip;
+  }
   Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){
     Completer completer = new Completer();
-    SelectorBuilder selectorBuilder = new SelectorBuilder();
-    selectorBuilder.map = selector.map;
-    selectorBuilder.extParams.limit = selector.extParams.limit;
-    selectorBuilder.extParams.skip = selector.extParams.skip;
+    SelectorBuilder selectorBuilder = convertSelector(selector);
     var result = new List<PersistentObject>();
     db.collection(selector.className)
       .find(selectorBuilder)
       .each((map){
         PersistentObject obj = objectory.map2Object(selector.className,map);
         result.add(obj);
-      }).then((_) => completer.complete(result));
+      }).then((_) {
+        if (!selector.extParams.fetchLinksMode) {
+          completer.complete(result);
+        } else {
+          Future
+          .wait(result.map((item) => item.fetchLinks()))
+          .then((res) {completer.complete(res);}); 
+        }
+      });
     return completer.future;
   }
-
+  Future<int> count(ObjectoryQueryBuilder selector) { 
+    SelectorBuilder selectorBuilder = convertSelector(selector); 
+    return  db.collection(selector.className).count(selectorBuilder); 
+  }  
   Future<PersistentObject> findOne(ObjectoryQueryBuilder selector){
-    SelectorBuilder selectorBuilder = new SelectorBuilder();
-    selectorBuilder.map = selector.map;
-    selectorBuilder.extParams.skip = selector.extParams.skip;
+    SelectorBuilder selectorBuilder = convertSelector(selector);    
     Completer completer = new Completer();
     var obj;
     if (selector.map.containsKey("_id")) {
@@ -58,19 +69,7 @@ class ObjectoryDirectConnectionImpl extends Objectory{
       db.collection(selector.className)
         .findOne(selectorBuilder)
         .then((map){
-          if (map == null) {
-           completer.complete(null);
-          }
-          else {
-            obj = findInCache(map["_id"]);
-            if (obj == null) {
-              if (map != null) {
-                obj = objectory.map2Object(selector.className,map);
-                addToCache(obj);
-                }
-              }
-            completer.complete(obj);
-          }
+          completeFindOne(map,completer,selector);          
         });
       }
     return completer.future;

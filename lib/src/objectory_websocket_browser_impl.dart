@@ -95,7 +95,13 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
         PersistentObject obj = objectory.map2Object(selector.className,map);
         result.add(obj);
       }
-      completer.complete(result);
+      if (!selector.extParams.fetchLinksMode) {
+        completer.complete(result);
+      } else {
+        Future
+        .wait(result.map((item) => item.fetchLinks()))
+        .then((res) {completer.complete(res);}); 
+      }
     });
     return completer.future;
   }
@@ -112,19 +118,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     else {
       _postMessage(_createCommand('findOne',selector.className), selector.map, selector.extParamsMap)
       .then((map){
-        if (map == null) {
-         completer.complete(null);
-        }
-        else {
-          obj = findInCache(map["_id"]);
-          if (obj == null) {
-            if (map != null) {
-              obj = objectory.map2Object(selector.className,map);
-              addToCache(obj);
-              }
-            }
-          completer.complete(obj);
-        }
+        completeFindOne(map,completer,selector); 
       });
     }
     return completer.future;

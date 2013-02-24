@@ -116,6 +116,7 @@ class Objectory{
 
 
   Future<PersistentObject> findOne(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
+  Future<int> count(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }  
   Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
   Future insert(PersistentObject persistentObject) { throw 'Must be implemented'; }
   Future update(PersistentObject persistentObject) { throw 'Must be implemented'; }
@@ -138,5 +139,26 @@ class Objectory{
     return res.future;
   }
 
-
+  completeFindOne(map,completer,selector) {
+    var obj;
+    if (map == null) {
+      completer.complete(null);
+    }
+    else {
+      obj = findInCache(map["_id"]);
+      if (obj == null) {
+        if (map != null) {
+          obj = objectory.map2Object(selector.className,map);
+          addToCache(obj);
+        }
+      }
+      if (!selector.extParams.fetchLinksMode) {
+        completer.complete(obj);
+      } else {
+        obj.fetchLinks().then((_) {
+          completer.complete(obj);
+        });  
+      }
+    }
+  }
 }
