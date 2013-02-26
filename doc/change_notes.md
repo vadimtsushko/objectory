@@ -1,5 +1,10 @@
 #Recent change notes
 
+###0.1.0
+
+- Support of dart:io version 2. (Stream-based).
+- fetchLinks method of QueryBuilder (With it PersistentObjects in resultset of findOne and find prefetch linked objects)
+
 ###0.0.11
 
 - Support for near and within geospatial queries in QueryBuilder (Thanks to Jesse https://github.com/FreakTheMighty)
