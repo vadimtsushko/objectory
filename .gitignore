@@ -4,3 +4,4 @@ packages
 *dart.js.map
 /*.lock
 *.dart.js.deps
+/.idea

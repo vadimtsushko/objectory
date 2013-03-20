@@ -93,6 +93,20 @@ class Objectory{
     });
     return result;
   }
+
+  /**
+   * Returns the collection name for the given model instance.
+   */
+  String getCollectionByModel(PersistentObject model) {
+    var collection;
+
+    factories.forEach((key, value) {
+      if (value().runtimeType == model.runtimeType) collection = key;
+    });
+
+    return collection;
+  }
+
   Future save(PersistentObject persistentObject){
     if (persistentObject.id != null){
       return update(persistentObject);

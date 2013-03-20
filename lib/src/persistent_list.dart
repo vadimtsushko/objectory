@@ -14,6 +14,10 @@ class _ValueConverter{
     if (value is DbRef) {
       return objectory.dbRef2Object(value);
     }
+
+    // When we have manually added an object to this persistent list and we call convertValue() over again,
+    // this keeps us from problems (no re-conversions nor null values).
+    return value;
   }
 }
 class _PersistentIterator<E> implements Iterator<E> {
@@ -43,6 +47,16 @@ class PersistentList<E> implements List<E>{
       isEmbeddedObject = true;
     }
     valueConverter = new _ValueConverter(this);
+
+    // Convert all values to actual objects. Is there a reason why we shouldn't do that?
+    // It seems pointless to convert when someone is calling [] or .first, or .last etc.
+    if (_list.length > 0) {
+      var actualList = [];
+      _list.forEach((dbRef) {
+        actualList.add(valueConverter.convertValue(dbRef));
+      });
+      _list = actualList;
+    }
   }
   factory PersistentList(BasePersistentObject parent, String elementType, String pathToMe) {
     PersistentList result = parent._compoundProperties[pathToMe];
@@ -130,7 +144,7 @@ class PersistentList<E> implements List<E>{
     return item;
   }
 
-  E get last => _list.last;
+  E get last => valueConverter.convertValue(_list.last);
 
   void insertRange(int start, int length, [E initialValue]){
     _list.insertRange(start, length, initialValue);
@@ -163,9 +177,5 @@ class PersistentList<E> implements List<E>{
     setDirty(null);
   }
 
-  E operator[](int index) {
-    return valueConverter.convertValue(_list[index]);
-  }
-
-
+  E operator[](int index) => valueConverter.convertValue(_list[index]);
 }

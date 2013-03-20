@@ -143,6 +143,18 @@ class ObjectoryQueryBuilder {
     return this;
   }
 
+  ObjectoryQueryBuilder references(String propertyName, PersistentObject model) {
+    testPropertyName(propertyName);
+    map[propertyName] = new DbRef(objectory.getCollectionByModel(model), model.id);
+    return this;
+  }
+
+  ObjectoryQueryBuilder containsReference(String propertyName, PersistentObject model) {
+    testPropertyName(propertyName);
+    map[propertyName] = {"\$in": [new DbRef(objectory.getCollectionByModel(model), model.id)]};
+    return this;
+  }
+
   _internQueryMap(){
     if (!map.containsKey("query")){
       LinkedHashMap queryMap = new LinkedHashMap.from(map);
