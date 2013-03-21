@@ -2,6 +2,7 @@ library objectory_server_impl;
 import 'dart:io';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:logging/logging.dart';
+import 'dart:async';
 import 'vm_log_config.dart';
 
 final IP = '127.0.0.1';
@@ -30,10 +31,10 @@ class ObjectoryClient {
   bool closed = false;
   ObjectoryClient(this.name, this.token, this.socket) {
     socket.send(JSON_EXT.stringify([{'command':'hello'}, {'connection':this.name}]));
-    socket.listen((event) {
-      if (event is MessageEvent) {
-        log.fine('message is $event');
-        var jdata = JSON_EXT.parse(event.data);
+    socket.listen((message) {
+        log.fine('message is $message');
+        var jdata = JSON_EXT.parse(message);
+        print(jdata);
         var header = new RequestHeader.fromMap(jdata[0]);
         Map content = jdata[1];
         Map extParams = jdata[2];
@@ -66,15 +67,17 @@ class ObjectoryClient {
           return;
         }
 
-        log.shout('Unexpected message: $event');
+        log.shout('Unexpected message: $message');
         sendResult(header,content);
-        
-      } else if (event is CloseEvent) {
-        /* Handle closed. */
-        log.info('closed with ${event.code} for ${event.reason}');
+    },
+      onDone: () {
         closed = true;
-      }
-    });
+      },
+      onError: (AsyncError error) {
+        throw error;
+      }  
+    
+   );
   }
   sendResult(RequestHeader header, content) {
     log.fine('sendResult($header, $content) ');

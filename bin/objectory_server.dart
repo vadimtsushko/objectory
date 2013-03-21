@@ -1,5 +1,6 @@
 library objectory_server;
 import 'package:args/args.dart';
+import 'dart:io';
 import 'package:objectory/src/objectory_server_impl.dart';
 void main() {
   var parser = new ArgParser();

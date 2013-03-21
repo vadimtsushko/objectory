@@ -41,9 +41,8 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
       webSocket = _webSocket;
       isConnected = true;
       completer.complete(true);      
-      webSocket.listen((event) {
-        if (event is MessageEvent) {
-          var jdata = JSON_EXT.parse(event.data);
+      webSocket.listen((mdata) {
+          var jdata = JSON_EXT.parse(mdata);
           log.info('onmessage: $jdata');
           var message = new ObjectoryMessage.fromList(jdata);
           int receivedRequestId = message.command['requestId'];
@@ -57,11 +56,9 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
           } else {
             log.shout('Not found completer for request: $receivedRequestId');
           }
-
-        } else if (event is CloseEvent) {
-          log.fine('close ${event.code} ${event.reason} ${event.wasClean}');
+        },
+        onDone:() {
           isConnected = false;
-        }
       });
     });
     return completer.future;
