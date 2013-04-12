@@ -139,6 +139,8 @@ testObjectWithCollectionOfExternalRefs(){
   })).then(expectAsync1((_){
     expect(son.father.firstName,'Father');
     expect(son.mother,isNull);
+    expect(father.children.contains(son),isTrue);
+    expect(father.children.indexOf(son),0);
     objectory.close();
   }));
 }

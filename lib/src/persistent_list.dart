@@ -93,9 +93,9 @@ class PersistentList<E> implements List<E>{
 
   Iterator<E> get iterator => new _PersistentIterator(this,_list.iterator,valueConverter);
 
-  int indexOf(E element, [int start = 0]) => _list.indexOf(element, start);
+  int indexOf(E element, [int start = 0]) => _list.indexOf(internValue(element), start);
 
-  int lastIndexOf(E element, [int start]) => _list.lastIndexOf(element, start);
+  int lastIndexOf(E element, [int start]) => _list.lastIndexOf(internValue(element), start);
 
   int get length => _list.length;
 
@@ -147,7 +147,7 @@ class PersistentList<E> implements List<E>{
     _list.removeRange(start, length);
     setDirty(null);
   }
-  bool contains(E element) => _list.contains(element);
+  bool contains(E element) => _list.contains(internValue(element));
 
   void setRange(int start, int length, List<E> from, [int startFrom]){
     _list.setRange(start, length, from, startFrom);
