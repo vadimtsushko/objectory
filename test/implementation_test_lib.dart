@@ -81,6 +81,9 @@ testObjectWithCollectionOfExternalRefs(){
   Person son;
   Person daughter;
   Person sonFromObjectory;
+  ObjectId fatherId;
+  ObjectId sonId;
+  ObjectId daughterId;
   objectory.initDomainModel().then(expectAsync1((_) {
     father = new Person();
     father.firstName = 'Father';
@@ -93,23 +96,49 @@ testObjectWithCollectionOfExternalRefs(){
     daughter.father = father;
     daughter.firstName = 'daughter';
     daughter.save();
+    fatherId = father.id;
+    sonId = son.id;
+    daughterId = daughter.id;
+    objectory.cache.clear();
+    father = null;
+    son = null;
+    daughter = null;
+    return objectory.findOne($Person.id(fatherId));
+  })).then(expectAsync1((fatherFromObjectory){
+    father = fatherFromObjectory;
+    return objectory.findOne($Person.id(sonId));
+   })).then(expectAsync1((sonFromObjectory){
+     son = sonFromObjectory;
+     return objectory.findOne($Person.id(daughterId));
+   })).then(expectAsync1((daughterFromObjectory){     
+    daughter = daughterFromObjectory;
     father.children.add(son);
     father.children.add(daughter);
+//    print(father.children);
     father.save();
-    return objectory.findOne($Person.id(father.id));
+//    print(father.children);
+    fatherId = father.id;
+    objectory.cache.clear();
+    father = null;
+    son = null;
+    daughter = null;
+    return objectory.findOne($Person.id(fatherId));
   })).then(expectAsync1((fatherFromObjectory){
       // Links must be fetched before use.
-    expect(fatherFromObjectory.children.length,2);
+    father = fatherFromObjectory;
+//    print(father.children);
+    expect(father.children.length,2);
     //Do not know yet how to test throws in async tests
     //expect(()=>father.children[0],throws);
     return father.fetchLinks();
-  })).then(expectAsync1((_) {
-    sonFromObjectory = father.children[0];
-    expect(sonFromObjectory.mother,isNull);
-    return sonFromObjectory.fetchLinks();
+  })).then(expectAsync1((_) { 
+//    print(father.children);
+    son = father.children[0];
+    expect(son.mother,isNull);
+    return son.fetchLinks();    
   })).then(expectAsync1((_){
-    expect(sonFromObjectory.father.firstName,'Father');
-    expect(sonFromObjectory.mother,isNull);
+    expect(son.father.firstName,'Father');
+    expect(son.mother,isNull);
     objectory.close();
   }));
 }

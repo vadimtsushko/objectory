@@ -47,16 +47,6 @@ class PersistentList<E> implements List<E>{
       isEmbeddedObject = true;
     }
     valueConverter = new _ValueConverter(this);
-
-    // Convert all values to actual objects. Is there a reason why we shouldn't do that?
-    // It seems pointless to convert when someone is calling [] or .first, or .last etc.
-    if (_list.length > 0) {
-      var actualList = [];
-      _list.forEach((dbRef) {
-        actualList.add(valueConverter.convertValue(dbRef));
-      });
-      _list = actualList;
-    }
   }
   factory PersistentList(BasePersistentObject parent, String elementType, String pathToMe) {
     PersistentList result = parent._compoundProperties[pathToMe];
@@ -82,7 +72,7 @@ class PersistentList<E> implements List<E>{
       el._pathToMe = pathToMe;
       return el.map;
     }
-    if (value is PersistentObject) {
+    if (el is PersistentObject) {
       return el.dbRef;
     }
     return value;
@@ -113,7 +103,9 @@ class PersistentList<E> implements List<E>{
     _list.sort(compare);
   }
 
-  List getRange(int start, int length) => _list.getRange(start, length);
+  List<E> sublist(int start, [int end]) {
+      throw 'Not implemented';
+  }  
 
   void add(E element){
     _list.add(internValue(element));
@@ -151,8 +143,6 @@ class PersistentList<E> implements List<E>{
     setDirty(null);
   }
 
-  void addLast(E value) => _list.addLast(value);
-
   void removeRange(int start, int length){
     _list.removeRange(start, length);
     setDirty(null);
@@ -167,9 +157,7 @@ class PersistentList<E> implements List<E>{
     _list.length = newLength;
   }
   E removeAt(int index) => _list.removeAt(index);
-  dynamic reduce(dynamic initialValue,
-                 dynamic combine(dynamic previousValue, E element)) => _list.reduce(initialValue, combine);
-
+  
   E get first => _list.first;
 
   void operator[]=(int index, E value){
