@@ -142,7 +142,7 @@ class PersistentObject extends BasePersistentObject{
     super._initMap();
   }
   Future remove() {
-    objectory.remove(this);
+    return objectory.remove(this);
   }
   Future save() {
     return objectory.save(this);
