@@ -1,5 +1,11 @@
 #Recent change notes
 
+###0.1.3
+
+- Bugfixes for PersistentObject methods: contains, indexIf, lastIndexOf
+- save and remove methods returns Future (consistently with Objectory save and return)
+- supported Dart SDK version 0.4.5.1_r21094
+
 ###0.1.0
 
 - Support of dart:io version 2. (Stream-based).
