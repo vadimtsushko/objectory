@@ -141,11 +141,11 @@ class PersistentObject extends BasePersistentObject{
     map["_id"] = null;
     super._initMap();
   }
-  remove() {
+  Future remove() {
     objectory.remove(this);
   }
-  save() {
-    objectory.save(this);
+  Future save() {
+    return objectory.save(this);
   }
   void setProperty(String property, value){
     super.setProperty(property,value);
