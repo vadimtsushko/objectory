@@ -60,7 +60,7 @@ testMap2ObjectMethod() {
     "streetName": "333",
     "cityName": "44444"
       };
-  var address = objectory.map2Object("Address",map);
+  Address address = objectory.map2Object("Address",map);
   expect(address.cityName,"44444");
 }
 testObjectWithListOfInternalObjects2Map() {
@@ -82,7 +82,7 @@ testObjectWithListOfInternalObjects2Map() {
 }
 testMap2ObjectWithListOfInternalObjects() {
   var map = {"_id": null, "name": "Tequila corporation", "addresses": [{"cityName": "Mexico"}, {"cityName": "Moscow"}]};
-  var customer = objectory.map2Object($Customer.className, map);
+  Customer customer = objectory.map2Object($Customer.className, map);
   expect(customer.name,"Tequila corporation");
   expect(customer.addresses.length,2);
   expect(customer.addresses[1].cityName,"Moscow");
@@ -125,7 +125,7 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   objectory.addToCache(user);
   Map articleMap = {"title": "test article", "body": "sasdfasdfasdf",
                     "comments": [{"body": "Excellent", "user": user.dbRef}]};
-  var article = objectory.map2Object($Article.className,articleMap);
+  Article article = objectory.map2Object($Article.className,articleMap);
   expect(article.map["comments"][0]["user"].id,user.dbRef.id);
   expect(article.comments[0].user,user);
 }

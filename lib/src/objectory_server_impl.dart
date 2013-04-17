@@ -49,6 +49,10 @@ class ObjectoryClient {
           findOne(header, content, extParams);
           return;
         }
+        if (header.command == "count") {
+          count(header, content, extParams);
+          return;
+        }
         if (header.command == "find") {
           find(header, content, extParams);
           return;
@@ -105,28 +109,33 @@ class ObjectoryClient {
       sendResult(header, responseData);
     });
   }
-  find(RequestHeader header, Map selector, Map extParams) {
+  SelectorBuilder _selectorBuilder(Map selector, Map extParams) {
     SelectorBuilder selectorBuilder = new SelectorBuilder();
     selectorBuilder.map = selector;
     selectorBuilder.extParams.limit = extParams['limit'];
     selectorBuilder.extParams.skip = extParams['skip'];
-    db.collection(header.collection).find(selectorBuilder).toList().
+    return selectorBuilder;
+  }
+  
+  find(RequestHeader header, Map selector, Map extParams) {
+    db.collection(header.collection).find(_selectorBuilder(selector,extParams)).toList().
     then((responseData) {
       sendResult(header, responseData);
     });
   }
 
   findOne(RequestHeader header, Map selector , Map extParams) {
-    SelectorBuilder selectorBuilder = new SelectorBuilder();
-    selectorBuilder.map = selector;
-    selectorBuilder.extParams.limit = extParams['limit'];
-    selectorBuilder.extParams.skip = extParams['skip'];
-    db.collection(header.collection).findOne(selectorBuilder).
+    db.collection(header.collection).findOne(_selectorBuilder(selector,extParams)).
     then((responseData) {
       sendResult(header, responseData);
     });
   }
-
+  count(RequestHeader header, Map selector , Map extParams) {
+    db.collection(header.collection).count(_selectorBuilder(selector,extParams)).
+    then((responseData) {
+      sendResult(header, responseData);
+    });
+  }
   queryDb(RequestHeader header,Map query) {
     db.executeDbCommand(DbCommand.createQueryDBCommand(db,query))
     .then((responseData) {
@@ -173,7 +182,7 @@ class ObjectoryServerImpl {
       configureConsoleLogger(Level.ALL);
     }
     else {
-      configureConsoleLogger(Level.INFO);
+      configureConsoleLogger(Level.WARNING);
     }    
     db = new Db(mongoUri);
     db.open().then((_) {
@@ -186,6 +195,6 @@ class ObjectoryServerImpl {
       });
     });
     print('Listening on http://$hostName:$port\n');
-    log.fine('MongoDB connection: ${db.serverConfig.host}:${db.serverConfig.port}');         
+    log.info('MongoDB connection: ${db.serverConfig.host}:${db.serverConfig.port}');         
   }
 }

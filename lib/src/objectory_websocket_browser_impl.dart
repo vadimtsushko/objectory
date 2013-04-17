@@ -105,6 +105,16 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     });
     return completer.future;
   }
+  
+  Future<int> count(ObjectoryQueryBuilder selector) { 
+    Completer completer = new Completer();
+    var obj;
+    _postMessage(_createCommand('count', selector.className), selector.map, selector.extParamsMap)
+      .then((int _count){
+        completer.complete(_count); 
+      });
+     return completer.future;
+  } 
 
   Future<PersistentObject> findOne(ObjectoryQueryBuilder selector){
     Completer completer = new Completer();

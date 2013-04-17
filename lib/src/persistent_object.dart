@@ -6,7 +6,6 @@ import 'dart:async';
 import 'dart:collection';
 part 'persistent_list.dart';
 
-
 class BasePersistentObject {
   LinkedHashMap map;
   Set<String> _dirtyFields;

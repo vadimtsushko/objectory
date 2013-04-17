@@ -83,9 +83,9 @@ class PersistentList<E> implements List<E>{
 
   void forEach(void f(element)) => _list.forEach(f);
 
-  Collection map(f(E element)) => _list.map(f);
+  Iterable map(f(E element)) => _list.map(f);
 
-  Collection<E> where(bool f(E element)) => _list.where(f);
+  Iterable<E> where(bool f(E element)) => _list.where(f);
 
   bool every(bool f(E element)) => _list.every(f);
 
@@ -118,13 +118,12 @@ class PersistentList<E> implements List<E>{
     setDirty(null);
   }
 
-  void addAll(Collection<E> elements){
+  void addAll(Iterable<E> elements){
     _list.addAll(elements);
     setDirty(null);
   }
 
   void clear(){
-    Collection<E> c = _list;
     _list.clear();
     setDirty(null);
   }
@@ -167,3 +166,5 @@ class PersistentList<E> implements List<E>{
 
   E operator[](int index) => valueConverter.convertValue(_list[index]);
 }
+
+

@@ -197,6 +197,22 @@ void testLimit(){
   }));
 }
 
+void testCount(){
+  objectory.initDomainModel().then(expectAsync1((_) {
+    for (int n=0; n < 27; n++) {
+      Author author = new Author();
+      author.age = n;
+      author.save();
+    }
+    objectory.wait().then(expectAsync1((coll){
+     return objectory.count($Author);
+    })).then(expectAsync1((_count){
+      expect(_count,27);
+      objectory.close();
+    }));
+  }));
+}
+
 testFindWithFetchLinksMode() {
   objectory.initDomainModel().then(expectAsync1((_) {
     _setupArticle(objectory);
@@ -262,6 +278,7 @@ allImplementationTests(){
     test('testObjectWithCollectionOfExternalRefs',testObjectWithCollectionOfExternalRefs);
     test('testMap2ObjectWithListtOfInternalObjectsWithExternalRefs',testMap2ObjectWithListtOfInternalObjectsWithExternalRefs);
     test('testLimit',testLimit);
+    test('testCount',testCount);
     test('testFindWithFetchLinksMode',testFindWithFetchLinksMode);
     test('testFindOneWithFetchLinksMode',testFindOneWithFetchLinksMode);    
 }

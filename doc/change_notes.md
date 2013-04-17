@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.5
+
+- Count() method implemented on all platforms
+
 ###0.1.4
 
 - Upgrade for M4 changes
