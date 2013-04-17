@@ -1,5 +1,10 @@
 #Recent change notes
 
+###0.1.4
+
+- Upgrade for M4 changes
+- Obectory server now does not log messages my default, verbosity switched by command line parameter --verbose
+
 ###0.1.3
 
 - Bugfixes for PersistentObject methods: contains, indexIf, lastIndexOf

@@ -30,11 +30,10 @@ class ObjectoryClient {
   WebSocket socket;
   bool closed = false;
   ObjectoryClient(this.name, this.token, this.socket) {
-    socket.send(JSON_EXT.stringify([{'command':'hello'}, {'connection':this.name}]));
+    socket.add(JSON_EXT.stringify([{'command':'hello'}, {'connection':this.name}]));
     socket.listen((message) {
         log.fine('message is $message');
         var jdata = JSON_EXT.parse(message);
-        print(jdata);
         var header = new RequestHeader.fromMap(jdata[0]);
         Map content = jdata[1];
         Map extParams = jdata[2];
@@ -73,7 +72,7 @@ class ObjectoryClient {
       onDone: () {
         closed = true;
       },
-      onError: (AsyncError error) {
+      onError: (error) {
         throw error;
       }  
     
@@ -82,9 +81,9 @@ class ObjectoryClient {
   sendResult(RequestHeader header, content) {
     log.fine('sendResult($header, $content) ');
     if (closed) {
-      log.shout('ERROR: trying send on closed connection. $header, $content');
+      log.fine('ERROR: trying send on closed connection. $header, $content');
     } else {
-      socket.send(JSON_EXT.stringify([header.toMap(),content]));
+      socket.add(JSON_EXT.stringify([header.toMap(),content]));
     }
   }
   save(RequestHeader header, Map mapToSave) {
@@ -154,7 +153,7 @@ class ObjectoryClient {
 
   protocolError(String errorMessage) {
     log.shout('PROTOCOL ERROR: $errorMessage');
-    socket.send(JSON_EXT.stringify({'error': errorMessage}));
+    socket.add(JSON_EXT.stringify({'error': errorMessage}));
   }
 
 
@@ -182,7 +181,7 @@ class ObjectoryServerImpl {
         server.transform(new WebSocketTransformer()).listen((WebSocket webSocket) {
           _token+=1;
           var c = new ObjectoryClient('objectory_client_${_token}', _token, webSocket);
-          log.info('adding connection token = ${_token}');
+          log.fine('adding connection token = ${_token}');
        });
       });
     });
