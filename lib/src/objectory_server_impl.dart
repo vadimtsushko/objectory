@@ -30,7 +30,7 @@ class ObjectoryClient {
   WebSocket socket;
   bool closed = false;
   ObjectoryClient(this.name, this.token, this.socket) {
-    socket.add(JSON_EXT.stringify([{'command':'hello'}, {'connection':this.name}]));
+    socket.send(JSON_EXT.stringify([{'command':'hello'}, {'connection':this.name}]));
     socket.listen((message) {
         log.fine('message is $message');
         var jdata = JSON_EXT.parse(message);
@@ -87,7 +87,7 @@ class ObjectoryClient {
     if (closed) {
       log.fine('ERROR: trying send on closed connection. $header, $content');
     } else {
-      socket.add(JSON_EXT.stringify([header.toMap(),content]));
+      socket.send(JSON_EXT.stringify([header.toMap(),content]));
     }
   }
   save(RequestHeader header, Map mapToSave) {
@@ -162,7 +162,7 @@ class ObjectoryClient {
 
   protocolError(String errorMessage) {
     log.shout('PROTOCOL ERROR: $errorMessage');
-    socket.add(JSON_EXT.stringify({'error': errorMessage}));
+    socket.send(JSON_EXT.stringify({'error': errorMessage}));
   }
 
 

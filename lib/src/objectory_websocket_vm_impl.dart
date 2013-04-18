@@ -66,7 +66,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
   Future _postMessage(Map command, Map content, [Map contentExt]) {
     requestId++;
     command['requestId'] = requestId;
-    webSocket.add(JSON_EXT.stringify([command,content, contentExt]));
+    webSocket.send(JSON_EXT.stringify([command,content, contentExt]));
     var completer = new Completer();
     awaitedRequests[requestId] = completer;
     return completer.future;
