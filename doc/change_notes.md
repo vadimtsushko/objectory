@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.6
+
+- Upgrade for Dart SDK version 0.4.7.5_r21658 (post M4)
+
 ###0.1.5
 
 - Count() method implemented on all platforms
