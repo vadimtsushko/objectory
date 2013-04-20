@@ -39,8 +39,11 @@ testFailOnSettingUnsavedLinkObject(){
   expect(()=>son.father = father, throws, reason: 'Link object must be saved (have ObjectId)');
 }
 testFailOnAbsentProperty(){
-  dynamic author = new Author();
-  expect(()=>author.sdfsdfsdfgdfgdf, throws, reason: 'Must fail on missing property getter');
+  void doAbrakadabraWith(val) {
+    expect(()=>val.abrakadabra, throws, reason: 'Must fail on missing property getter');
+  }
+  var author = new Author();
+  doAbrakadabraWith(author);
 }
 testNewInstanceMethod(){
   var author = objectory.newInstance('Author');

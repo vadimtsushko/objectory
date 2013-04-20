@@ -14,22 +14,11 @@ class _ValueConverter{
     if (value is DbRef) {
       return objectory.dbRef2Object(value);
     }
-
-    // When we have manually added an object to this persistent list and we call convertValue() over again,
-    // this keeps us from problems (no re-conversions nor null values).
-    return value;
+    throw 'Value of unknown type in Persistent list: %value';
   }
 }
-class _PersistentIterator<E> implements Iterator<E> {
-  Iterator _it;
-  _ValueConverter valueConverter;
-  PersistentList persistentList;
-  _PersistentIterator(this.persistentList,this._it, this.valueConverter);
-  E get current => valueConverter.convertValue(_it.current);
-  bool moveNext() => _it.moveNext();
-}
 
-class PersistentList<E> implements List<E>{
+class PersistentList<E> extends ListBase<E>{
   bool isEmbeddedObject = false;
   BasePersistentObject _parent;
   String pathToMe;
@@ -64,8 +53,6 @@ class PersistentList<E> implements List<E>{
 
 
   internValue(E value) {
-    // get rid of warnings (Type inferring does not work in code below)
-    //TODO revert when possible
     var el = value;
     if (el is EmbeddedPersistentObject) {
       el._parent = _parent;
@@ -78,86 +65,11 @@ class PersistentList<E> implements List<E>{
     return value;
   }
 
-
-  bool get isEmpty => _list.isEmpty;
-
-  void forEach(void f(element)) => _list.forEach(f);
-
-  Iterable map(f(E element)) => _list.map(f);
-
-  Iterable<E> where(bool f(E element)) => _list.where(f);
-
-  bool every(bool f(E element)) => _list.every(f);
-
-  bool any(bool f(E element)) => _list.any(f);
-
-  Iterator<E> get iterator => new _PersistentIterator(this,_list.iterator,valueConverter);
-
-  int indexOf(E element, [int start = 0]) => _list.indexOf(internValue(element), start);
-
-  int lastIndexOf(E element, [int start]) => _list.lastIndexOf(internValue(element), start);
-
   int get length => _list.length;
 
-  void sort([Comparator compare = Comparable.compare]) {
-    _list.sort(compare);
-  }
-
-  List<E> sublist(int start, [int end]) {
-      throw 'Not implemented';
-  }  
-
-  void add(E element){
-    _list.add(internValue(element));
-    setDirty(null);
-  }
-
-  void remove(E element){
-    if (_list.indexOf(element) == -1) return;
-    _list.removeRange(_list.indexOf(element), 1);
-    setDirty(null);
-  }
-
-  void addAll(Iterable<E> elements){
-    _list.addAll(elements);
-    setDirty(null);
-  }
-
-  void clear(){
-    _list.clear();
-    setDirty(null);
-  }
-
-  E removeLast(){
-    E item = _list.last;
-    _list.removeLast();
-    setDirty(null);
-    return item;
-  }
-
-  E get last => valueConverter.convertValue(_list.last);
-
-  void insertRange(int start, int length, [E initialValue]){
-    _list.insertRange(start, length, initialValue);
-    setDirty(null);
-  }
-
-  void removeRange(int start, int length){
-    _list.removeRange(start, length);
-    setDirty(null);
-  }
-  bool contains(E element) => _list.contains(internValue(element));
-
-  void setRange(int start, int length, List<E> from, [int startFrom]){
-    _list.setRange(start, length, from, startFrom);
-    setDirty(null);
-  }
   void set length(int newLength) {
     _list.length = newLength;
   }
-  E removeAt(int index) => _list.removeAt(index);
-  
-  E get first => _list.first;
 
   void operator[]=(int index, E value){
     _list[index] = internValue(value);
@@ -166,5 +78,6 @@ class PersistentList<E> implements List<E>{
 
   E operator[](int index) => valueConverter.convertValue(_list[index]);
 }
+
 
 

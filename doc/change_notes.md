@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.1.7
+
+- PersistentList inherit from ListBase. No more notimplemented methods and type warnings. 
+
 ###0.1.6
 
 - Upgrade for Dart SDK version 0.4.7.5_r21658 (post M4)
