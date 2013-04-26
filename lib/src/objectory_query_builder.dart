@@ -138,7 +138,7 @@ class ObjectoryQueryBuilder {
       rangeMap["\$lte"] = max;
     }
     else{
-      rangeMap["\$gt"] = max;
+      rangeMap["\$lt"] = max;
     }
     map[propertyName] = rangeMap;
     return this;
