@@ -1,6 +1,6 @@
 #Recent change notes
 
-###0.1.7
+###0.1.8
 
 - Upgrade to Dart SDK version 0.5.0.1_r21823
 - find() and findOne() always get objects from Db (If objects exists in cache they are replaced by fresh ones from Db) 
