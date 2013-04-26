@@ -60,16 +60,6 @@ class Objectory{
     if (map == null) {
       map = new LinkedHashMap();
     }
-    if (map.containsKey("_id")) {
-      var id = map["_id"];
-      if (id != null) {
-        var res = cache[id.toHexString()];
-        if (res != null) {
-          print("Object from cache:  $res");
-          return res;
-        }
-      }
-    }
     var result = newInstance(className);
     result.map = map;
     if (result is PersistentObject){
@@ -159,13 +149,8 @@ class Objectory{
       completer.complete(null);
     }
     else {
-      obj = findInCache(map["_id"]);
-      if (obj == null) {
-        if (map != null) {
-          obj = objectory.map2Object(selector.className,map);
-          addToCache(obj);
-        }
-      }
+      obj = objectory.map2Object(selector.className,map);
+      addToCache(obj);
       if (!selector.extParams.fetchLinksMode) {
         completer.complete(obj);
       } else {

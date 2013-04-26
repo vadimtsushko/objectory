@@ -94,7 +94,7 @@ testObjectWithCollectionOfExternalRefs(){
     son.save();
     daughter = new Person();
     daughter.father = father;
-    daughter.firstName = 'daughter';
+    daughter.firstName = 'Daughter';
     daughter.save();
     fatherId = father.id;
     sonId = son.id;
@@ -114,9 +114,7 @@ testObjectWithCollectionOfExternalRefs(){
     daughter = daughterFromObjectory;
     father.children.add(son);
     father.children.add(daughter);
-//    print(father.children);
     father.save();
-//    print(father.children);
     fatherId = father.id;
     objectory.cache.clear();
     father = null;
@@ -124,15 +122,12 @@ testObjectWithCollectionOfExternalRefs(){
     daughter = null;
     return objectory.findOne($Person.id(fatherId));
   })).then(expectAsync1((fatherFromObjectory){
-      // Links must be fetched before use.
     father = fatherFromObjectory;
-//    print(father.children);
     expect(father.children.length,2);
     //Do not know yet how to test throws in async tests
     //expect(()=>father.children[0],throws);
     return father.fetchLinks();
   })).then(expectAsync1((_) { 
-//    print(father.children);
     son = father.children[0];
     expect(son.mother,isNull);
     return son.fetchLinks();    
@@ -141,6 +136,17 @@ testObjectWithCollectionOfExternalRefs(){
     expect(son.mother,isNull);
     expect(father.children.contains(son),isTrue);
     expect(father.children.indexOf(son),0);
+    father.children.remove(son);
+    father.save();
+    objectory.cache.clear();
+    father = null;
+    son = null;
+    daughter = null;
+    return objectory.findOne($Person.id(fatherId));
+  })).then(expectAsync1((fatherFromObjectory){
+    father = fatherFromObjectory;
+    expect(father.children.length,1);
+    expect(father.children[0].id,daughterId);
     objectory.close();
   }));
 }
