@@ -1,6 +1,6 @@
 #Recent change notes
 
-###0.1.8
+###0.1.9
 
 - Change in dependencies - bson library separated from within mongo_dart 
 
