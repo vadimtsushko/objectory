@@ -3,8 +3,8 @@ import 'dart:html';
 import 'persistent_object.dart';
 import 'objectory_query_builder.dart';
 import 'objectory_base.dart';
-import 'package:mongo_dart/bson.dart';
-import 'package:mongo_dart/src/bson/json_ext.dart';
+import 'package:bson/bson.dart';
+import 'package:bson/src/json_ext.dart';
 import 'dart:async';
 
 const IP = '127.0.0.1';

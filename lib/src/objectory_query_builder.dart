@@ -1,5 +1,5 @@
 library objectory_query;
-import 'package:mongo_dart/bson.dart';
+import 'package:bson/bson.dart';
 import 'objectory_base.dart';
 import 'persistent_object.dart';
 import 'dart:collection';

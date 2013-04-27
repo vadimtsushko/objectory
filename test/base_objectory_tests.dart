@@ -135,7 +135,6 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
 
 main(){
   objectory = new Objectory(null,null, false);
-  initBsonPlatform();
   registerClasses();
   group("PersistenObjectTests", ()  {
     test("testAuthorCreation",testAuthorCreation);

@@ -2,6 +2,10 @@
 
 ###0.1.8
 
+- Change in dependencies - bson library separated from within mongo_dart 
+
+###0.1.8
+
 - Upgrade to Dart SDK version 0.5.0.1_r21823
 - find() and findOne() always get objects from Db (If objects exists in cache they are replaced by fresh ones from Db) 
 

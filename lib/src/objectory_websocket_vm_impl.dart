@@ -4,8 +4,8 @@ import 'persistent_object.dart';
 import 'objectory_query_builder.dart';
 import 'objectory_base.dart';
 import 'package:logging/logging.dart';
-import 'package:mongo_dart/bson.dart';
-import 'package:mongo_dart/src/bson/json_ext.dart';
+import 'package:bson/bson.dart';
+import 'package:bson/src/json_ext.dart';
 import 'vm_log_config.dart';
 import 'dart:async';
 

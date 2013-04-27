@@ -1,6 +1,6 @@
 library persistent_object;
 import 'objectory_query_builder.dart';
-import 'package:mongo_dart/bson.dart';
+import 'package:bson/bson.dart';
 import 'objectory_base.dart';
 import 'dart:async';
 import 'dart:collection';
