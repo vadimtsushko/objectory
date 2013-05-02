@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:logging/logging.dart';
 import 'dart:async';
-import 'vm_log_config.dart';
 
 final IP = '127.0.0.1';
 final PORT = 8080;
 final URI = 'mongodb://127.0.0.1/objectory_server_test';
+final Logger _log = new Logger('Objectory server');
 
 //Map<String, ObjectoryClient> connections;
 List chatText;
@@ -30,13 +30,12 @@ class ObjectoryClient {
   WebSocket socket;
   bool closed = false;
   ObjectoryClient(this.name, this.token, this.socket) {
-    socket.add(JSON_EXT.stringify([{'command':'hello'}, {'connection':this.name}]));
     socket.listen((message) {
-        log.fine('message is $message');
-        var jdata = JSON_EXT.parse(message);
-        var header = new RequestHeader.fromMap(jdata[0]);
-        Map content = jdata[1];
-        Map extParams = jdata[2];
+        var binary = new BsonBinary.from(message);
+        var jdata = new BSON().deserialize(binary);
+        var header = new RequestHeader.fromMap(jdata['header']);
+        Map content = jdata['content'];
+        Map extParams = jdata['extParams'];
         if (header.command == "insert") {
           save(header,content);
           return;
@@ -70,7 +69,7 @@ class ObjectoryClient {
           return;
         }
 
-        log.shout('Unexpected message: $message');
+        _log.shout('Unexpected message: $message');
         sendResult(header,content);
     },
       onDone: () {
@@ -83,12 +82,15 @@ class ObjectoryClient {
    );
   }
   sendResult(RequestHeader header, content) {
-    log.fine('sendResult($header, $content) ');
     if (closed) {
-      log.fine('ERROR: trying send on closed connection. $header, $content');
+      _log.warning('WARNING: trying send on closed connection. token:$token $header, $content');
     } else {
-      socket.add(JSON_EXT.stringify([header.toMap(),content]));
+      _log.fine('token:$token sendResult($header, $content) ');
+      sendMessage(header.toMap(),content);      
     }
+  }
+  sendMessage(header, content) {
+    socket.add(new BSON().serialize({'header': header,'content': content}).byteList);
   }
   save(RequestHeader header, Map mapToSave) {
     if (header.command == 'insert') {
@@ -101,11 +103,10 @@ class ObjectoryClient {
         db.collection(header.collection).update({'_id': id},mapToSave);
       }
       else {
-        log.shout('ERROR: Trying to update object without ObjectId set. $header, $mapToSave');
+        _log.shout('ERROR: Trying to update object without ObjectId set. $header, $mapToSave');
       }
     }
     db.getLastError().then((responseData) {
-      log.fine('$responseData');
       sendResult(header, responseData);
     });
   }
@@ -139,14 +140,12 @@ class ObjectoryClient {
   queryDb(RequestHeader header,Map query) {
     db.executeDbCommand(DbCommand.createQueryDBCommand(db,query))
     .then((responseData) {
-      log.fine('$responseData');
       sendResult(header,responseData);
     });
   }
   dropDb(RequestHeader header) {
     db.drop()
     .then((responseData) {
-      log.fine('$responseData');
       sendResult(header,responseData);
     });
   }
@@ -154,15 +153,13 @@ class ObjectoryClient {
   dropCollection(RequestHeader header) {
     db.dropCollection(header.collection)
     .then((responseData) {
-      log.fine('$responseData');
       sendResult(header,responseData);
     });
   }
 
 
   protocolError(String errorMessage) {
-    log.shout('PROTOCOL ERROR: $errorMessage');
-    socket.add(JSON_EXT.stringify({'error': errorMessage}));
+    _log.shout('PROTOCOL ERROR: $errorMessage');
   }
 
 
@@ -178,11 +175,12 @@ class ObjectoryServerImpl {
   int _token = 0;
   ObjectoryServerImpl(this.hostName,this.port,this.mongoUri, bool verbose){
     chatText = [];
+    hierarchicalLoggingEnabled = true;
     if (verbose) {
-      configureConsoleLogger(Level.ALL);
+      _log.level = Level.ALL;
     }
     else {
-      configureConsoleLogger(Level.WARNING);
+      _log.level = Level.WARNING;
     }    
     db = new Db(mongoUri);
     db.open().then((_) {
@@ -190,11 +188,11 @@ class ObjectoryServerImpl {
         server.transform(new WebSocketTransformer()).listen((WebSocket webSocket) {
           _token+=1;
           var c = new ObjectoryClient('objectory_client_${_token}', _token, webSocket);
-          log.fine('adding connection token = ${_token}');
+          _log.fine('adding connection token = ${_token}');
        });
       });
     });
-    print('Listening on http://$hostName:$port\n');
-    log.info('MongoDB connection: ${db.serverConfig.host}:${db.serverConfig.port}');         
+    print('Listening on http://$hostName:$port');
+    print('MongoDB connection: ${db.serverConfig.host}:${db.serverConfig.port}');         
   }
 }

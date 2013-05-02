@@ -1,5 +1,10 @@
 #Recent change notes
 
+###0.2.0
+
+- Client/Server communication moved from JsonExt to Bson (using new cross-platform version of bson)
+- Bugfix on browser side - findOne still was using cache.
+
 ###0.1.9
 
 - Change in dependencies - bson library separated from within mongo_dart 

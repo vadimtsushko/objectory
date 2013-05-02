@@ -5,6 +5,7 @@ import 'objectory_query_builder.dart';
 import 'objectory_base.dart';
 import 'package:bson/bson.dart';
 import 'package:bson/src/json_ext.dart';
+import 'dart:typed_data';
 import 'dart:async';
 
 const IP = '127.0.0.1';
@@ -12,9 +13,9 @@ const PORT = 8080;
 class ObjectoryMessage {
   Map command;
   var content;
-  ObjectoryMessage.fromList(List jdata){
-    command = jdata[0];
-    content = jdata[1];
+  ObjectoryMessage.fromMessage(Map jdata){
+    command = jdata['header'];
+    content = jdata['content'];
   }
   toString() => 'ObjectoryMessage(command: $command, content: $content)';
 }
@@ -46,28 +47,38 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     });
 
     webSocket.onMessage.listen((m) {
-      var jdata = JSON_EXT.parse(m.data);
-      //log.info('onmessage: $jdata');
-      var message = new ObjectoryMessage.fromList(jdata);
-      int receivedRequestId = message.command['requestId'];
-      if (receivedRequestId == null) {
-        return;
-      }
-      var completer = awaitedRequests[receivedRequestId];
-      if (completer != null) {
-        //log.fine("Complete request: $receivedRequestId message: $message");
-        completer.complete(message.content);
-      } else {
-        //log.shout('Not found completer for request: $receivedRequestId');
-      }
-
+      var reader = new FileReader();
+      reader.onLoadEnd.listen(_onMessageRead);
+      reader.readAsArrayBuffer(m.data);
     });
     return completer.future;
   }
-  Future _postMessage(Map command, Map content, [Map contentExt]) {
+  
+  _onMessageRead(ProgressEvent event) {
+    FileReader reader = event.target;
+    var data = reader.result;
+    if (data is! List) {
+      data = new Uint8List.view(data);
+    }
+    var jdata = new BSON().deserialize(new BsonBinary.from(data));
+    //log.info('onmessage: $jdata');
+    var message = new ObjectoryMessage.fromMessage(jdata);      
+    int receivedRequestId = message.command['requestId'];
+    if (receivedRequestId == null) {
+      return;
+    }
+    var completer = awaitedRequests[receivedRequestId];
+    if (completer != null) {
+      //log.fine("Complete request: $receivedRequestId message: $message");
+      completer.complete(message.content);
+    } else {
+      //log.shout('Not found completer for request: $receivedRequestId');
+    }
+  }
+  Future _postMessage(Map command, Map content, [Map extParams]) {
     requestId++;
     command['requestId'] = requestId;
-    webSocket.send(JSON_EXT.stringify([command,content,contentExt]));
+    webSocket.send(new BSON().serialize({'header':command, 'content':content, 'extParams': extParams}).byteList);
     var completer = new Completer();
     awaitedRequests[requestId] = completer;
     return completer.future;
@@ -119,18 +130,10 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future<PersistentObject> findOne(ObjectoryQueryBuilder selector){
     Completer completer = new Completer();
     var obj;
-    if (selector.map.containsKey("_id")) {
-      obj = findInCache(selector.map["_id"]);
-    }
-    if (obj != null) {
-      completer.complete(obj);
-    }
-    else {
-      _postMessage(_createCommand('findOne',selector.className), selector.map, selector.extParamsMap)
-      .then((map){
+    _postMessage(_createCommand('findOne',selector.className), selector.map, selector.extParamsMap)
+    .then((map){
         completeFindOne(map,completer,selector); 
-      });
-    }
+    });
     return completer.future;
   }
 

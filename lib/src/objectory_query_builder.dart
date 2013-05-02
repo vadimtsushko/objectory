@@ -47,7 +47,7 @@ class ObjectoryQueryBuilder {
     return this;
   }
 
-  ObjectoryQueryBuilder id(value){
+  ObjectoryQueryBuilder id(ObjectId value){
     map["_id"] = value;
     return this;
   }

@@ -6,17 +6,17 @@ import 'objectory_base.dart';
 import 'package:logging/logging.dart';
 import 'package:bson/bson.dart';
 import 'package:bson/src/json_ext.dart';
-import 'vm_log_config.dart';
 import 'dart:async';
 
+final Logger _log = new Logger('Objectory websocket wm client');
 const IP = '127.0.0.1';
 const PORT = 8080;
 class ObjectoryMessage {
-  Map command;
+  var command;
   var content;
-  ObjectoryMessage.fromList(List jdata){
-    command = jdata[0];
-    content = jdata[1];
+  ObjectoryMessage.fromMessage(Map jdata){
+    command = jdata['header'];
+    content = jdata['content'];
   }
   toString() => 'ObjectoryMessage(command: $command, content: $content)';
 }
@@ -24,7 +24,7 @@ class ObjectoryMessage {
 class ObjectoryWebsocketConnectionImpl extends Objectory{
   WebSocket webSocket;
   bool isConnected;
-  Map<int,Completer> awaitedRequests = new Map<int,Completer>();
+  var awaitedRequests = new Map<int,Completer>();
   int requestId = 0;
 
   ObjectoryWebsocketConnectionImpl(String uri,Function registerClassesCallback,bool dropCollectionsOnStartup):
@@ -42,19 +42,19 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
       isConnected = true;
       completer.complete(true);      
       webSocket.listen((mdata) {
-          var jdata = JSON_EXT.parse(mdata);
-          log.info('onmessage: $jdata');
-          var message = new ObjectoryMessage.fromList(jdata);
+          var jdata = new BSON().deserialize(new BsonBinary.from(mdata));
+          _log.info('onmessage: $jdata');
+          var message = new ObjectoryMessage.fromMessage(jdata);
           int receivedRequestId = message.command['requestId'];
           if (receivedRequestId == null) {
             return;
           }
           var completer = awaitedRequests[receivedRequestId];
           if (completer != null) {
-            log.fine("Complete request: $receivedRequestId message: $message");
+            _log.fine("Complete request: $receivedRequestId message: $message");
             completer.complete(message.content);
           } else {
-            log.shout('Not found completer for request: $receivedRequestId');
+            _log.shout('Not found completer for request: $receivedRequestId');
           }
         },
         onDone:() {
@@ -63,10 +63,10 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     });
     return completer.future;
   }
-  Future _postMessage(Map command, Map content, [Map contentExt]) {
+  Future _postMessage(Map command, Map content, [Map extParams]) {
     requestId++;
     command['requestId'] = requestId;
-    webSocket.add(JSON_EXT.stringify([command,content, contentExt]));
+    webSocket.add(new BSON().serialize({'header':command, 'content':content, 'extParams': extParams}).byteList);
     var completer = new Completer();
     awaitedRequests[requestId] = completer;
     return completer.future;
@@ -119,18 +119,10 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
   Future<PersistentObject> findOne(ObjectoryQueryBuilder selector){
     Completer completer = new Completer();
     var obj;
-    if (selector.map.containsKey("_id")) {
-      obj = findInCache(selector.map["_id"]);
-    }
-    if (obj != null) {
-      completer.complete(obj);
-    }
-    else {
-      _postMessage(_createCommand('findOne', selector.className), selector.map, selector.extParamsMap)
-      .then((map){
+    _postMessage(_createCommand('findOne', selector.className), selector.map, selector.extParamsMap)
+    .then((map){
         completeFindOne(map,completer,selector); 
-      });
-    }
+    });
     return completer.future;
   }
 
