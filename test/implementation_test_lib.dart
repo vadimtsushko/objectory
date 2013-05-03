@@ -78,6 +78,25 @@ void testJsQuery(){
       objectory.close();
   }));
 }
+
+void tesFindWithoutParams(){
+  objectory.initDomainModel().then(expectAsync1((_) {
+    var person = new Person();
+    person.firstName = 'Daniil';
+    person.save();
+    person = new Person();
+    person.firstName = 'Vadim';
+    person.save();
+    person = new Person();
+    person.firstName = 'Nickolay';
+    return person.save();
+  })).then(expectAsync1((_) {  
+    return objectory.find($Person);
+  })).then(expectAsync1((coll){
+      expect(coll.length,3);
+      objectory.close();
+  }));
+}
 testCompoundObject(){
   objectory.initDomainModel().then(expectAsync1((_) {
     var person = new Person();
@@ -321,6 +340,7 @@ allImplementationTests(){
     test('testInsertionAndUpdate',testInsertionAndUpdate);
     test('testMatch',testMatch);
     test('tesJsQuery',testJsQuery);
+    test('tesFindWithoutParams',tesFindWithoutParams);
     test('testCompoundObject',testCompoundObject);
     test('testObjectWithExternalRefs',testObjectWithExternalRefs);
     test('testObjectWithCollectionOfExternalRefs',testObjectWithCollectionOfExternalRefs);
