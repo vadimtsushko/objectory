@@ -31,7 +31,8 @@ class Customer extends PersistentObject {
   String get name => getProperty('name');
   set name(String value) => setProperty('name',value);
 
-  List<Address> get addresses => new PersistentList<Address>(this,'Address','addresses');
+//  List<Address> get addresses => new PersistentList<Address>(this,'Address','addresses');
+  List<Address> get addresses => getPersistentList('Address','addresses');
 }
 
 
@@ -50,7 +51,7 @@ class Person extends PersistentObject {
   Person get mother => getLinkedObject('mother');
   set mother (PersistentObject value) => setLinkedObject('mother',value);
 
-  List<Person> get children => new PersistentList<Person>(this,'Person','children');
+  List<Person> get children => getPersistentList('Person','children');
 }
 
 class User extends PersistentObject {
@@ -74,7 +75,7 @@ class Article extends PersistentObject {
   Author get author => getLinkedObject('author');
   set author (Author value) => setLinkedObject('author',value);
 
-  List<Comment> get comments => new PersistentList<Comment>(this,'Comment','comments');
+  List<Comment> get comments => getPersistentList('Comment','comments');
 }
 
 class Comment extends EmbeddedPersistentObject {

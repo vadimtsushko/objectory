@@ -40,7 +40,7 @@ class Article extends PersistentObject {
   Author get author => getLinkedObject('author');
   set author (Author value) => setLinkedObject('author',value);
 
-  List<BlogComment> get comments => new PersistentList<BlogComment>(this,'Comment','comments');
+  List<BlogComment> get comments => getPersistentList('Comment','comments');
 }
 
 class BlogComment extends EmbeddedPersistentObject {

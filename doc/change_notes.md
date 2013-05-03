@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.2.2
+
+- PersistentObject got getPersistentList method as preferred way to define List properties in models.  
+
 ###0.2.1
 
 - match in QueryBuilder go named instead of positional parameters 

@@ -36,6 +36,15 @@ class BasePersistentObject {
     }
     return result;
   }
+  PersistentList getPersistentList(String className, String property) {
+    PersistentList result = _compoundProperties[property];
+    if (result == null) {
+      result = new PersistentList(this,className,property);
+      _compoundProperties[property] = result;
+    }
+    return result;
+  }
+  
   PersistentObject getLinkedObject(String property) {
     DbRef dbRef = map[property];
     if (dbRef == null) {
