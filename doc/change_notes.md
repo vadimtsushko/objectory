@@ -1,5 +1,13 @@
 #Recent change notes
 
+###0.2.1
+
+- match in QueryBuilder go named instead of positional parameters 
+- where in QueryBuilder deprecated in favour of jsQuery
+- range in QueryBuilder deprecated in favour of inRange
+- test for match added
+- test for jsQuery added
+
 ###0.2.0
 
 - Client/Server communication moved from JsonExt to Bson (using new cross-platform version of bson)

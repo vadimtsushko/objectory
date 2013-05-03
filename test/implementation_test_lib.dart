@@ -38,6 +38,46 @@ void testInsertionAndUpdate(){
     }));
   }));
 }
+void testMatch(){
+  objectory.initDomainModel().then(expectAsync1((_) {
+    var person = new Person();
+    person.firstName = 'Daniil';
+    person.save();
+    person = new Person();
+    person.firstName = 'Vadim';
+    person.save();
+    person = new Person();
+    person.firstName = 'Nickolay';
+    return person.save();
+  })).then(expectAsync1((_) {  
+    return objectory.find($Person.match('firstName','^niCk.*y\$', caseInsensitive: true));
+  })).then(expectAsync1((coll){
+      expect(coll.length,1);
+      var personFromMongo = coll[0];
+      expect(personFromMongo.firstName,'Nickolay');
+      objectory.close();
+  }));
+}
+void testJsQuery(){
+  objectory.initDomainModel().then(expectAsync1((_) {
+    var person = new Person();
+    person.firstName = 'Daniil';
+    person.save();
+    person = new Person();
+    person.firstName = 'Vadim';
+    person.save();
+    person = new Person();
+    person.firstName = 'Nickolay';
+    return person.save();
+  })).then(expectAsync1((_) {  
+    return objectory.find($Person.jsQuery('this.firstName.charAt(2) == "d"'));
+  })).then(expectAsync1((coll){
+      expect(coll.length,1);
+      var personFromMongo = coll[0];
+      expect(personFromMongo.firstName,'Vadim');
+      objectory.close();
+  }));
+}
 testCompoundObject(){
   objectory.initDomainModel().then(expectAsync1((_) {
     var person = new Person();
@@ -279,6 +319,8 @@ _setupArticle(objectory) {
 allImplementationTests(){
     test('simpleTestInsertionAndUpdate',simpleTestInsertionAndUpdate);
     test('testInsertionAndUpdate',testInsertionAndUpdate);
+    test('testMatch',testMatch);
+    test('tesJsQuery',testJsQuery);
     test('testCompoundObject',testCompoundObject);
     test('testObjectWithExternalRefs',testObjectWithExternalRefs);
     test('testObjectWithCollectionOfExternalRefs',testObjectWithCollectionOfExternalRefs);

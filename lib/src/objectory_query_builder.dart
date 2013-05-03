@@ -3,6 +3,7 @@ import 'package:bson/bson.dart';
 import 'objectory_base.dart';
 import 'persistent_object.dart';
 import 'dart:collection';
+import 'package:meta/meta.dart';
 
 class _ExtParams {
   int skip = 0;
@@ -118,13 +119,13 @@ class ObjectoryQueryBuilder {
     return this;
   }
 
-  ObjectoryQueryBuilder match(String propertyName, String pattern,[bool multiLine, bool caseInsensitive, bool dotAll, bool extended]){
+  ObjectoryQueryBuilder match(String propertyName, String pattern,{bool multiLine, bool caseInsensitive, bool dotAll, bool extended}){
     testPropertyName(propertyName);
     map[propertyName] = {'\$regex': new BsonRegexp(pattern,multiLine:multiLine, caseInsensitive:caseInsensitive,
         dotAll:dotAll,extended:extended)};
     return this;
   }
-
+  @deprecated
   ObjectoryQueryBuilder range(String propertyName, min, max, [bool minInclude=true, bool maxInclude=true]){
     testPropertyName(propertyName);
     Map rangeMap = {};
@@ -144,6 +145,26 @@ class ObjectoryQueryBuilder {
     return this;
   }
 
+  ObjectoryQueryBuilder inRange(String propertyName, min, max, {bool minInclude: true, bool maxInclude: true}){
+    testPropertyName(propertyName);
+    Map rangeMap = {};
+    if (minInclude){
+      rangeMap["\$gte"] = min;
+    }
+    else{
+      rangeMap["\$gt"] = min;
+    }
+    if (maxInclude){
+      rangeMap["\$lte"] = max;
+    }
+    else{
+      rangeMap["\$lt"] = max;
+    }
+    map[propertyName] = rangeMap;
+    return this;
+  }
+
+  
   ObjectoryQueryBuilder references(String propertyName, PersistentObject model) {
     testPropertyName(propertyName);
     map[propertyName] = new DbRef(objectory.getCollectionByModel(model), model.id);
@@ -208,7 +229,16 @@ class ObjectoryQueryBuilder {
     return this;
   }
 
+  @deprecated
+  /*** 
+   * Use jsQuery instead
+   */
   ObjectoryQueryBuilder where(String javaScriptCode){
+    map["\$where"] = new BsonCode(javaScriptCode);
+    return this;
+  }
+  
+  ObjectoryQueryBuilder jsQuery(String javaScriptCode){
     map["\$where"] = new BsonCode(javaScriptCode);
     return this;
   }

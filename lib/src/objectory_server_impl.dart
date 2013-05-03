@@ -119,6 +119,7 @@ class ObjectoryClient {
   }
   
   find(RequestHeader header, Map selector, Map extParams) {
+    _log.fine('find $header $selector $extParams');
     db.collection(header.collection).find(_selectorBuilder(selector,extParams)).toList().
     then((responseData) {
       sendResult(header, responseData);
