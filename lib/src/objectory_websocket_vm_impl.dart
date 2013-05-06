@@ -87,9 +87,9 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
   Future remove(PersistentObject persistentObject) =>
     _postMessage(_createCommand('remove',persistentObject.dbType),persistentObject.map);
 
-  Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){
+  Future<List> find(ObjectoryQueryBuilder selector){
     Completer completer = new Completer();
-    var result = new List<PersistentObject>();
+    var result = objectory.createTypedList(selector.className);
     _postMessage(_createCommand('find',selector.className),selector.map, selector.extParamsMap).then((list) {
       for (var map in list) {
         PersistentObject obj = objectory.map2Object(selector.className,map);

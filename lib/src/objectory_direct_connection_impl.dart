@@ -31,10 +31,10 @@ class ObjectoryDirectConnectionImpl extends Objectory{
       ..extParams.limit = selector.extParams.limit
       ..extParams.skip = selector.extParams.skip;
   }
-  Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){
+  Future<List> find(ObjectoryQueryBuilder selector){
     Completer completer = new Completer();
     SelectorBuilder selectorBuilder = convertSelector(selector);
-    var result = new List<PersistentObject>();
+    var result = objectory.createTypedList(selector.className);
     db.collection(selector.className)
       .find(selectorBuilder)
       .each((map){

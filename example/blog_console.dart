@@ -23,6 +23,16 @@ main(){
     author.save();
     return objectory.find($Author.sortBy('age'));
   }).then((auths){
+    if( auths is List<Author>) {
+      print("**********************************************");
+      print("* GOOD!!!!! auths is List<Author> :-)");
+      print("**********************************************");
+    } else {
+      print("**********************************************");
+      print("* GASP!!!!! auths is! List<Author> :'-(");
+      print("*           auths --> "+auths.runtimeType.toString());
+      print("**********************************************");
+    }
     print("===================================================================================");
     print(">> Authors ordered by age ascending");
     for (var auth in auths) {

@@ -19,9 +19,11 @@ class Objectory{
   bool dropCollectionsOnStartup;
   Map<String,BasePersistentObject> cache;
   Map<String,FactoryMethod> factories;
+  Map<String,FactoryMethod> listFactories;
 
   Objectory(this.uri,this.registerClassesCallback,this.dropCollectionsOnStartup){
     factories = new  Map<String,FactoryMethod>();
+    listFactories = new  Map<String,FactoryMethod>();
     cache = new Map<String,BasePersistentObject>();
   }
 
@@ -72,6 +74,9 @@ class Objectory{
     }
     return result;
   }
+  List createTypedList(String className) {
+    return listFactories[className]();
+  }
 
   List<String> getCollections() {
     var result = new List<String>();
@@ -111,8 +116,13 @@ class Objectory{
 
   ObjectId generateId() => new ObjectId();
 
-  void registerClass(String className,FactoryMethod factory){
+  void registerClass(String className,FactoryMethod factory,[FactoryMethod listFactory]){
     factories[className] = factory;
+    if( listFactory==null ) {
+      listFactories[className] = ()=>new List<PersistentObject>();
+    } else {
+      listFactories[className] = listFactory;
+    }
   }
   Future dropCollections() { throw 'Must be implemented'; }
 
@@ -121,7 +131,7 @@ class Objectory{
 
   Future<PersistentObject> findOne(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
   Future<int> count(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }  
-  Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
+  Future<List> find(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
   Future insert(PersistentObject persistentObject) { throw 'Must be implemented'; }
   Future update(PersistentObject persistentObject) { throw 'Must be implemented'; }
   Future remove(BasePersistentObject persistentObject) { throw 'Must be implemented'; }
