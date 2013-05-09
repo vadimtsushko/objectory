@@ -7,6 +7,7 @@ import 'package:bson/bson.dart';
 import 'package:bson/src/json_ext.dart';
 import 'dart:typed_data';
 import 'dart:async';
+import 'dart:json' as json;
 
 const IP = '127.0.0.1';
 const PORT = 8080;
@@ -47,20 +48,23 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     });
 
     webSocket.onMessage.listen((m) {
-      var reader = new FileReader();
+      // TODO: Figure out if it's binary or not.
+      // We could use print((new WebSocket('ws://.')).binaryType); -- but how does the server know?
+      /*var reader = new FileReader();
       reader.onLoadEnd.listen(_onMessageRead);
-      reader.readAsArrayBuffer(m.data);
+      reader.readAsArrayBuffer(m.data);*/
+      _onMessageRead(m.data);
     });
     return completer.future;
   }
   
-  _onMessageRead(ProgressEvent event) {
-    FileReader reader = event.target;
+  _onMessageRead(/*ProgressEvent event*/data) {
+    /*FileReader reader = event.target;
     var data = reader.result;
     if (data is! List) {
       data = new Uint8List.view(data);
-    }
-    var jdata = new BSON().deserialize(new BsonBinary.from(data));
+    }*/
+    var jdata = new BSON().deserialize(new BsonBinary.from(json.parse(data)));
     //log.info('onmessage: $jdata');
     var message = new ObjectoryMessage.fromMessage(jdata);      
     int receivedRequestId = message.command['requestId'];
@@ -78,7 +82,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future _postMessage(Map command, Map content, [Map extParams]) {
     requestId++;
     command['requestId'] = requestId;
-    webSocket.send(new BSON().serialize({'header':command, 'content':content, 'extParams': extParams}).byteList);
+    webSocket.send(json.stringify(new BSON().serialize({'header':command, 'content':content, 'extParams': extParams}).byteList));
     var completer = new Completer();
     awaitedRequests[requestId] = completer;
     return completer.future;
