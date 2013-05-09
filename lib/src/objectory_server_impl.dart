@@ -77,7 +77,8 @@ class ObjectoryClient {
         closed = true;
       },
       onError: (error) {
-        throw error;
+        _log.severe(error);
+        socket.close();
       }  
     
    );
@@ -191,8 +192,8 @@ class ObjectoryServerImpl {
           _token+=1;
           var c = new ObjectoryClient('objectory_client_${_token}', _token, webSocket);
           _log.fine('adding connection token = ${_token}');
-       });
-      });
+       }, onError: (e) => _log.severe(e));
+      }).catchError((e) => _log.severe(e));
     });
     print('Listening on http://$hostName:$port');
     print('MongoDB connection: ${db.serverConfig.host}:${db.serverConfig.port}');         
