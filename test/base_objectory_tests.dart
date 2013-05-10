@@ -46,7 +46,7 @@ testFailOnAbsentProperty(){
   doAbrakadabraWith(author);
 }
 testNewInstanceMethod(){
-  var author = objectory.newInstance('Author');
+  var author = objectory.newInstance(Author);
   expect(author is Author, isTrue);
 }
 testMap2ObjectMethod() {
@@ -54,7 +54,7 @@ testMap2ObjectMethod() {
     "name": "Vadim",
     "age": 300,
     "email": "nobody@know.it"};
-  Author author = objectory.map2Object("Author",map);
+  Author author = objectory.map2Object(Author,map);
   //Not converted to upperCase because setter has not been invoked
   expect(author.name,"Vadim");
   expect(author.age,300);
@@ -63,7 +63,7 @@ testMap2ObjectMethod() {
     "streetName": "333",
     "cityName": "44444"
       };
-  Address address = objectory.map2Object("Address",map);
+  Address address = objectory.map2Object(Address,map);
   expect(address.cityName,"44444");
 }
 testObjectWithListOfInternalObjects2Map() {
@@ -85,7 +85,7 @@ testObjectWithListOfInternalObjects2Map() {
 }
 testMap2ObjectWithListOfInternalObjects() {
   var map = {"_id": null, "name": "Tequila corporation", "addresses": [{"cityName": "Mexico"}, {"cityName": "Moscow"}]};
-  Customer customer = objectory.map2Object($Customer.className, map);
+  Customer customer = objectory.map2Object(Customer, map);
   expect(customer.name,"Tequila corporation");
   expect(customer.addresses.length,2);
   expect(customer.addresses[1].cityName,"Moscow");
@@ -128,7 +128,7 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   objectory.addToCache(user);
   Map articleMap = {"title": "test article", "body": "sasdfasdfasdf",
                     "comments": [{"body": "Excellent", "user": user.dbRef}]};
-  Article article = objectory.map2Object($Article.className,articleMap);
+  Article article = objectory.map2Object(Article,articleMap);
   expect(article.map["comments"][0]["user"].id,user.dbRef.id);
   expect(article.comments[0].user,user);
 }

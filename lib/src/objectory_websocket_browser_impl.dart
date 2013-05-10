@@ -7,6 +7,7 @@ import 'package:bson/bson.dart';
 import 'package:bson/src/json_ext.dart';
 import 'dart:typed_data';
 import 'dart:async';
+import 'dart:json' as json;
 
 const IP = '127.0.0.1';
 const PORT = 8080;
@@ -20,6 +21,59 @@ class ObjectoryMessage {
   toString() => 'ObjectoryMessage(command: $command, content: $content)';
 }
 
+
+class ObjectoryCollectionWebsocketBrowserImpl extends ObjectoryCollection{
+  ObjectoryWebsocketBrowserImpl objectoryImpl;
+  ObjectoryCollectionWebsocketBrowserImpl(this.objectoryImpl);
+  Future<int> count([ObjectoryQueryBuilder selector]) { 
+    Completer completer = new Completer();
+    if (selector == null) {
+      selector = new ObjectoryQueryBuilder();
+    }
+    var obj;
+    objectoryImpl._postMessage(objectoryImpl._createCommand('count', collectionName), selector.map, selector.extParamsMap)
+      .then((int _count){
+        completer.complete(_count); 
+      });
+     return completer.future; 
+  }
+  Future<List<PersistentObject>> find([ObjectoryQueryBuilder selector]){
+    Completer completer = new Completer();
+    if (selector == null) {
+      selector = new ObjectoryQueryBuilder();
+    }
+    var result = objectory.createTypedList(classType);
+    objectoryImpl._postMessage(objectoryImpl._createCommand('find',collectionName), selector.map, selector.extParamsMap).then((list) {
+      for (var map in list) {
+        PersistentObject obj = objectory.map2Object(classType,map);
+        result.add(obj);
+      }
+      if (!selector.paramFetchLinks) {
+        completer.complete(result);
+      } else {
+        Future
+        .wait(result.map((item) => item.fetchLinks()))
+        .then((res) {completer.complete(res);}); 
+      }
+    });
+    return completer.future;
+  }  
+  
+  Future<PersistentObject> findOne([ObjectoryQueryBuilder selector]){
+    Completer completer = new Completer();
+    if (selector == null) {
+      selector = new ObjectoryQueryBuilder();
+    }
+    var obj;
+    objectoryImpl._postMessage(objectoryImpl._createCommand('findOne',collectionName), selector.map, selector.extParamsMap)
+    .then((map){
+      objectoryImpl.completeFindOne(map,completer,selector, classType); 
+    });
+    return completer.future;
+  }
+}
+
+
 class ObjectoryWebsocketBrowserImpl extends Objectory{
   WebSocket webSocket;
   bool isConnected;
@@ -31,7 +85,11 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future open(){
     return setupWebsocket(uri);
   }
-
+  ObjectoryCollection createObjectoryCollection(Type classType, String collectionName){
+    return new ObjectoryCollectionWebsocketBrowserImpl(this)
+      ..collectionName = collectionName
+      ..classType = classType;
+  }
   Future<bool> setupWebsocket(String uri) {
     Completer completer = new Completer();
     webSocket = new WebSocket("ws://$uri/ws");
@@ -47,20 +105,23 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     });
 
     webSocket.onMessage.listen((m) {
-      var reader = new FileReader();
+      // TODO: Figure out if it's binary or not.
+      // We could use print((new WebSocket('ws://.')).binaryType); -- but how does the server know?
+      /*var reader = new FileReader();
       reader.onLoadEnd.listen(_onMessageRead);
-      reader.readAsArrayBuffer(m.data);
+      reader.readAsArrayBuffer(m.data);*/
+      _onMessageRead(m.data);
     });
     return completer.future;
   }
   
-  _onMessageRead(ProgressEvent event) {
-    FileReader reader = event.target;
+  _onMessageRead(/*ProgressEvent event*/data) {
+    /*FileReader reader = event.target;
     var data = reader.result;
     if (data is! List) {
       data = new Uint8List.view(data);
-    }
-    var jdata = new BSON().deserialize(new BsonBinary.from(data));
+    }*/
+    var jdata = new BSON().deserialize(new BsonBinary.from(json.parse(data)));
     //log.info('onmessage: $jdata');
     var message = new ObjectoryMessage.fromMessage(jdata);      
     int receivedRequestId = message.command['requestId'];
@@ -78,7 +139,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future _postMessage(Map command, Map content, [Map extParams]) {
     requestId++;
     command['requestId'] = requestId;
-    webSocket.send(new BSON().serialize({'header':command, 'content':content, 'extParams': extParams}).byteList);
+    webSocket.send(json.stringify(new BSON().serialize({'header':command, 'content':content, 'extParams': extParams}).byteList));
     var completer = new Completer();
     awaitedRequests[requestId] = completer;
     return completer.future;
@@ -97,45 +158,6 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
 
   Future remove(PersistentObject persistentObject) =>
     _postMessage(_createCommand('remove',persistentObject.dbType),persistentObject.map);
-
-  Future<List> find(ObjectoryQueryBuilder selector){
-    Completer completer = new Completer();
-    var result = objectory.createTypedList(selector.className);
-    _postMessage(_createCommand('find',selector.className), selector.map, selector.extParamsMap).then((list) {
-      for (var map in list) {
-        PersistentObject obj = objectory.map2Object(selector.className,map);
-        result.add(obj);
-      }
-      if (!selector.extParams.fetchLinksMode) {
-        completer.complete(result);
-      } else {
-        Future
-        .wait(result.map((item) => item.fetchLinks()))
-        .then((res) {completer.complete(res);}); 
-      }
-    });
-    return completer.future;
-  }
-  
-  Future<int> count(ObjectoryQueryBuilder selector) { 
-    Completer completer = new Completer();
-    var obj;
-    _postMessage(_createCommand('count', selector.className), selector.map, selector.extParamsMap)
-      .then((int _count){
-        completer.complete(_count); 
-      });
-     return completer.future;
-  } 
-
-  Future<PersistentObject> findOne(ObjectoryQueryBuilder selector){
-    Completer completer = new Completer();
-    var obj;
-    _postMessage(_createCommand('findOne',selector.className), selector.map, selector.extParamsMap)
-    .then((map){
-        completeFindOne(map,completer,selector); 
-    });
-    return completer.future;
-  }
 
   Future<Map> dropDb() {
     return _postMessage(_createCommand('dropDb',null),{});

@@ -58,7 +58,7 @@ Next we embed this class in appropiate attribute of `PersistentObject` class by 
       Date get birthday => getProperty('birthday');
       set birthday(Date value) => setProperty('birthday',value);
       
-      Address get homeAddress => getEmbeddedObject('Address','homeAddress'); 
+      Address get homeAddress => getEmbeddedObject(Address,'homeAddress'); 
     }
 
 Setters for embedded objects are not used. Example of usage on client side:  
@@ -103,7 +103,7 @@ Embedded lists are defined by means of getter annotated as `List<SomeClass>`
 
 For example we can define Article which contains list of comments so 
 
-    class Comment extends EmbeddedPersistentObject {
+    class BlogComment extends EmbeddedPersistentObject {
       
       User get user => getLinkedObject('user');
       set user (User value) => setLinkedObject('user',value);
@@ -124,11 +124,11 @@ For example we can define Article which contains list of comments so
       
       Author get author => getLinkedObject('author');
       set author (Author value) => setLinkedObject('author',value);
-    
-      List<Comment> get comments => new PersistentList<Comment>(this,'Comment','comments');
+      List<BlogComment> get comments => getPersistentList(BlogComment,'comments');
+      
     }
 
-So firstly we define class for embedded object Comment, then in class Article define getter for list of comments. Getter invokes factory of PersistentList class, with referense on entity object, type of elements for list and name of property as parameters.
+So firstly we define class for embedded object BlogComment, then in class Article define getter for list of comments. Getter invokes factory of PersistentList class, with referense on entity object, type of elements for list and name of property as parameters.
 
 In MongoDB such a document may look like:
 
@@ -163,7 +163,7 @@ To query data objectory have methods `find` (returning result as `Future` of lis
 For example that script prints some information for all Articles in db:
 
     initDomainModel().chain((_) {    
-      return objectory.find($Article);
+      return objectory[Article].find();
     }).then((articles) {
       for (var article  in articles) {
         print('title: ${article.title}; ==> ${article.body}');
@@ -173,13 +173,14 @@ For example that script prints some information for all Articles in db:
       }
     }  
 
-$Article above is top level getter for ObjectoryQueryBuilder for type Article, defined in domain model library of application (library where defined all entity classes)
-ObjectoryQueryBuilder provide fluent API to build valid MongoDB queries. 
+objectory[Article] above roughly correspond to MongoDb collection. 
 
+ObjectoryQueryBuilder extends mongo_dart SelectorBuilder and provide fluent API to build valid MongoDB queries. 
+In objectory as in mongo_dart query builder object usualy created by top level getter `where`
 To print all articles having comments in 2011 year and later with word "new" in their titles: 
 
     initDomainModel().chain((_) {    
-      return objectory.find($Article.match('title','[nN]ew').gte('comments.date', new Date(2011,01,01)));
+      return objectory[Article].find(where.match('title','[nN]ew').gte('comments.date', new Date(2011,01,01)));
     }).then((articles) {
       for (var article  in articles) {
         print('title: ${article.title}; ==> ${article.body}');

@@ -23,23 +23,23 @@ class BasePersistentObject {
     _dirtyFields = new Set<String>();
   }
   get dirtyFields => _dirtyFields;
-  EmbeddedPersistentObject getEmbeddedObject(String className, String property) {
+  EmbeddedPersistentObject getEmbeddedObject(Type classType, String property) {
     EmbeddedPersistentObject result = _compoundProperties[property];
     if (result == null) {
       if (map[property] == null) {
         map[property] = {};
       }
-      result = objectory.newInstance(className);
+      result = objectory.newInstance(classType);
       result.setMap(map[property]);
       result._parent = this;
       result._pathToMe = property;
     }
     return result;
   }
-  PersistentList getPersistentList(String className, String property) {
+  PersistentList getPersistentList(Type classType, String property) {
     PersistentList result = _compoundProperties[property];
     if (result == null) {
-      result = new PersistentList(this,className,property);
+      result = new PersistentList(this,classType,property);
       _compoundProperties[property] = result;
     }
     return result;
@@ -50,7 +50,8 @@ class BasePersistentObject {
     if (dbRef == null) {
       return null;
     }
-    return objectory.findInCacheOrGetProxy(dbRef.id,dbRef.collection);
+    Type classType = objectory.getClassTypeByCollection(dbRef.collection);
+    return objectory.findInCacheOrGetProxy(dbRef.id,classType);
   }
 
   setLinkedObject(String property, PersistentObject value) {
@@ -164,7 +165,7 @@ class PersistentObject extends BasePersistentObject{
 
   Future<bool> fetch() {
     Completer completer = new Completer();
-    objectory.findOne(new ObjectoryQueryBuilder(dbType).id(id)).then((res){
+    objectory[this.runtimeType].findOne(new ObjectoryQueryBuilder().id(id)).then((res){
       completer.complete(true);
     });
     return completer.future;

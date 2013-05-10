@@ -5,18 +5,21 @@ import 'domain_model.dart';
 
 
 void simpleTestInsertionAndUpdate(){
+  Author author;
   objectory.initDomainModel().then(expectAsync1((_) {
-    Author author = new Author();
+    author = new Author();
     author.name = 'Dan';
     author.age = 3;
     author.email = 'who@cares.net';
     author.save();
     author.age = 4;
-    author.save();
-    objectory.findOne($Author.id(author.id)).then(expectAsync1((authFromDb){
+    return author.save();
+  })).then(expectAsync1((saveRes) {
+    return objectory[Author].findOne(where.id(author.id));
+  })).then(expectAsync1((authFromDb){
+    expect(authFromDb,isNotNull);
       expect(authFromDb.age,4);
       objectory.close();
-    }));
   }));
 }
 
@@ -30,7 +33,7 @@ void testInsertionAndUpdate(){
     author.save();
     author.age = 4;
     author.save();
-    objectory.find($Author).then(expectAsync1((coll){
+    objectory[Author].find().then(expectAsync1((coll){
       expect(coll.length,1);
       var authFromMongo = coll[0];
       expect(authFromMongo.age,4);
@@ -50,7 +53,7 @@ void testMatch(){
     person.firstName = 'Nickolay';
     return person.save();
   })).then(expectAsync1((_) {  
-    return objectory.find($Person.match('firstName','^niCk.*y\$', caseInsensitive: true));
+    return objectory[Person].find(where.match('firstName','^niCk.*y\$', caseInsensitive: true));
   })).then(expectAsync1((coll){
       expect(coll.length,1);
       var personFromMongo = coll[0];
@@ -70,7 +73,7 @@ void testJsQuery(){
     person.firstName = 'Nickolay';
     return person.save();
   })).then(expectAsync1((_) {  
-    return objectory.find($Person.jsQuery('this.firstName.charAt(2) == "d"'));
+    return objectory[Person].find(where.jsQuery('this.firstName.charAt(2) == "d"'));
   })).then(expectAsync1((coll){
       expect(coll.length,1);
       var personFromMongo = coll[0];
@@ -91,7 +94,7 @@ void tesFindWithoutParams(){
     person.firstName = 'Nickolay';
     return person.save();
   })).then(expectAsync1((_) {  
-    return objectory.find($Person);
+    return objectory[Person].find();
   })).then(expectAsync1((coll){
       expect(coll.length,3);
       objectory.close();
@@ -104,7 +107,7 @@ testCompoundObject(){
     person.address.streetName = 'Elm';
     person.firstName = 'Dick';
     person.save();
-    objectory.findOne($Person.id(person.id)).then(expectAsync1((savedPerson){
+    objectory[Person].findOne(where.id(person.id)).then(expectAsync1((savedPerson){
       expect(savedPerson.firstName,'Dick');
       expect(savedPerson.address.streetName,'Elm');
       expect(savedPerson.address.cityName,'Tyumen');
@@ -121,7 +124,7 @@ testObjectWithExternalRefs(){
     son.firstName = 'Son';
     son.father = father;
     son.save();
-    objectory.findOne($Person.id(son.id)).then(expectAsync1((sonFromObjectory){
+    objectory[Person].findOne(where.id(son.id)).then(expectAsync1((sonFromObjectory){
       // Links must be fetched before use.
       //Do not know yet how to test throws in async tests
       //Expect.throws(()=>sonFromObjectory.father.firstName);
@@ -162,13 +165,13 @@ testObjectWithCollectionOfExternalRefs(){
     father = null;
     son = null;
     daughter = null;
-    return objectory.findOne($Person.id(fatherId));
+    return objectory[Person].findOne(where.id(fatherId));
   })).then(expectAsync1((fatherFromObjectory){
     father = fatherFromObjectory;
-    return objectory.findOne($Person.id(sonId));
+    return objectory[Person].findOne(where.id(sonId));
    })).then(expectAsync1((sonFromObjectory){
      son = sonFromObjectory;
-     return objectory.findOne($Person.id(daughterId));
+     return objectory[Person].findOne(where.id(daughterId));
    })).then(expectAsync1((daughterFromObjectory){     
     daughter = daughterFromObjectory;
     father.children.add(son);
@@ -179,7 +182,7 @@ testObjectWithCollectionOfExternalRefs(){
     father = null;
     son = null;
     daughter = null;
-    return objectory.findOne($Person.id(fatherId));
+    return objectory[Person].findOne(where.id(fatherId));
   })).then(expectAsync1((fatherFromObjectory){
     father = fatherFromObjectory;
     expect(father.children.length,2);
@@ -201,7 +204,7 @@ testObjectWithCollectionOfExternalRefs(){
     father = null;
     son = null;
     daughter = null;
-    return objectory.findOne($Person.id(fatherId));
+    return objectory[Person].findOne(where.id(fatherId));
   })).then(expectAsync1((fatherFromObjectory){
     father = fatherFromObjectory;
     expect(father.children.length,1);
@@ -216,7 +219,7 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   Author author;
   objectory.initDomainModel().then(expectAsync1((_) {
     _setupArticle(objectory);
-    return objectory.find($Article.sortBy('title'));
+    return objectory[Article].find(where.sortBy('title'));
   })).then(expectAsync1((articles) {
     var artcl = articles[0];
     expect(artcl.comments[0] is EmbeddedPersistentObject, isTrue);
@@ -235,15 +238,6 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   }));
 }
 
-testPropertyNameChecks() {
-  var query = $Person.eq('firstName', 'Vadim');
-  expect(query.map,containsPair('firstName', 'Vadim'));
-  expect(() => $Person.eq('unkwnownProperty', null),throws);
-  query = $Person.eq('address.cityName', 'Tyumen');
-  expect(query.map,containsPair('address.cityName','Tyumen'));
-  expect(() => $Person.eq('address.cityName1', 'Tyumen'),throws);
-}
-
 void testLimit(){
   objectory.initDomainModel().then(expectAsync1((_) {
     for (int n=0; n < 30; n++) {
@@ -252,7 +246,7 @@ void testLimit(){
       author.save();
     }
     objectory.wait().then(expectAsync1((coll){
-     return objectory.find($Author.skip(20).limit(10));
+     return objectory[Author].find(where.skip(20).limit(10));
     })).then(expectAsync1((coll){
       expect(coll.length,10);
       var authFromMongo = coll[0];
@@ -270,7 +264,7 @@ void testCount(){
       author.save();
     }
     objectory.wait().then(expectAsync1((coll){
-     return objectory.count($Author);
+     return objectory[Author].count();
     })).then(expectAsync1((_count){
       expect(_count,27);
       objectory.close();
@@ -281,7 +275,7 @@ void testCount(){
 testFindWithFetchLinksMode() {
   objectory.initDomainModel().then(expectAsync1((_) {
     _setupArticle(objectory);
-    return objectory.find($Article.sortBy('title').fetchLinks());
+    return objectory[Article].find(where.sortBy('title').fetchLinks());
   })).then(expectAsync1((artciles) {
     var artcl = artciles[0];
     expect(artcl.comments[0].user.name,'Joe Great');
@@ -294,7 +288,7 @@ testFindWithFetchLinksMode() {
 testFindOneWithFetchLinksMode() {
   objectory.initDomainModel().then(expectAsync1((_) {
     _setupArticle(objectory);
-    return objectory.findOne($Article.sortBy('title').fetchLinks());
+    return objectory[Article].findOne(where.sortBy('title').fetchLinks());
   })).then(expectAsync1((artcl) {
     expect(artcl.comments[0].user.name,'Joe Great');
     expect(artcl.comments[1].user.name,'Lisa Fine');
@@ -302,6 +296,19 @@ testFindOneWithFetchLinksMode() {
     objectory.close();
   }));
 }
+
+testFindOneDontGetObjectFromCache() {
+  objectory.initDomainModel().then(expectAsync1((_) {
+    var article = new Article();
+    article.id = new ObjectId();
+    objectory.addToCache(article);
+    return objectory[Article].findOne(where.id(article.id));
+  })).then(expectAsync1((artcl) {
+    expect(artcl, isNull);
+    objectory.close();
+  }));
+}
+
 
 _setupArticle(objectory) {
   User joe;
@@ -349,4 +356,6 @@ allImplementationTests(){
     test('testCount',testCount);
     test('testFindWithFetchLinksMode',testFindWithFetchLinksMode);
     test('testFindOneWithFetchLinksMode',testFindOneWithFetchLinksMode);    
+    test('testFindOneDontGetObjectFromCache',testFindOneDontGetObjectFromCache);    
+    
 }

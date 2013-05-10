@@ -5,11 +5,20 @@ import 'dart:collection';
 import 'dart:async';
 import 'package:bson/bson.dart';
 
-typedef Object FactoryMethod();
+
 
 Objectory get objectory => Objectory.objectoryImpl;
 set objectory(Objectory impl) => Objectory.objectoryImpl = impl;
 
+class ObjectoryCollection {
+  String collectionName;
+  Type classType;
+  Future<PersistentObject> findOne([ObjectoryQueryBuilder selector]) { throw new Exception('method findOne must be implemented'); }
+  Future<int> count([ObjectoryQueryBuilder selector]) { throw new Exception('method count must be implemented'); }  
+  Future<List<PersistentObject>> find([ObjectoryQueryBuilder selector]) { throw new Exception('method find must be implemented'); }
+}
+
+typedef Object FactoryMethod();
 
 class Objectory{
 
@@ -17,52 +26,50 @@ class Objectory{
   String uri;
   Function registerClassesCallback;
   bool dropCollectionsOnStartup;
-  Map<String,BasePersistentObject> cache;
-  Map<String,FactoryMethod> factories;
-  Map<String,FactoryMethod> listFactories;
+  final Map<String,BasePersistentObject> cache = new  Map<String,BasePersistentObject>();
+  final Map<Type,FactoryMethod> _factories = new Map<Type,FactoryMethod>();
+  final Map<Type,FactoryMethod> _listFactories = new Map<Type,FactoryMethod>();
+  final Map<Type,ObjectoryCollection> _collections = new Map<Type,ObjectoryCollection>();
+  final Map<String,Type> _collectionNameToTypeMap = new Map<String,Type>();
 
-  Objectory(this.uri,this.registerClassesCallback,this.dropCollectionsOnStartup){
-    factories = new  Map<String,FactoryMethod>();
-    listFactories = new  Map<String,FactoryMethod>();
-    cache = new Map<String,BasePersistentObject>();
-  }
+  Objectory(this.uri,this.registerClassesCallback,this.dropCollectionsOnStartup);
 
   void addToCache(PersistentObject obj) {
     cache[obj.id.toString()] = obj;
   }
-
+  Type getClassTypeByCollection(String collectionName) => _collectionNameToTypeMap[collectionName];
   PersistentObject findInCache(var id) {
     if (id == null) {
       return null;
     }
     return cache[id.toString()];
   }
-  PersistentObject findInCacheOrGetProxy(var id, String className) {
+  PersistentObject findInCacheOrGetProxy(var id, Type classType) {
     if (id == null) {
       return null;
     }
     PersistentObject result = findInCache(id);
     if (result == null) {
-      result = objectory.newInstance(className);
+      result = objectory.newInstance(classType);
       result.id = id;
       result.notFetched = true;
     }
     return result;
   }
-  BasePersistentObject newInstance(String className){
-    if (factories.containsKey(className)){
-      return factories[className]();
+  BasePersistentObject newInstance(Type classType){
+    if (_factories.containsKey(classType)){
+      return _factories[classType]();
     }
-    throw "Class $className have not been registered in Objectory";
+    throw new Exception('Class $classType have not been registered in Objectory');
   }
   PersistentObject dbRef2Object(DbRef dbRef) {
-    return findInCacheOrGetProxy(dbRef.id, dbRef.collection);
+    return findInCacheOrGetProxy(dbRef.id, objectory.getClassTypeByCollection(dbRef.collection));
   }
-  BasePersistentObject map2Object(String className, Map map){
+  BasePersistentObject map2Object(Type classType, Map map){
     if (map == null) {
       map = new LinkedHashMap();
     }
-    var result = newInstance(className);
+    var result = newInstance(classType);
     result.map = map;
     if (result is PersistentObject){
       result.id = map["_id"];
@@ -74,28 +81,18 @@ class Objectory{
     }
     return result;
   }
-  List createTypedList(String className) {
-    return listFactories[className]();
+  List createTypedList(Type classType) {
+    return _listFactories[classType]();
   }
 
-  List<String> getCollections() {
-    var result = new List<String>();
-    factories.forEach( (key, value) {
-      var obj = value();
-      if (obj is PersistentObject) {
-        result.add(key);
-       }
-    });
-    return result;
-  }
-
+  List<String> getCollections() => _collections.values.map((ObjectoryCollection oc) => oc.collectionName).toList();
   /**
    * Returns the collection name for the given model instance.
    */
   String getCollectionByModel(PersistentObject model) {
     var collection;
 
-    factories.forEach((key, value) {
+    _factories.forEach((key, value) {
       if (value().runtimeType == model.runtimeType) collection = key;
     });
 
@@ -116,28 +113,31 @@ class Objectory{
 
   ObjectId generateId() => new ObjectId();
 
-  void registerClass(String className,FactoryMethod factory,[FactoryMethod listFactory]){
-    factories[className] = factory;
-    if( listFactory==null ) {
-      listFactories[className] = ()=>new List<PersistentObject>();
-    } else {
-      listFactories[className] = listFactory;
+  void registerClass(Type classType,FactoryMethod factory,[FactoryMethod listFactory]){
+    _factories[classType] = factory;
+    _listFactories[classType] = (listFactory==null ? ()=>new List<PersistentObject>() : listFactory);
+    BasePersistentObject obj = factory();
+    if (obj is PersistentObject) {
+      var collectionName = obj.dbType;
+      _collectionNameToTypeMap[collectionName] = classType;
+      _collections[classType] = createObjectoryCollection(classType,collectionName);
     }
   }
-  Future dropCollections() { throw 'Must be implemented'; }
+  Future dropCollections() { throw new Exception('Must be implemented'); }
 
-  Future open() { throw 'Must be implemented'; }
+  Future open() { throw new Exception('Must be implemented'); }
 
-
-  Future<PersistentObject> findOne(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
-  Future<int> count(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }  
-  Future<List> find(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
-  Future insert(PersistentObject persistentObject) { throw 'Must be implemented'; }
-  Future update(PersistentObject persistentObject) { throw 'Must be implemented'; }
-  Future remove(BasePersistentObject persistentObject) { throw 'Must be implemented'; }
-  Future<Map> dropDb() { throw 'Must be implemented'; }
-  Future<Map> wait() { throw 'Must be implemented'; }
-  void close() { throw 'Must be implemented'; }
+  ObjectoryCollection createObjectoryCollection(Type classType, String collectionName){
+    return new ObjectoryCollection()
+      ..classType = classType
+      ..collectionName = collectionName;
+  }
+  Future insert(PersistentObject persistentObject) { throw new Exception('Must be implemented'); }
+  Future update(PersistentObject persistentObject) { throw new Exception('Must be implemented'); }
+  Future remove(BasePersistentObject persistentObject) { throw new Exception('Must be implemented'); }
+  Future<Map> dropDb() { throw new Exception('Must be implemented'); }
+  Future<Map> wait() { throw new Exception('Must be implemented'); }
+  void close() { throw new Exception('Must be implemented'); }
   Future<bool> initDomainModel() {
     var res = new Completer();
     registerClassesCallback();
@@ -153,15 +153,15 @@ class Objectory{
     return res.future;
   }
 
-  completeFindOne(map,completer,selector) {
+  completeFindOne(Map map,Completer completer,ObjectoryQueryBuilder selector,Type classType) {
     var obj;
     if (map == null) {
       completer.complete(null);
     }
     else {
-      obj = objectory.map2Object(selector.className,map);
+      obj = objectory.map2Object(classType,map);
       addToCache(obj);
-      if (!selector.extParams.fetchLinksMode) {
+      if ((selector == null) ||  !selector.paramFetchLinks) {
         completer.complete(obj);
       } else {
         obj.fetchLinks().then((_) {
@@ -170,4 +170,6 @@ class Objectory{
       }
     }
   }
+  
+  ObjectoryCollection operator[](Type classType) => _collections[classType];
 }
