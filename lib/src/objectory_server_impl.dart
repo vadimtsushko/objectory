@@ -31,6 +31,7 @@ class ObjectoryClient {
   WebSocket socket;
   bool closed = false;
   ObjectoryClient(this.name, this.token, this.socket) {
+    socket.done.catchError((e) {closed = true;});
     socket.listen((message) {
       try {
         var binary = new BsonBinary.from(json.parse(message));
@@ -79,6 +80,7 @@ class ObjectoryClient {
     },
       onDone: () {
         closed = true;
+        socket.close();
       },
       onError: (error) {
         _log.severe(error);
