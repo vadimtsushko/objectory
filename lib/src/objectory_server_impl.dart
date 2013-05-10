@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:logging/logging.dart';
 import 'dart:async';
+import 'dart:json' as json;
 
 final IP = '127.0.0.1';
 final PORT = 8080;
@@ -31,7 +32,8 @@ class ObjectoryClient {
   bool closed = false;
   ObjectoryClient(this.name, this.token, this.socket) {
     socket.listen((message) {
-        var binary = new BsonBinary.from(message);
+      try {
+        var binary = new BsonBinary.from(json.parse(message));
         var jdata = new BSON().deserialize(binary);
         var header = new RequestHeader.fromMap(jdata['header']);
         Map content = jdata['content'];
@@ -71,12 +73,16 @@ class ObjectoryClient {
 
         _log.shout('Unexpected message: $message');
         sendResult(header,content);
+      } catch (e) {
+        _log.severe(e);
+      }
     },
       onDone: () {
         closed = true;
       },
       onError: (error) {
-        throw error;
+        _log.severe(error);
+        socket.close();
       }  
     
    );
@@ -90,7 +96,7 @@ class ObjectoryClient {
     }
   }
   sendMessage(header, content) {
-    socket.add(new BSON().serialize({'header': header,'content': content}).byteList);
+    socket.add(json.stringify(new BSON().serialize({'header': header,'content': content}).byteList));
   }
   save(RequestHeader header, Map mapToSave) {
     if (header.command == 'insert') {
@@ -190,8 +196,8 @@ class ObjectoryServerImpl {
           _token+=1;
           var c = new ObjectoryClient('objectory_client_${_token}', _token, webSocket);
           _log.fine('adding connection token = ${_token}');
-       });
-      });
+       }, onError: (e) => _log.severe(e));
+      }).catchError((e) => _log.severe(e));
     });
     print('Listening on http://$hostName:$port');
     print('MongoDB connection: ${db.serverConfig.host}:${db.serverConfig.port}');         
