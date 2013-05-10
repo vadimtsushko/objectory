@@ -5,6 +5,8 @@ import 'dart:collection';
 import 'dart:async';
 import 'package:bson/bson.dart';
 
+part 'objectory_collection.dart';
+
 typedef Object FactoryMethod();
 
 Objectory get objectory => Objectory.objectoryImpl;
@@ -17,50 +19,49 @@ class Objectory{
   String uri;
   Function registerClassesCallback;
   bool dropCollectionsOnStartup;
-  Map<String,BasePersistentObject> cache;
-  Map<String,FactoryMethod> factories;
+  final Map<String,BasePersistentObject> cache = new  Map<String,BasePersistentObject>();
+  final Map<Type,FactoryMethod> _factories = new Map<Type,FactoryMethod>();
+  final Map<Type,ObjectoryCollection> _collections = new Map<Type,ObjectoryCollection>();
+  final Map<String,Type> _collectionNameToTypeMap = new Map<String,Type>();
 
-  Objectory(this.uri,this.registerClassesCallback,this.dropCollectionsOnStartup){
-    factories = new  Map<String,FactoryMethod>();
-    cache = new Map<String,BasePersistentObject>();
-  }
+  Objectory(this.uri,this.registerClassesCallback,this.dropCollectionsOnStartup);
 
   void addToCache(PersistentObject obj) {
     cache[obj.id.toString()] = obj;
   }
-
+  Type classTypeForCollection(String collectionName) => _collectionNameToTypeMap[collectionName];
   PersistentObject findInCache(var id) {
     if (id == null) {
       return null;
     }
     return cache[id.toString()];
   }
-  PersistentObject findInCacheOrGetProxy(var id, String className) {
+  PersistentObject findInCacheOrGetProxy(var id, Type classType) {
     if (id == null) {
       return null;
     }
     PersistentObject result = findInCache(id);
     if (result == null) {
-      result = objectory.newInstance(className);
+      result = objectory.newInstance(classType);
       result.id = id;
       result.notFetched = true;
     }
     return result;
   }
-  BasePersistentObject newInstance(String className){
-    if (factories.containsKey(className)){
-      return factories[className]();
+  BasePersistentObject newInstance(Type classType){
+    if (_factories.containsKey(classType)){
+      return _factories[classType]();
     }
-    throw "Class $className have not been registered in Objectory";
+    throw "Class $classType have not been registered in Objectory";
   }
   PersistentObject dbRef2Object(DbRef dbRef) {
     return findInCacheOrGetProxy(dbRef.id, dbRef.collection);
   }
-  BasePersistentObject map2Object(String className, Map map){
+  BasePersistentObject map2Object(Type classType, Map map){
     if (map == null) {
       map = new LinkedHashMap();
     }
-    var result = newInstance(className);
+    var result = newInstance(classType);
     result.map = map;
     if (result is PersistentObject){
       result.id = map["_id"];
@@ -75,7 +76,7 @@ class Objectory{
 
   List<String> getCollections() {
     var result = new List<String>();
-    factories.forEach( (key, value) {
+    _factories.forEach( (key, value) {
       var obj = value();
       if (obj is PersistentObject) {
         result.add(key);
@@ -90,7 +91,7 @@ class Objectory{
   String getCollectionByModel(PersistentObject model) {
     var collection;
 
-    factories.forEach((key, value) {
+    _factories.forEach((key, value) {
       if (value().runtimeType == model.runtimeType) collection = key;
     });
 
@@ -111,8 +112,14 @@ class Objectory{
 
   ObjectId generateId() => new ObjectId();
 
-  void registerClass(String className,FactoryMethod factory){
-    factories[className] = factory;
+  void registerClass(Type classType,FactoryMethod factory){
+    _factories[classType] = factory;
+    BasePersistentObject obj = factory();
+    if (obj is PersistentObject) {
+      var collectionName = obj.dbType;
+      _collectionNameToTypeMap[collectionName] = classType;
+      _collections[classType] = new ObjectoryCollection(collectionName);
+    }
   }
   Future dropCollections() { throw 'Must be implemented'; }
 
@@ -149,7 +156,7 @@ class Objectory{
       completer.complete(null);
     }
     else {
-      obj = objectory.map2Object(selector.className,map);
+      obj = objectory.map2Object(selector.classType,map);
       addToCache(obj);
       if (!selector.extParams.fetchLinksMode) {
         completer.complete(obj);
@@ -160,4 +167,6 @@ class Objectory{
       }
     }
   }
+  
+  ObjectoryCollection operator[](Type classType) => _factories[classType];
 }

@@ -101,9 +101,9 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){
     Completer completer = new Completer();
     var result = new List<PersistentObject>();
-    _postMessage(_createCommand('find',selector.className), selector.map, selector.extParamsMap).then((list) {
+    _postMessage(_createCommand('find',selector.classType), selector.map, selector.extParamsMap).then((list) {
       for (var map in list) {
-        PersistentObject obj = objectory.map2Object(selector.className,map);
+        PersistentObject obj = objectory.map2Object(selector.classType,map);
         result.add(obj);
       }
       if (!selector.extParams.fetchLinksMode) {
@@ -120,7 +120,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future<int> count(ObjectoryQueryBuilder selector) { 
     Completer completer = new Completer();
     var obj;
-    _postMessage(_createCommand('count', selector.className), selector.map, selector.extParamsMap)
+    _postMessage(_createCommand('count', selector.classType), selector.map, selector.extParamsMap)
       .then((int _count){
         completer.complete(_count); 
       });
@@ -130,7 +130,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future<PersistentObject> findOne(ObjectoryQueryBuilder selector){
     Completer completer = new Completer();
     var obj;
-    _postMessage(_createCommand('findOne',selector.className), selector.map, selector.extParamsMap)
+    _postMessage(_createCommand('findOne',selector.classType), selector.map, selector.extParamsMap)
     .then((map){
         completeFindOne(map,completer,selector); 
     });

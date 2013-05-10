@@ -35,10 +35,10 @@ class ObjectoryDirectConnectionImpl extends Objectory{
     Completer completer = new Completer();
     SelectorBuilder selectorBuilder = convertSelector(selector);
     var result = new List<PersistentObject>();
-    db.collection(selector.className)
+    db.collection(selector.classType)
       .find(selectorBuilder)
       .each((map){
-        PersistentObject obj = objectory.map2Object(selector.className,map);
+        PersistentObject obj = objectory.map2Object(selector.classType,map);
         result.add(obj);
       }).then((_) {
         if (!selector.extParams.fetchLinksMode) {
@@ -53,7 +53,7 @@ class ObjectoryDirectConnectionImpl extends Objectory{
   }
   Future<int> count(ObjectoryQueryBuilder selector) { 
     SelectorBuilder selectorBuilder = convertSelector(selector); 
-    return  db.collection(selector.className).count(selectorBuilder); 
+    return  db.collection(selector.classType).count(selectorBuilder); 
   }  
   Future<PersistentObject> findOne(ObjectoryQueryBuilder selector){
     SelectorBuilder selectorBuilder = convertSelector(selector);    
@@ -66,7 +66,7 @@ class ObjectoryDirectConnectionImpl extends Objectory{
       completer.complete(obj);
     }
     else {
-      db.collection(selector.className)
+      db.collection(selector.classType)
         .findOne(selectorBuilder)
         .then((map){
           completeFindOne(map,completer,selector);          

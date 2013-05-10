@@ -22,7 +22,7 @@ class PersistentList<E> extends ListBase<E>{
   bool isEmbeddedObject = false;
   BasePersistentObject _parent;
   String pathToMe;
-  String elementType;
+  Type elementType;
   List _list;
 //  set internalList(List value) => _list = value;
   List get internalList => _list;
@@ -37,7 +37,7 @@ class PersistentList<E> extends ListBase<E>{
     }
     valueConverter = new _ValueConverter(this);
   }
-  factory PersistentList(BasePersistentObject parent, String elementType, String pathToMe) {
+  factory PersistentList(BasePersistentObject parent, Type elementType, String pathToMe) {
     PersistentList result = parent._compoundProperties[pathToMe];
     if (result == null) {
       result = new PersistentList._internal(parent,elementType,pathToMe);

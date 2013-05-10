@@ -12,7 +12,7 @@ class Author extends PersistentObject  {
   int get age => getProperty('age');
   set age(int value) => setProperty('age',value);
 
-  Address get address => getEmbeddedObject('Address', 'address');
+  Address get address => getEmbeddedObject(Address, 'address');
 
 }
 
@@ -32,7 +32,7 @@ class Customer extends PersistentObject {
   set name(String value) => setProperty('name',value);
 
 //  List<Address> get addresses => new PersistentList<Address>(this,'Address','addresses');
-  List<Address> get addresses => getPersistentList('Address','addresses');
+  List<Address> get addresses => getPersistentList(Address,'addresses');
 }
 
 
@@ -43,7 +43,7 @@ class Person extends PersistentObject {
   String get lastName => getProperty('lastName');
   set lastName(String value) => setProperty('lastName',value);
 
-  Address get address => getEmbeddedObject('Address', 'address');
+  Address get address => getEmbeddedObject(Address, 'address');
 
   Person get father => getLinkedObject('father');
   set father (PersistentObject value) => setLinkedObject('father',value);
@@ -51,7 +51,7 @@ class Person extends PersistentObject {
   Person get mother => getLinkedObject('mother');
   set mother (PersistentObject value) => setLinkedObject('mother',value);
 
-  List<Person> get children => getPersistentList('Person','children');
+  List<Person> get children => getPersistentList(Person,'children');
 }
 
 class User extends PersistentObject {
@@ -75,7 +75,7 @@ class Article extends PersistentObject {
   Author get author => getLinkedObject('author');
   set author (Author value) => setLinkedObject('author',value);
 
-  List<Comment> get comments => getPersistentList('Comment','comments');
+  List<Comment> get comments => getPersistentList(Comment,'comments');
 }
 
 class Comment extends EmbeddedPersistentObject {
@@ -90,17 +90,17 @@ class Comment extends EmbeddedPersistentObject {
 }
 
 void registerClasses() {
-  objectory.registerClass('Author',()=>new Author());
-  objectory.registerClass('Address',()=>new Address());
-  objectory.registerClass('Person',()=>new Person());
-  objectory.registerClass('Customer',()=>new Customer());
-  objectory.registerClass('User',()=>new User());
-  objectory.registerClass('Article',()=>new Article());
-  objectory.registerClass('Comment',()=>new Comment());
+  objectory.registerClass(Author,()=>new Author());
+  objectory.registerClass(Address,()=>new Address());
+  objectory.registerClass(Person,()=>new Person());
+  objectory.registerClass(Customer,()=>new Customer());
+  objectory.registerClass(User,()=>new User());
+  objectory.registerClass(Article,()=>new Article());
+  objectory.registerClass(Comment,()=>new Comment());
 }
 
-ObjectoryQueryBuilder get $Person => new ObjectoryQueryBuilder('Person');
-ObjectoryQueryBuilder get $Author => new ObjectoryQueryBuilder('Author');
-ObjectoryQueryBuilder get $Customer => new ObjectoryQueryBuilder('Customer');
-ObjectoryQueryBuilder get $User => new ObjectoryQueryBuilder('User');
-ObjectoryQueryBuilder get $Article => new ObjectoryQueryBuilder('Article');
+ObjectoryQueryBuilder get $Person => new ObjectoryQueryBuilder(Person);
+ObjectoryQueryBuilder get $Author => new ObjectoryQueryBuilder(Author);
+ObjectoryQueryBuilder get $Customer => new ObjectoryQueryBuilder(Customer);
+ObjectoryQueryBuilder get $User => new ObjectoryQueryBuilder(User);
+ObjectoryQueryBuilder get $Article => new ObjectoryQueryBuilder(Article);

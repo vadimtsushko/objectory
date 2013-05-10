@@ -14,13 +14,13 @@ class _ExtParams {
 class ObjectoryQueryBuilder {
   Map map = new LinkedHashMap();
   _ExtParams extParams = new _ExtParams();
-  ObjectoryQueryBuilder(this.className){
+  ObjectoryQueryBuilder(this.classType){
     map = new LinkedHashMap();
   }
 
-  toString() => "ObjectoryQueryBuilder($className $map)";
+  toString() => "ObjectoryQueryBuilder($classType $map)";
 
-  String className;
+  Type classType;
 
   Map get extParamsMap => {'skip': extParams.skip, 'limit': extParams.limit, 'countMode': extParams.countMode, 'fetchLinksMode': extParams.fetchLinksMode};
 
@@ -29,12 +29,12 @@ class ObjectoryQueryBuilder {
 //    var currentProperty = propertyChain[0];
 //    var propertySchema = schema.properties[currentProperty];
 //    if (propertySchema === null) {
-//      throw "Unknown property $currentProperty in class ${schema.className}";
+//      throw "Unknown property $currentProperty in class ${schema.classType}";
 //    }
 //    if (propertyChain.length > 1) {
 //      if (!propertySchema.embeddedObject)
 //      {
-//        throw "$currentProperty is not an embedded object in class ${schema.className}. Dot notation of $propertyName is not applicable";
+//        throw "$currentProperty is not an embedded object in class ${schema.classType}. Dot notation of $propertyName is not applicable";
 //      }
 //      propertyChain.removeRange(0, 1);
 //      currentProperty = Strings.join(propertyChain,'.');
