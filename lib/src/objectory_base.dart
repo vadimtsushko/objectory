@@ -28,6 +28,7 @@ class Objectory{
   bool dropCollectionsOnStartup;
   final Map<String,BasePersistentObject> cache = new  Map<String,BasePersistentObject>();
   final Map<Type,FactoryMethod> _factories = new Map<Type,FactoryMethod>();
+  final Map<Type,FactoryMethod> _listFactories = new Map<Type,FactoryMethod>();
   final Map<Type,ObjectoryCollection> _collections = new Map<Type,ObjectoryCollection>();
   final Map<String,Type> _collectionNameToTypeMap = new Map<String,Type>();
 
@@ -80,6 +81,9 @@ class Objectory{
     }
     return result;
   }
+  List createTypedList(Type classType) {
+    return _listFactories[classType]();
+  }
 
   List<String> getCollections() => _collections.values.map((ObjectoryCollection oc) => oc.collectionName).toList();
   /**
@@ -109,8 +113,9 @@ class Objectory{
 
   ObjectId generateId() => new ObjectId();
 
-  void registerClass(Type classType,FactoryMethod factory){
+  void registerClass(Type classType,FactoryMethod factory,[FactoryMethod listFactory]){
     _factories[classType] = factory;
+    _listFactories[classType] = (listFactory==null ? ()=>new List<PersistentObject>() : listFactory);
     BasePersistentObject obj = factory();
     if (obj is PersistentObject) {
       var collectionName = obj.dbType;

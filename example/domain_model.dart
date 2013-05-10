@@ -55,8 +55,8 @@ class BlogComment extends EmbeddedPersistentObject {
 }
 
 void registerClasses() {
-  objectory.registerClass(Author,()=>new Author());
-  objectory.registerClass(User,()=>new User());
-  objectory.registerClass(Article,()=>new Article());
-  objectory.registerClass(BlogComment,()=>new BlogComment());
+  objectory.registerClass(Author,()=>new Author(),()=>new List<Author>());
+  objectory.registerClass(User,()=>new User(),()=>new List<User>());
+  objectory.registerClass(Article,()=>new Article(),()=>new List<Article>());
+  objectory.registerClass(BlogComment,()=>new BlogComment(),()=>new List<BlogComment>());
 }

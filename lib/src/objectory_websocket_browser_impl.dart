@@ -42,7 +42,7 @@ class ObjectoryCollectionWebsocketBrowserImpl extends ObjectoryCollection{
     if (selector == null) {
       selector = new ObjectoryQueryBuilder();
     }
-    var result = new List<PersistentObject>();
+    var result = objectory.createTypedList(classType);
     objectoryImpl._postMessage(objectoryImpl._createCommand('find',collectionName), selector.map, selector.extParamsMap).then((list) {
       for (var map in list) {
         PersistentObject obj = objectory.map2Object(classType,map);

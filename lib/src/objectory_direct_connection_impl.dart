@@ -13,7 +13,7 @@ class ObjectoryCollectionDirectConnectionImpl extends ObjectoryCollection{
   }
   Future<List<PersistentObject>> find([ObjectoryQueryBuilder selector]){
     Completer completer = new Completer();
-    var result = new List<PersistentObject>();
+    var result = objectory.createTypedList(classType);
     objectoryImpl.db.collection(collectionName)
       .find(selector)
       .each((map){
