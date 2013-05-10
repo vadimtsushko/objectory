@@ -13,9 +13,9 @@ set objectory(Objectory impl) => Objectory.objectoryImpl = impl;
 class ObjectoryCollection {
   String collectionName;
   Type classType;
-  Future<PersistentObject> findOne([ObjectoryQueryBuilder selector]) { throw 'Must be implemented'; }
-  Future<int> count([ObjectoryQueryBuilder selector]) { throw 'Must be implemented'; }  
-  Future<List<PersistentObject>> find([ObjectoryQueryBuilder selector]) { throw 'Must be implemented'; }
+  Future<PersistentObject> findOne([ObjectoryQueryBuilder selector]) { throw new Exception('method findOne must be implemented'); }
+  Future<int> count([ObjectoryQueryBuilder selector]) { throw new Exception('method count must be implemented'); }  
+  Future<List<PersistentObject>> find([ObjectoryQueryBuilder selector]) { throw new Exception('method find must be implemented'); }
 }
 
 typedef Object FactoryMethod();
@@ -59,7 +59,7 @@ class Objectory{
     if (_factories.containsKey(classType)){
       return _factories[classType]();
     }
-    throw "Class $classType have not been registered in Objectory";
+    throw new Exception('Class $classType have not been registered in Objectory');
   }
   PersistentObject dbRef2Object(DbRef dbRef) {
     return findInCacheOrGetProxy(dbRef.id, objectory.getClassTypeByCollection(dbRef.collection));
@@ -118,21 +118,21 @@ class Objectory{
       _collections[classType] = createObjectoryCollection(classType,collectionName);
     }
   }
-  Future dropCollections() { throw 'Must be implemented'; }
+  Future dropCollections() { throw new Exception('Must be implemented'); }
 
-  Future open() { throw 'Must be implemented'; }
+  Future open() { throw new Exception('Must be implemented'); }
 
   ObjectoryCollection createObjectoryCollection(Type classType, String collectionName){
     return new ObjectoryCollection()
       ..classType = classType
       ..collectionName = collectionName;
   }
-  Future insert(PersistentObject persistentObject) { throw 'Must be implemented'; }
-  Future update(PersistentObject persistentObject) { throw 'Must be implemented'; }
-  Future remove(BasePersistentObject persistentObject) { throw 'Must be implemented'; }
-  Future<Map> dropDb() { throw 'Must be implemented'; }
-  Future<Map> wait() { throw 'Must be implemented'; }
-  void close() { throw 'Must be implemented'; }
+  Future insert(PersistentObject persistentObject) { throw new Exception('Must be implemented'); }
+  Future update(PersistentObject persistentObject) { throw new Exception('Must be implemented'); }
+  Future remove(BasePersistentObject persistentObject) { throw new Exception('Must be implemented'); }
+  Future<Map> dropDb() { throw new Exception('Must be implemented'); }
+  Future<Map> wait() { throw new Exception('Must be implemented'); }
+  void close() { throw new Exception('Must be implemented'); }
   Future<bool> initDomainModel() {
     var res = new Completer();
     registerClassesCallback();

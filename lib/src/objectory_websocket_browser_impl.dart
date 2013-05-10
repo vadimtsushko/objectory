@@ -20,6 +20,59 @@ class ObjectoryMessage {
   toString() => 'ObjectoryMessage(command: $command, content: $content)';
 }
 
+
+class ObjectoryCollectionWebsocketBrowserImpl extends ObjectoryCollection{
+  ObjectoryWebsocketBrowserImpl objectoryImpl;
+  ObjectoryCollectionWebsocketBrowserImpl(this.objectoryImpl);
+  Future<int> count([ObjectoryQueryBuilder selector]) { 
+    Completer completer = new Completer();
+    if (selector == null) {
+      selector = new ObjectoryQueryBuilder();
+    }
+    var obj;
+    objectoryImpl._postMessage(objectoryImpl._createCommand('count', collectionName), selector.map, selector.extParamsMap)
+      .then((int _count){
+        completer.complete(_count); 
+      });
+     return completer.future; 
+  }
+  Future<List<PersistentObject>> find([ObjectoryQueryBuilder selector]){
+    Completer completer = new Completer();
+    if (selector == null) {
+      selector = new ObjectoryQueryBuilder();
+    }
+    var result = new List<PersistentObject>();
+    objectoryImpl._postMessage(objectoryImpl._createCommand('find',collectionName), selector.map, selector.extParamsMap).then((list) {
+      for (var map in list) {
+        PersistentObject obj = objectory.map2Object(classType,map);
+        result.add(obj);
+      }
+      if (!selector.paramFetchLinks) {
+        completer.complete(result);
+      } else {
+        Future
+        .wait(result.map((item) => item.fetchLinks()))
+        .then((res) {completer.complete(res);}); 
+      }
+    });
+    return completer.future;
+  }  
+  
+  Future<PersistentObject> findOne([ObjectoryQueryBuilder selector]){
+    Completer completer = new Completer();
+    if (selector == null) {
+      selector = new ObjectoryQueryBuilder();
+    }
+    var obj;
+    objectoryImpl._postMessage(objectoryImpl._createCommand('findOne',collectionName), selector.map, selector.extParamsMap)
+    .then((map){
+      objectoryImpl.completeFindOne(map,completer,selector, classType); 
+    });
+    return completer.future;
+  }
+}
+
+
 class ObjectoryWebsocketBrowserImpl extends Objectory{
   WebSocket webSocket;
   bool isConnected;
@@ -31,7 +84,11 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future open(){
     return setupWebsocket(uri);
   }
-
+  ObjectoryCollection createObjectoryCollection(Type classType, String collectionName){
+    return new ObjectoryCollectionWebsocketBrowserImpl(this)
+      ..collectionName = collectionName
+      ..classType = classType;
+  }
   Future<bool> setupWebsocket(String uri) {
     Completer completer = new Completer();
     webSocket = new WebSocket("ws://$uri/ws");
@@ -97,45 +154,6 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
 
   Future remove(PersistentObject persistentObject) =>
     _postMessage(_createCommand('remove',persistentObject.dbType),persistentObject.map);
-
-  Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector){
-    Completer completer = new Completer();
-    var result = new List<PersistentObject>();
-    _postMessage(_createCommand('find',selector.classType), selector.map, selector.extParamsMap).then((list) {
-      for (var map in list) {
-        PersistentObject obj = objectory.map2Object(selector.classType,map);
-        result.add(obj);
-      }
-      if (!selector.extParams.fetchLinksMode) {
-        completer.complete(result);
-      } else {
-        Future
-        .wait(result.map((item) => item.fetchLinks()))
-        .then((res) {completer.complete(res);}); 
-      }
-    });
-    return completer.future;
-  }
-  
-  Future<int> count(ObjectoryQueryBuilder selector) { 
-    Completer completer = new Completer();
-    var obj;
-    _postMessage(_createCommand('count', selector.classType), selector.map, selector.extParamsMap)
-      .then((int _count){
-        completer.complete(_count); 
-      });
-     return completer.future;
-  } 
-
-  Future<PersistentObject> findOne(ObjectoryQueryBuilder selector){
-    Completer completer = new Completer();
-    var obj;
-    _postMessage(_createCommand('findOne',selector.classType), selector.map, selector.extParamsMap)
-    .then((map){
-        completeFindOne(map,completer,selector); 
-    });
-    return completer.future;
-  }
 
   Future<Map> dropDb() {
     return _postMessage(_createCommand('dropDb',null),{});
