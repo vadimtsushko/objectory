@@ -14,7 +14,7 @@ class _ValueConverter{
     if (value is DbRef) {
       return objectory.dbRef2Object(value);
     }
-    throw 'Value of unknown type in Persistent list: %value';
+    throw new Exception('Value of unknown type in Persistent list: %value');
   }
 }
 

@@ -5,7 +5,7 @@ import 'objectory_query_builder.dart';
 import 'objectory_base.dart';
 import 'package:logging/logging.dart';
 import 'package:bson/bson.dart';
-import 'package:bson/src/json_ext.dart';
+import 'dart:json' as json;
 import 'dart:async';
 
 final Logger _log = new Logger('Objectory websocket wm client');
@@ -98,7 +98,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
       isConnected = true;
       completer.complete(true);      
       webSocket.listen((mdata) {
-          var jdata = new BSON().deserialize(new BsonBinary.from(mdata));
+          var jdata = new BSON().deserialize(new BsonBinary.from(json.parse(mdata)));
           _log.info('onmessage: $jdata');
           var message = new ObjectoryMessage.fromMessage(jdata);
           int receivedRequestId = message.command['requestId'];
@@ -122,7 +122,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
   Future _postMessage(Map command, Map content, [Map extParams]) {
     requestId++;
     command['requestId'] = requestId;
-    webSocket.add(new BSON().serialize({'header':command, 'content':content, 'extParams': extParams}).byteList);
+    webSocket.add(json.stringify(new BSON().serialize({'header':command, 'content':content, 'extParams': extParams}).byteList));
     var completer = new Completer();
     awaitedRequests[requestId] = completer;
     return completer.future;

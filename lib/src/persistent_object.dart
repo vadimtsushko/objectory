@@ -59,7 +59,7 @@ class BasePersistentObject {
       map[property] = null;
     } else {
       if (value.id == null) {
-        throw 'Attemt to set link to unsaved object: $value';
+        throw new Exception('Attemt to set link to unsaved object: $value');
       }
       map[property] = value.dbRef;
     }
@@ -181,9 +181,9 @@ class EmbeddedPersistentObject extends BasePersistentObject{
     }
   }
   remove() {
-    throw 'Must not be invoked';
+    throw new Exception('Must not be invoked');
   }
   save() {
-    throw 'Must not be invoked';
+    throw new Exception('Must not be invoked');
   }
 }
