@@ -1,5 +1,10 @@
 #Recent change notes
 
+###0.3.0
+
+- Modelling API revamped. Classes in modelling designated by Type not by string names.
+- Querying API revamped, more closely followed to mongo_db and mongo_dart patterns.
+
 ###0.2.2
 
 - PersistentObject got getPersistentList method as preferred way to define List properties in models.  
