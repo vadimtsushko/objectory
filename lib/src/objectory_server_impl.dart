@@ -32,6 +32,7 @@ class ObjectoryClient {
   bool closed = false;
   ObjectoryClient(this.name, this.token, this.socket) {
     socket.listen((message) {
+      try {
         var binary = new BsonBinary.from(json.parse(message));
         var jdata = new BSON().deserialize(binary);
         var header = new RequestHeader.fromMap(jdata['header']);
@@ -72,6 +73,9 @@ class ObjectoryClient {
 
         _log.shout('Unexpected message: $message');
         sendResult(header,content);
+      } catch (e) {
+        _log.severe(e);
+      }
     },
       onDone: () {
         closed = true;
