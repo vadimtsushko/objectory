@@ -4,9 +4,12 @@ author: Vadim Tsushko <vadimtsushko@gmail.com>
 description: Object document mapper/persistency layer for server-side and browser apps
 homepage: https://github.com/vadimtsushko/objectory
 dependencies:
-  mongo_dart: any
+  mongo_dart:
+    path: ../mongo_dart
   args: any
   browser: any
   logging: any
+  mongo_dart_query:
+    path: ../mongo_dart_query
 dev_dependencies:
   unittest: any

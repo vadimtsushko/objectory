@@ -21,7 +21,7 @@ main(){
     author.email = 'jorge@borges.com';
     author.age = 123;
     author.save();
-    return objectory.find($Author.sortBy('age'));
+    return objectory[Author].find(where.sortBy('age'));
   }).then((auths){
     print("===================================================================================");
     print(">> Authors ordered by age ascending");
@@ -41,7 +41,7 @@ main(){
     user.login = 'lsmith';
     user.email = 'lucy@smith.com';
     user.save();
-    return objectory.find($User.sortBy('login'));
+    return objectory[User].find(where.sortBy('login'));
   }).then((usrs){
     print("===================================================================================");
     print(">> >> Users ordered by login ascending");
@@ -78,7 +78,7 @@ main(){
     comment.user = users['jdoe'];
     article.comments.add(comment);
     article.save();
-    return objectory.find($Article);
+    return objectory[Article].find();
   }).then((articles){
     return Future.wait(articles.map((article) => printArticle(article)));
   }).then((_) {

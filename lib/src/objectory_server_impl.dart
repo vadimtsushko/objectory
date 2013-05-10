@@ -113,8 +113,8 @@ class ObjectoryClient {
   SelectorBuilder _selectorBuilder(Map selector, Map extParams) {
     SelectorBuilder selectorBuilder = new SelectorBuilder();
     selectorBuilder.map = selector;
-    selectorBuilder.extParams.limit = extParams['limit'];
-    selectorBuilder.extParams.skip = extParams['skip'];
+    selectorBuilder.paramLimit = extParams['limit'];
+    selectorBuilder.paramSkip = extParams['skip'];
     return selectorBuilder;
   }
   

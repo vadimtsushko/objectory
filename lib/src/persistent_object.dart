@@ -50,7 +50,7 @@ class BasePersistentObject {
     if (dbRef == null) {
       return null;
     }
-    Type classType = objectory.classTypeForCollection(dbRef.collection);
+    Type classType = objectory.getClassTypeByCollection(dbRef.collection);
     return objectory.findInCacheOrGetProxy(dbRef.id,classType);
   }
 
@@ -165,7 +165,7 @@ class PersistentObject extends BasePersistentObject{
 
   Future<bool> fetch() {
     Completer completer = new Completer();
-    objectory.findOne(new ObjectoryQueryBuilder(dbType).id(id)).then((res){
+    objectory[this.runtimeType].findOne(new ObjectoryQueryBuilder().id(id)).then((res){
       completer.complete(true);
     });
     return completer.future;

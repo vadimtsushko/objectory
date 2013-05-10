@@ -5,13 +5,20 @@ import 'dart:collection';
 import 'dart:async';
 import 'package:bson/bson.dart';
 
-part 'objectory_collection.dart';
 
-typedef Object FactoryMethod();
 
 Objectory get objectory => Objectory.objectoryImpl;
 set objectory(Objectory impl) => Objectory.objectoryImpl = impl;
 
+class ObjectoryCollection {
+  String collectionName;
+  Type classType;
+  Future<PersistentObject> findOne([ObjectoryQueryBuilder selector]) { throw 'Must be implemented'; }
+  Future<int> count([ObjectoryQueryBuilder selector]) { throw 'Must be implemented'; }  
+  Future<List<PersistentObject>> find([ObjectoryQueryBuilder selector]) { throw 'Must be implemented'; }
+}
+
+typedef Object FactoryMethod();
 
 class Objectory{
 
@@ -29,7 +36,7 @@ class Objectory{
   void addToCache(PersistentObject obj) {
     cache[obj.id.toString()] = obj;
   }
-  Type classTypeForCollection(String collectionName) => _collectionNameToTypeMap[collectionName];
+  Type getClassTypeByCollection(String collectionName) => _collectionNameToTypeMap[collectionName];
   PersistentObject findInCache(var id) {
     if (id == null) {
       return null;
@@ -55,7 +62,7 @@ class Objectory{
     throw "Class $classType have not been registered in Objectory";
   }
   PersistentObject dbRef2Object(DbRef dbRef) {
-    return findInCacheOrGetProxy(dbRef.id, dbRef.collection);
+    return findInCacheOrGetProxy(dbRef.id, objectory.getClassTypeByCollection(dbRef.collection));
   }
   BasePersistentObject map2Object(Type classType, Map map){
     if (map == null) {
@@ -74,17 +81,7 @@ class Objectory{
     return result;
   }
 
-  List<String> getCollections() {
-    var result = new List<String>();
-    _factories.forEach( (key, value) {
-      var obj = value();
-      if (obj is PersistentObject) {
-        result.add(key);
-       }
-    });
-    return result;
-  }
-
+  List<String> getCollections() => _collections.values.map((ObjectoryCollection oc) => oc.collectionName).toList();
   /**
    * Returns the collection name for the given model instance.
    */
@@ -118,17 +115,18 @@ class Objectory{
     if (obj is PersistentObject) {
       var collectionName = obj.dbType;
       _collectionNameToTypeMap[collectionName] = classType;
-      _collections[classType] = new ObjectoryCollection(collectionName);
+      _collections[classType] = createObjectoryCollection(classType,collectionName);
     }
   }
   Future dropCollections() { throw 'Must be implemented'; }
 
   Future open() { throw 'Must be implemented'; }
 
-
-  Future<PersistentObject> findOne(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
-  Future<int> count(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }  
-  Future<List<PersistentObject>> find(ObjectoryQueryBuilder selector) { throw 'Must be implemented'; }
+  ObjectoryCollection createObjectoryCollection(Type classType, String collectionName){
+    return new ObjectoryCollection()
+      ..classType = classType
+      ..collectionName = collectionName;
+  }
   Future insert(PersistentObject persistentObject) { throw 'Must be implemented'; }
   Future update(PersistentObject persistentObject) { throw 'Must be implemented'; }
   Future remove(BasePersistentObject persistentObject) { throw 'Must be implemented'; }
@@ -150,15 +148,15 @@ class Objectory{
     return res.future;
   }
 
-  completeFindOne(map,completer,selector) {
+  completeFindOne(Map map,Completer completer,ObjectoryQueryBuilder selector,Type classType) {
     var obj;
     if (map == null) {
       completer.complete(null);
     }
     else {
-      obj = objectory.map2Object(selector.classType,map);
+      obj = objectory.map2Object(classType,map);
       addToCache(obj);
-      if (!selector.extParams.fetchLinksMode) {
+      if ((selector == null) ||  !selector.paramFetchLinks) {
         completer.complete(obj);
       } else {
         obj.fetchLinks().then((_) {
@@ -168,5 +166,5 @@ class Objectory{
     }
   }
   
-  ObjectoryCollection operator[](Type classType) => _factories[classType];
+  ObjectoryCollection operator[](Type classType) => _collections[classType];
 }

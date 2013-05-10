@@ -98,9 +98,3 @@ void registerClasses() {
   objectory.registerClass(Article,()=>new Article());
   objectory.registerClass(Comment,()=>new Comment());
 }
-
-ObjectoryQueryBuilder get $Person => new ObjectoryQueryBuilder(Person);
-ObjectoryQueryBuilder get $Author => new ObjectoryQueryBuilder(Author);
-ObjectoryQueryBuilder get $Customer => new ObjectoryQueryBuilder(Customer);
-ObjectoryQueryBuilder get $User => new ObjectoryQueryBuilder(User);
-ObjectoryQueryBuilder get $Article => new ObjectoryQueryBuilder(Article);

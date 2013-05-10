@@ -40,7 +40,7 @@ class Article extends PersistentObject {
   Author get author => getLinkedObject('author');
   set author (Author value) => setLinkedObject('author',value);
 
-  List<BlogComment> get comments => getPersistentList('Comment','comments');
+  List<BlogComment> get comments => getPersistentList(BlogComment,'comments');
 }
 
 class BlogComment extends EmbeddedPersistentObject {
@@ -55,12 +55,8 @@ class BlogComment extends EmbeddedPersistentObject {
 }
 
 void registerClasses() {
-  objectory.registerClass('Author',()=>new Author());
-  objectory.registerClass('User',()=>new User());
-  objectory.registerClass('Article',()=>new Article());
-  objectory.registerClass('Comment',()=>new BlogComment());
+  objectory.registerClass(Author,()=>new Author());
+  objectory.registerClass(User,()=>new User());
+  objectory.registerClass(Article,()=>new Article());
+  objectory.registerClass(BlogComment,()=>new BlogComment());
 }
-
-ObjectoryQueryBuilder get $Author => new ObjectoryQueryBuilder('Author');
-ObjectoryQueryBuilder get $User => new ObjectoryQueryBuilder('User');
-ObjectoryQueryBuilder get $Article => new ObjectoryQueryBuilder('Article');
