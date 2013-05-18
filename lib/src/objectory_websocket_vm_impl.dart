@@ -156,7 +156,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
   }
 
   void close(){
-    webSocket.close(1, 'Normal close');
+    webSocket.close(1000, 'Normal close');
   }
   Future dropCollections() {
     return Future.wait(getCollections().map(

@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.3.1
+
+- Bugfix in WebSocket VM implementation.
+
 ###0.3.0
 
 - Modelling API revamped. Classes in modelling designated by Type not by string names.
