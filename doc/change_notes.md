@@ -1,5 +1,10 @@
 #Recent change notes
 
+###0.3.2
+
+- Query API supports AND and OR operators
+
+
 ###0.3.1
 
 - Bugfix in WebSocket VM implementation.

@@ -48,7 +48,8 @@ class ObjectoryQueryBuilder extends SelectorBuilder{
   ObjectoryQueryBuilder within(String fieldName, value) => super.within(fieldName, value);
   ObjectoryQueryBuilder near(String fieldName, var value, [double maxDistance]) => super.near(fieldName, value);
   ObjectoryQueryBuilder sortBy(String fieldName, {bool descending: false}) => super.sortBy(fieldName, descending: descending);
-  
+  ObjectoryQueryBuilder and(ObjectoryQueryBuilder other) => super.and(other);
+  ObjectoryQueryBuilder or(ObjectoryQueryBuilder other) => super.or(other);
 
   ObjectoryQueryBuilder fetchLinks() {
     paramFetchLinks = true;
