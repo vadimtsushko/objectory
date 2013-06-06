@@ -4,7 +4,6 @@ import 'persistent_object.dart';
 import 'objectory_query_builder.dart';
 import 'objectory_base.dart';
 import 'package:bson/bson.dart';
-import 'package:bson/src/json_ext.dart';
 import 'dart:typed_data';
 import 'dart:async';
 import 'dart:json' as json;

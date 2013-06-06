@@ -5,7 +5,6 @@ import 'package:objectory/src/persistent_object.dart';
 import 'package:objectory/src/objectory_query_builder.dart';
 import 'package:bson/bson.dart';
 import 'domain_model.dart';
-import 'package:bson/src/json_ext.dart';
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_enhanced_config.dart';
 import 'implementation_test_lib.dart';

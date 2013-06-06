@@ -1,5 +1,10 @@
 #Recent change notes
 
+###0.3.3
+
+- Upgrade for bson 0.1.5. json_ext dependenvy removed.
+
+
 ###0.3.2
 
 - Query API supports AND and OR operators
