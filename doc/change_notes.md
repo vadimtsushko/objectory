@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.3.4
+
+- Bugfix for remove operation in objectory_server (was not implemented)
+
 ###0.3.3
 
 - Upgrade for bson 0.1.5. json_ext dependenvy removed.

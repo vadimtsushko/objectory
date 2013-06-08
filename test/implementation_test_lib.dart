@@ -18,8 +18,28 @@ void simpleTestInsertionAndUpdate(){
     return objectory[Author].findOne(where.id(author.id));
   })).then(expectAsync1((authFromDb){
     expect(authFromDb,isNotNull);
-      expect(authFromDb.age,4);
-      objectory.close();
+    expect(authFromDb.age,4);
+    objectory.close();
+  }));
+}
+void simpleTestInsertAndRemove(){
+  Author author;
+  objectory.initDomainModel().then(expectAsync1((_) {
+    author = new Author();
+    author.name = 'Dan';
+    author.age = 3;
+    author.email = 'who@cares.net';
+    return author.save();
+  })).then(expectAsync1((saveRes) {
+    return objectory[Author].findOne(where.id(author.id));
+  })).then(expectAsync1((Author authFromDb){
+    expect(authFromDb,isNotNull);
+    expect(authFromDb.age,3);
+    authFromDb.remove();
+    return objectory[Author].findOne(where.id(author.id));
+  })).then(expectAsync1((authFromDb){
+    expect(authFromDb,isNull);
+    objectory.close();
   }));
 }
 
@@ -344,6 +364,7 @@ _setupArticle(objectory) {
 }
 allImplementationTests(){
     test('simpleTestInsertionAndUpdate',simpleTestInsertionAndUpdate);
+    test('simpleTestInsertAndRemove',simpleTestInsertAndRemove);
     test('testInsertionAndUpdate',testInsertionAndUpdate);
     test('testMatch',testMatch);
     test('tesJsQuery',testJsQuery);

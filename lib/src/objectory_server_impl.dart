@@ -47,6 +47,10 @@ class ObjectoryClient {
           save(header,content);
           return;
         }
+        if (header.command == "remove") {
+          remove(header,content);
+          return;
+        }
         if (header.command == "findOne") {
           findOne(header, content, extParams);
           return;
@@ -130,6 +134,13 @@ class ObjectoryClient {
     _log.fine('find $header $selector $extParams');
     db.collection(header.collection).find(_selectorBuilder(selector,extParams)).toList().
     then((responseData) {
+      sendResult(header, responseData);
+    });
+  }
+
+  remove(RequestHeader header, Map selector) {
+    db.collection(header.collection).remove(selector);
+    db.getLastError().then((responseData) {
       sendResult(header, responseData);
     });
   }
