@@ -106,21 +106,22 @@ class ObjectoryClient {
   }
   save(RequestHeader header, Map mapToSave) {
     if (header.command == 'insert') {
-      db.collection(header.collection).insert(mapToSave);
+      db.collection(header.collection).insert(mapToSave).then((responseData) {
+        sendResult(header, responseData);
+      });
     }
     else
     {
       ObjectId id = mapToSave['_id'];
       if (id != null) {
-        db.collection(header.collection).update({'_id': id},mapToSave);
+        db.collection(header.collection).update({'_id': id},mapToSave).then((responseData) {
+          sendResult(header, responseData);
+        });
       }
       else {
         _log.shout('ERROR: Trying to update object without ObjectId set. $header, $mapToSave');
       }
     }
-    db.getLastError().then((responseData) {
-      sendResult(header, responseData);
-    });
   }
   SelectorBuilder _selectorBuilder(Map selector, Map extParams) {
     SelectorBuilder selectorBuilder = new SelectorBuilder();
@@ -139,9 +140,9 @@ class ObjectoryClient {
   }
 
   remove(RequestHeader header, Map selector) {
-    db.collection(header.collection).remove(selector);
-    db.getLastError().then((responseData) {
-      sendResult(header, responseData);
+    db.collection(header.collection).remove(selector)
+      .then((responseData) {
+        sendResult(header, responseData);
     });
   }
 
