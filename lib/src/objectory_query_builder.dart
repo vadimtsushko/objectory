@@ -25,10 +25,10 @@ class ObjectoryQueryBuilder extends SelectorBuilder{
   ObjectoryQueryBuilder lt(String fieldName,value) => super.lt(fieldName, value);
   ObjectoryQueryBuilder lte(String fieldName,value) => super.lte(fieldName, value);
   ObjectoryQueryBuilder all(String fieldName, List values) => super.all(fieldName, values);
-  ObjectoryQueryBuilder nin(String fieldName, List values) => nin(fieldName, values);
+  ObjectoryQueryBuilder nin(String fieldName, List values) => super.nin(fieldName, values);
   ObjectoryQueryBuilder oneFrom(String fieldName, List values) => super.oneFrom(fieldName, values);
   ObjectoryQueryBuilder exists(String fieldName) => super.exists(fieldName);
-  ObjectoryQueryBuilder notExists(String fieldName) => notExists(fieldName);
+  ObjectoryQueryBuilder notExists(String fieldName) => super.notExists(fieldName);
   ObjectoryQueryBuilder mod(String fieldName, int value) => super.mod(fieldName, value);
   ObjectoryQueryBuilder match(String fieldName, String pattern,{bool multiLine, bool caseInsensitive, bool dotAll, bool extended})
     => super.match(fieldName, pattern, multiLine: multiLine, caseInsensitive: caseInsensitive, dotAll: dotAll, extended: extended);
