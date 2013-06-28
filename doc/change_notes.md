@@ -1,5 +1,11 @@
 #Recent change notes
 
+
+###0.3.5-0.3.6
+
+- Small changes, bugfixes in query builder
+
+
 ###0.3.4
 
 - Bugfix for remove operation in objectory_server (was not implemented)
