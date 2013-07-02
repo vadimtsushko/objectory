@@ -55,13 +55,7 @@ class ObjectoryQueryBuilder extends SelectorBuilder{
     paramFetchLinks = true;
     return this;
   }
-  ObjectoryQueryBuilder references(String propertyName, PersistentObject model) {
-    map[propertyName] = new DbRef(objectory.getCollectionByModel(model), model.id);
-    return this;
-  }
-  ObjectoryQueryBuilder containsReference(String propertyName, PersistentObject model) {
-    map[propertyName] = {"\$in": [new DbRef(objectory.getCollectionByModel(model), model.id)]};
-    return this;
-  }
   
+  ObjectoryQueryBuilder references(String propertyName, PersistentObject model) => eq(propertyName, new DbRef(objectory.getCollectionByModel(model), model.id));
+  ObjectoryQueryBuilder containsReference(String propertyName, PersistentObject model) => oneFrom(propertyName, [new DbRef(objectory.getCollectionByModel(model), model.id)]);
 }
