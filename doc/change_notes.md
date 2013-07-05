@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.3.6
+
+-Small changes in query builder. Better error handling in open connection 
+(pull requests from kaisellgren and izaera respectively) 
 
 ###0.3.5-0.3.6
 
