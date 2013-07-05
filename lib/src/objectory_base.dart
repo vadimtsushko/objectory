@@ -139,18 +139,12 @@ class Objectory{
   Future<Map> wait() { throw new Exception('Must be implemented'); }
   void close() { throw new Exception('Must be implemented'); }
   Future<bool> initDomainModel() {
-    var res = new Completer();
     registerClassesCallback();
-    open().then((_){
+    return open().then((_){
       if (dropCollectionsOnStartup) {
-        objectory.dropCollections().then((_) =>  res.complete(true));
-      }
-      else
-      {
-        res.complete(true);
+        return objectory.dropCollections();
       }
     });
-    return res.future;
   }
 
   completeFindOne(Map map,Completer completer,ObjectoryQueryBuilder selector,Type classType) {
