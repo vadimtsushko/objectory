@@ -4,12 +4,14 @@ class _ValueConverter{
   _ValueConverter(this.persistentList);
 
    convertValue(value) {
-    var result;
     if (value == null) {
       return null;
     }
     if (value is Map) {
-      return objectory.map2Object(persistentList.elementType, value);
+      return (objectory.map2Object(persistentList.elementType, value) as EmbeddedPersistentObject)
+      .._parent = persistentList._parent 
+      .._pathToMe = persistentList._pathToMe
+      .._elementListMode = true; 
     }
     if (value is DbRef) {
       return objectory.dbRef2Object(value);
@@ -21,17 +23,17 @@ class _ValueConverter{
 class PersistentList<E> extends ListBase<E>{
   bool isEmbeddedObject = false;
   BasePersistentObject _parent;
-  String pathToMe;
+  String _pathToMe;
   Type elementType;
   List _list;
 //  set internalList(List value) => _list = value;
   List get internalList => _list;
   _ValueConverter valueConverter;
-  PersistentList._internal(this._parent, this.elementType, this.pathToMe) {
-    if (_parent.map[pathToMe] == null) {
-      _parent.map[pathToMe] = [];
+  PersistentList._internal(this._parent, this.elementType, this._pathToMe) {
+    if (_parent.map[_pathToMe] == null) {
+      _parent.map[_pathToMe] = [];
     }
-    _list = _parent.map[pathToMe];
+    _list = _parent.map[_pathToMe];
     if (objectory.newInstance(elementType) is EmbeddedPersistentObject) {
       isEmbeddedObject = true;
     }
@@ -48,7 +50,7 @@ class PersistentList<E> extends ListBase<E>{
   toString() => "PersistentList($_list)";
 
   void setDirty(String propertyName) {
-    _parent.setDirty(pathToMe);
+    _parent.setDirty(_pathToMe);
   }
 
 
@@ -56,7 +58,7 @@ class PersistentList<E> extends ListBase<E>{
     var el = value;
     if (el is EmbeddedPersistentObject) {
       el._parent = _parent;
-      el._pathToMe = pathToMe;
+      el._pathToMe = _pathToMe;
       return el.map;
     }
     if (el is PersistentObject) {
@@ -77,6 +79,11 @@ class PersistentList<E> extends ListBase<E>{
   }
 
   E operator[](int index) => valueConverter.convertValue(_list[index]);
+  
+  void clear() {
+    setDirty(null);
+    _list.clear();
+  }
 }
 
 

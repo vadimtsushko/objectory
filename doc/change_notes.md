@@ -1,6 +1,11 @@
 #Recent change notes
 
-###0.3.6
+###0.3.8
+
+- Objectory now use field level updates (update with $set operator) by default. This shoud greatly reduses problems 
+with concurrent updates. Old mode can be toggled by attribute useFieldLevelUpdate
+
+###0.3.7
 
 -Small changes in query builder. Better error handling in open connection 
 (pull requests from kaisellgren and izaera respectively) 

@@ -121,19 +121,29 @@ void tesFindWithoutParams(){
   }));
 }
 testCompoundObject(){
-  objectory.initDomainModel().then(expectAsync1((_) {
+  objectory.initDomainModel()
+  .then(expectAsync1((_) {
     var person = new Person();
     person.address.cityName = 'Tyumen';
     person.address.streetName = 'Elm';
     person.firstName = 'Dick';
     person.save();
-    objectory[Person].findOne(where.id(person.id)).then(expectAsync1((savedPerson){
+    return objectory[Person].findOne(where.id(person.id));
+  })).then(expectAsync1((savedPerson){
       expect(savedPerson.firstName,'Dick');
       expect(savedPerson.address.streetName,'Elm');
       expect(savedPerson.address.cityName,'Tyumen');
+      savedPerson.firstName = 'Fred';
+      savedPerson.address.cityName = 'Moscow';
+      savedPerson.save();
+      return objectory[Person].findOne(where.id(savedPerson.id));
+    })).then(expectAsync1((savedPerson){
+      expect(savedPerson.firstName,'Fred');
+      expect(savedPerson.address.streetName,'Elm');
+      expect(savedPerson.address.cityName,'Moscow');
       objectory.close();
-    }));
   }));
+  ;
 }
 testObjectWithExternalRefs(){
   objectory.initDomainModel().then(expectAsync1((_) {
@@ -183,8 +193,6 @@ testObjectWithCollectionOfExternalRefs(){
     daughterId = daughter.id;
     objectory.cache.clear();
     father = null;
-    son = null;
-    daughter = null;
     return objectory[Person].findOne(where.id(fatherId));
   })).then(expectAsync1((fatherFromObjectory){
     father = fatherFromObjectory;
@@ -200,14 +208,27 @@ testObjectWithCollectionOfExternalRefs(){
     fatherId = father.id;
     objectory.cache.clear();
     father = null;
-    son = null;
-    daughter = null;
     return objectory[Person].findOne(where.id(fatherId));
   })).then(expectAsync1((fatherFromObjectory){
     father = fatherFromObjectory;
+    expect(father.firstName,'Father');
     expect(father.children.length,2);
-    //Do not know yet how to test throws in async tests
-    //expect(()=>father.children[0],throws);
+    father.children.clear();
+    father.save();
+    return objectory[Person].findOne(where.id(fatherId));
+   })).then(expectAsync1((fatherFromObjectory){
+     father = fatherFromObjectory;
+     expect(father.firstName,'Father');
+     expect(father.children.length,0);
+     father.children.add(son);
+     father.children.add(daughter);
+     father.save();
+     return objectory[Person].findOne(where.id(fatherId));
+    })).then(expectAsync1((fatherFromObjectory){
+      father = fatherFromObjectory;
+      expect(father.children.length,2);
+     //Do not know yet how to test throws in async tests
+     //expect(()=>father.children[0],throws);
     return father.fetchLinks();
   })).then(expectAsync1((_) { 
     son = father.children[0];

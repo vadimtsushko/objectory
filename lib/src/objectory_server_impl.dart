@@ -44,7 +44,7 @@ class ObjectoryClient {
           return;
         }
         if (header.command == "update") {
-          save(header,content);
+          save(header,content,extParams);
           return;
         }
         if (header.command == "remove") {
@@ -104,7 +104,7 @@ class ObjectoryClient {
   sendMessage(header, content) {
     socket.add(json.stringify(new BSON().serialize({'header': header,'content': content}).byteList));
   }
-  save(RequestHeader header, Map mapToSave) {
+  save(RequestHeader header, Map mapToSave, [Map idMap]) {
     if (header.command == 'insert') {
       db.collection(header.collection).insert(mapToSave).then((responseData) {
         sendResult(header, responseData);
@@ -119,7 +119,13 @@ class ObjectoryClient {
         });
       }
       else {
-        _log.shout('ERROR: Trying to update object without ObjectId set. $header, $mapToSave');
+        if (idMap != null) {
+          db.collection(header.collection).update(idMap,mapToSave).then((responseData) {
+            sendResult(header, responseData);
+          });
+        } else {
+          _log.shout('ERROR: Trying to update object without ObjectId set. $header, $mapToSave');
+          }  
       }
     }
   }

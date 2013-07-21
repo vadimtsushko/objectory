@@ -22,7 +22,7 @@ class BasePersistentObject {
     init();
     _dirtyFields = new Set<String>();
   }
-  get dirtyFields => _dirtyFields;
+  Set<String> get dirtyFields => _dirtyFields;
   EmbeddedPersistentObject getEmbeddedObject(Type classType, String property) {
     EmbeddedPersistentObject result = _compoundProperties[property];
     if (result == null) {
@@ -174,10 +174,11 @@ class PersistentObject extends BasePersistentObject{
 class EmbeddedPersistentObject extends BasePersistentObject{
   BasePersistentObject _parent;
   String _pathToMe;
+  bool _elementListMode = false;
   void setDirty(String fieldName){
     super.setDirty(fieldName);
     if (_parent != null) {
-      _parent.setDirty('${_pathToMe}.${fieldName}');
+      _elementListMode? _parent.setDirty('${_pathToMe}'): _parent.setDirty('${_pathToMe}.${fieldName}');
     }
   }
   remove() {

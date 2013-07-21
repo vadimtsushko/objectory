@@ -4,7 +4,7 @@ import 'objectory_query_builder.dart';
 import 'dart:collection';
 import 'dart:async';
 import 'package:bson/bson.dart';
-
+import 'package:mongo_dart_query/mongo_dart_query.dart' hide where;
 
 
 Objectory get objectory => Objectory.objectoryImpl;
@@ -31,7 +31,7 @@ class Objectory{
   final Map<Type,FactoryMethod> _listFactories = new Map<Type,FactoryMethod>();
   final Map<Type,ObjectoryCollection> _collections = new Map<Type,ObjectoryCollection>();
   final Map<String,Type> _collectionNameToTypeMap = new Map<String,Type>();
-
+  bool useFieldLevelUpdate = true;
   Objectory(this.uri,this.registerClassesCallback,this.dropCollectionsOnStartup);
 
   void addToCache(PersistentObject obj) {
@@ -164,6 +164,25 @@ class Objectory{
       }
     }
   }
+
+  Map getMapForUpdateCommand(PersistentObject object) {
+    if (!useFieldLevelUpdate) {
+      return object.map;
+    }
+    var builder = modify;
+    
+    for (var attr in object.dirtyFields) {
+      var root = object.map;
+      for (var field in attr.split('.')) {
+        root = root[field];
+      }
+      builder.set(attr, root);
+    }
+    
+//    print('set map = ${builder.map}');
+    return builder.map;
+  }
   
   ObjectoryCollection operator[](Type classType) => _collections[classType];
 }
+

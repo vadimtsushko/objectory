@@ -134,7 +134,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
   ObjectId generateId() => new ObjectId(clientMode: true);
 
   Future update(PersistentObject persistentObject) =>
-      _postMessage(_createCommand('update',persistentObject.dbType),persistentObject.map);
+      _postMessage(_createCommand('update',persistentObject.dbType),getMapForUpdateCommand(persistentObject),{"_id": persistentObject.id});
 
 
   Future insert(PersistentObject persistentObject) =>

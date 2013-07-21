@@ -18,8 +18,19 @@ testAuthorCreation(){
 testSetDirty(){
   var author = new Author();
   author.name = "Vadim";
-  //expect(author.dirtyFields.length,1);
+  expect(author.dirtyFields.length,1);
   expect(author.isDirty(), isTrue);
+  author.address.cityName = 'Tyumen';
+  expect(author.dirtyFields.length,2);
+  expect(author.isDirty(), isTrue);
+  var customer = new Customer();
+  customer.name = 'Freddy';
+  customer.addresses.add(new Address());
+  customer.dirtyFields.clear();
+  customer.addresses[0].cityName = 'Tyumen';
+  expect(customer.dirtyFields.length,1, reason: ' Modifying element object in PersistentList shoud set dirty flag on PersistentList attribute');
+  expect(customer.dirtyFields.contains('addresses'),isTrue);
+
 }
 testCompoundObject(){
   var person = new Person();
@@ -138,7 +149,7 @@ main(){
   registerClasses();
   group("PersistenObjectTests", ()  {
     test("testAuthorCreation",testAuthorCreation);
-    test("testSetDirty",testSetDirty);
+    solo_test("testSetDirty",testSetDirty);
     test("testCompoundObject",testCompoundObject);
     test("testFailOnAbsentProperty",testFailOnAbsentProperty);
     test("testFailOnSettingUnsavedLinkObject",testFailOnSettingUnsavedLinkObject);
