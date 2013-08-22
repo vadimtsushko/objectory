@@ -100,15 +100,18 @@ class Objectory{
   }
 
   Future save(PersistentObject persistentObject){
+    Future res;
     if (persistentObject.id != null){
-      return update(persistentObject);
+      res = update(persistentObject);
     }
     else{
       persistentObject.id = generateId();
       persistentObject.map["_id"] = persistentObject.id;
       objectory.addToCache(persistentObject);
-      return insert(persistentObject);
+      res =  insert(persistentObject);
     }
+    persistentObject.dirtyFields.clear();
+    return res;
   }
 
   ObjectId generateId() => new ObjectId();
@@ -178,8 +181,6 @@ class Objectory{
       }
       builder.set(attr, root);
     }
-    
-//    print('set map = ${builder.map}');
     return builder.map;
   }
   

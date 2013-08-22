@@ -87,7 +87,7 @@ class ObjectoryClient {
         socket.close();
       },
       onError: (error) {
-        _log.severe(error);
+        _log.severe(error.toString());
         socket.close();
       }  
     

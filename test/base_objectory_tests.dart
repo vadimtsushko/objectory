@@ -30,8 +30,8 @@ testSetDirty(){
   customer.addresses[0].cityName = 'Tyumen';
   expect(customer.dirtyFields.length,1, reason: ' Modifying element object in PersistentList shoud set dirty flag on PersistentList attribute');
   expect(customer.dirtyFields.contains('addresses'),isTrue);
-
 }
+
 testCompoundObject(){
   var person = new Person();
   person.address.cityName = 'Tyumen';
@@ -149,7 +149,7 @@ main(){
   registerClasses();
   group("PersistenObjectTests", ()  {
     test("testAuthorCreation",testAuthorCreation);
-    solo_test("testSetDirty",testSetDirty);
+    test("testSetDirty",testSetDirty);
     test("testCompoundObject",testCompoundObject);
     test("testFailOnAbsentProperty",testFailOnAbsentProperty);
     test("testFailOnSettingUnsavedLinkObject",testFailOnSettingUnsavedLinkObject);

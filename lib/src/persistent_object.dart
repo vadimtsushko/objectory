@@ -61,6 +61,7 @@ class BasePersistentObject {
       if (value.id == null) {
         throw new Exception('Attemt to set link to unsaved object: $value');
       }
+      onValueChanging(property, value.dbRef);
       map[property] = value.dbRef;
     }
   }

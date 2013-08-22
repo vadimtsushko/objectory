@@ -1,5 +1,10 @@
 #Recent change notes
 
+###0.3.9
+
+- Bugfix for issue https://github.com/vadimtsushko/objectory/issues/52. Case added in tests
+- Tests refactored
+
 ###0.3.8
 
 - Objectory now use field level updates (update with $set operator) by default. This shoud greatly reduses problems 
