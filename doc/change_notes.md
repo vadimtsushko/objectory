@@ -1,5 +1,10 @@
 #Recent change notes
 
+###0.3.10
+
+- Bugfix and test for situation when save operation on PersistentObject without dirty fields (should be no-op)
+actually set all its properties to null
+
 ###0.3.9
 
 - Bugfix for issue https://github.com/vadimtsushko/objectory/issues/52. Case added in tests
