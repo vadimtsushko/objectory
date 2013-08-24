@@ -136,7 +136,7 @@ class Objectory{
       ..collectionName = collectionName;
   }
   Future insert(PersistentObject persistentObject) { throw new Exception('Must be implemented'); }
-  Future update(PersistentObject persistentObject) { throw new Exception('Must be implemented'); }
+  Future doUpdate(String collection, ObjectId id, Map toUpdate) { throw new Exception('Must be implemented'); }
   Future remove(BasePersistentObject persistentObject) { throw new Exception('Must be implemented'); }
   Future<Map> dropDb() { throw new Exception('Must be implemented'); }
   Future<Map> wait() { throw new Exception('Must be implemented'); }
@@ -149,7 +149,17 @@ class Objectory{
       }
     });
   }
-
+  Future update(PersistentObject persistentObject) {
+    var id = persistentObject.id;
+    if (id == null) {
+      return new Future.error(new Exception('Update operation on object with null id'));
+    }
+    Map toUpdate = getMapForUpdateCommand(persistentObject);
+    if (toUpdate.isEmpty) {
+      return new Future.value({'ok': 1.0, 'warn': 'Update operation called without actual changes'});
+    }
+    doUpdate(persistentObject.dbType,id,toUpdate);
+  }
   completeFindOne(Map map,Completer completer,ObjectoryQueryBuilder selector,Type classType) {
     var obj;
     if (map == null) {

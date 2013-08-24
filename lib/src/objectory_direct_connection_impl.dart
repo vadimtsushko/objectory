@@ -56,8 +56,8 @@ class ObjectoryDirectConnectionImpl extends Objectory{
   Future insert(PersistentObject persistentObject) =>
       db.collection(persistentObject.dbType).insert(persistentObject.map);
 
-  Future update(PersistentObject persistentObject) =>
-        db.collection(persistentObject.dbType).update({"_id": persistentObject.id},getMapForUpdateCommand(persistentObject));
+  Future doUpdate(String collection,ObjectId id, Map toUpdate) =>
+        db.collection(collection).update({"_id": id},toUpdate);
 
   Future remove(PersistentObject persistentObject) =>
       db.collection(persistentObject.dbType).remove({"_id":persistentObject.id});

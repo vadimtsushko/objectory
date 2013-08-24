@@ -62,6 +62,30 @@ Future testInsertionAndUpdate(){
     objectory.close();
   });
 }
+
+Future testSaveWithoutChanges(){
+  return objectory.initDomainModel().then((_) {
+    Author author = new Author();
+    author.name = 'Dan';
+    author.age = 3;
+    author.email = 'who@cares.net';
+    author.save();
+    author.age = 4;
+    author.save();
+    return objectory[Author].find();
+  }).then((coll){
+    expect(coll.length,1);
+    var authFromMongo = coll[0];
+    expect(authFromMongo.age,4);
+    authFromMongo.save();
+    return objectory[Author].findOne(where.id(authFromMongo.id));
+  }).then((author1){
+    expect(author1.age,4);
+    expect(author1.name,'DAN'); // Converted to uppecase in setter
+    expect(author1.email,'who@cares.net');
+    objectory.close();
+  });
+}
 Future testMatch(){
   return objectory.initDomainModel().then((_) {
     var person = new Person();
@@ -391,6 +415,7 @@ allImplementationTests(){
     test('simpleTestInsertionAndUpdate',simpleTestInsertionAndUpdate);
     test('simpleTestInsertAndRemove',simpleTestInsertAndRemove);
     test('testInsertionAndUpdate',testInsertionAndUpdate);
+    test('testSaveWithoutChanges',testSaveWithoutChanges);
     test('testMatch',testMatch);
     test('tesJsQuery',testJsQuery);
     test('tesFindWithoutParams',tesFindWithoutParams);
