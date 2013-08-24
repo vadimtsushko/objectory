@@ -7,17 +7,23 @@ import 'dart:collection';
 part 'persistent_list.dart';
 
 class BasePersistentObject {
-  LinkedHashMap map;
+  final Map _map = objectory.datamapDecorator(new LinkedHashMap());
+  Map get map => _map;
+  set map(Map newValue) {
+    _setMap(newValue);
+  }
   Set<String> _dirtyFields;
   Map<String,dynamic> _compoundProperties;
   bool saveOnUpdate = false;
   BasePersistentObject() {
-    map = new LinkedHashMap();
-    setMap(map);
+    _setMap(map);
   }
-  void setMap(Map newValue) {
+  void _setMap(Map newValue) {
     _compoundProperties = new Map<String,dynamic>();
-    map = newValue;
+    _map.clear();
+    if (newValue != null) {
+      newValue.forEach((k, v) => _map[k] = v);
+    }
     _initMap();
     init();
     _dirtyFields = new Set<String>();
@@ -26,11 +32,9 @@ class BasePersistentObject {
   EmbeddedPersistentObject getEmbeddedObject(Type classType, String property) {
     EmbeddedPersistentObject result = _compoundProperties[property];
     if (result == null) {
-      if (map[property] == null) {
-        map[property] = {};
-      }
       result = objectory.newInstance(classType);
-      result.setMap(map[property]);
+      result._setMap(map[property]);
+      map[property] = result.map;
       result._parent = this;
       result._pathToMe = property;
     }

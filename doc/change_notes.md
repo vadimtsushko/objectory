@@ -1,4 +1,9 @@
 #Recent change notes
+###0.3.11
+
+- Added datamapDecorator property to Objectory, so PersistentObject's data map may be substituted by arbitrary
+map-like object upon creation. For example Web-UI application may configure Objectory to make PersistenObject observable by:
+`objectory.datamapDecorator = (Map map)=>toObservable(map);` 
 
 ###0.3.10
 

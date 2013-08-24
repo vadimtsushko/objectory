@@ -19,13 +19,14 @@ class ObjectoryCollection {
 }
 
 typedef Object FactoryMethod();
+typedef Map DatamapDecorator(Map map);
 
 class Objectory{
-
   static Objectory objectoryImpl;
   String uri;
   Function registerClassesCallback;
   bool dropCollectionsOnStartup;
+  DatamapDecorator datamapDecorator = (Map map) => map;
   final Map<String,BasePersistentObject> cache = new  Map<String,BasePersistentObject>();
   final Map<Type,FactoryMethod> _factories = new Map<Type,FactoryMethod>();
   final Map<Type,FactoryMethod> _listFactories = new Map<Type,FactoryMethod>();
