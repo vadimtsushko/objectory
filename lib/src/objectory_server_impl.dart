@@ -4,15 +4,11 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'package:logging/logging.dart';
 import 'dart:async';
 import 'dart:json' as json;
+import 'dart:convert';
 
-final IP = '127.0.0.1';
-final PORT = 8080;
-final URI = 'mongodb://127.0.0.1/objectory_server_test';
 final Logger _log = new Logger('Objectory server');
 
 //Map<String, ObjectoryClient> connections;
-List chatText;
-Db db;
 class RequestHeader {
   String command;
   String collection;
@@ -26,11 +22,13 @@ class RequestHeader {
   String toString() => 'RequestHeader(${toMap()})';
 }
 class ObjectoryClient {
+  Db db;
   int token;
-  String name;
   WebSocket socket;
+  String oauthClientId;
+  bool authenticated = false;
   bool closed = false;
-  ObjectoryClient(this.name, this.token, this.socket) {
+  ObjectoryClient(this.token, this.socket, this.db) {
     socket.done.catchError((e) {closed = true;});
     socket.listen((message) {
       try {
@@ -39,6 +37,15 @@ class ObjectoryClient {
         var header = new RequestHeader.fromMap(jdata['header']);
         Map content = jdata['content'];
         Map extParams = jdata['extParams'];
+        if (oauthClientId != null && !authenticated) {
+          if (header.command == 'authenticate') {
+            authenticate(header,content);
+            return;
+          } else {
+            _log.shout('Unexpected first message: $message in oauthMode. Closing connection');
+            socket.close();
+          }
+        }
         if (header.command == "insert") {
           save(header,content);
           return;
@@ -75,7 +82,6 @@ class ObjectoryClient {
           dropCollection(header);
           return;
         }
-
         _log.shout('Unexpected message: $message');
         sendResult(header,content);
       } catch (e) {
@@ -158,6 +164,39 @@ class ObjectoryClient {
       sendResult(header, responseData);
     });
   }
+  authenticate(RequestHeader header, Map selector) {
+    String tokenData = selector['tokenData'];
+    Map token;
+    HttpClient client = new HttpClient();
+    client.getUrl(Uri.parse("https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=ya29.AHES6ZSUBWMUd2UfutTyvgqf5CXw3vVAc-sbzogKu-3iHw"))
+      .then((HttpClientRequest request) {
+        return request.close();
+      }).then((HttpClientResponse response) {
+          return response.transform(UTF8.decoder).toList();
+      }).then((data) {
+          client.close();
+          token = JSON.decode(data.join(''));
+          if (token['issued_to'] != oauthClientId) {
+            _log.shout('Invalid oauth token. Closing connection');
+            socket.close();
+          } else {
+            return db.collection(header.collection).findOne(where.eq('email',token['email']))
+            .then((responseData) {
+              if (responseData == null) {
+                _log.shout('Not found email ${token['email']} in collection ${header.collection}. Closing connection');
+                socket.close();                
+              } else {
+                authenticated = true;
+                sendResult(header, responseData);
+              }
+            });
+          }
+      }).catchError((_){
+        _log.shout('Authentification error. Closing connection');
+        socket.close();             
+      });
+  }
+ 
   count(RequestHeader header, Map selector , Map extParams) {
     db.collection(header.collection).count(_selectorBuilder(selector,extParams)).
     then((responseData) {
@@ -191,17 +230,18 @@ class ObjectoryClient {
 
 
   String toString() {
-    return "${name}_${token}";
+    return "ObjectoryClient_${token}";
   }
 }
 
 class ObjectoryServerImpl {
+  Db db;
   String hostName;
   int port;
   String mongoUri;
   int _token = 0;
+  String oauthClientId;
   ObjectoryServerImpl(this.hostName,this.port,this.mongoUri, bool verbose){
-    chatText = [];
     hierarchicalLoggingEnabled = true;
     if (verbose) {
       _log.level = Level.ALL;
@@ -214,10 +254,10 @@ class ObjectoryServerImpl {
       HttpServer.bind(hostName, port).then((server) {
         server.transform(new WebSocketTransformer()).listen((WebSocket webSocket) {
           _token+=1;
-          var c = new ObjectoryClient('objectory_client_${_token}', _token, webSocket);
+          var c = new ObjectoryClient(_token, webSocket, db);
           _log.fine('adding connection token = ${_token}');
-       }, onError: (e) => _log.severe(e));
-      }).catchError((e) => _log.severe(e));
+       }, onError: (e) => _log.severe(e.toString()));
+      }).catchError((e) => _log.severe(e.toString()));
     });
     print('Listening on http://$hostName:$port');
     print('MongoDB connection: ${db.serverConfig.host}:${db.serverConfig.port}');         

@@ -3,8 +3,6 @@ import 'package:bson/bson.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart' hide where;
 import 'objectory_base.dart';
 import 'persistent_object.dart';
-import 'dart:collection';
-import 'package:meta/meta.dart';
 
 ObjectoryQueryBuilder get where => new ObjectoryQueryBuilder();
 

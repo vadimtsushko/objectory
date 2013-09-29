@@ -161,6 +161,9 @@ class PersistentObject extends BasePersistentObject{
   Future save() {
     return objectory.save(this);
   }
+  Future getMeFromDb() {
+    return objectory[objectory.getClassTypeByCollection(this.dbType)].findOne(where.id(this.id));
+  }
   void setProperty(String property, value){
     super.setProperty(property,value);
     if (saveOnUpdate) {

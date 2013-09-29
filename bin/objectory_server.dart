@@ -9,10 +9,12 @@ void main() {
   parser.addOption('ip', abbr: 'i', defaultsTo: '127.0.0.1', help: "Ip for objectory_server");
   parser.addFlag('verbose', abbr: 'v', defaultsTo: false, negatable: false);
   parser.addFlag('help',abbr: 'h', negatable: false);
+  parser.addFlag('oauth', abbr: 'a', help: 'OAuth Client ID for web applications');
   var args = parser.parse(new Options().arguments);
   if (args["help"] == true) {
     print(parser.getUsage());
     return;
   }
   var server = new ObjectoryServerImpl(args['ip'],int.parse(args['port']),args['uri'],args['verbose']);
+  //server.oauthClientId = args['oauth'];
 }
