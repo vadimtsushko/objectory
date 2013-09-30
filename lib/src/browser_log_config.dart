@@ -1,6 +1,5 @@
 library log_helper;
 import 'package:logging/logging.dart';
-import 'dart:html';
 final Logger log = Logger.root;
 configureBrowserLogger([Level level = Level.INFO]) {
   log.level = level;
