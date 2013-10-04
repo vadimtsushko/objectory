@@ -17,7 +17,7 @@ Future simpleTestInsertionAndUpdate(){
     return author.save();
   }).then((saveRes) {
     return objectory[Author].findOne(where.id(author.id));
-  }).then((authFromDb){
+  }).then((Author authFromDb){
     expect(authFromDb,isNotNull);
     expect(authFromDb.age,4);
     objectory.close();
@@ -57,7 +57,7 @@ Future testInsertionAndUpdate(){
     return objectory[Author].find();
   }).then((coll){
     expect(coll.length,1);
-    var authFromMongo = coll[0];
+    Author authFromMongo = coll[0];
     expect(authFromMongo.age,4);
     objectory.close();
   });
@@ -75,11 +75,11 @@ Future testSaveWithoutChanges(){
     return objectory[Author].find();
   }).then((coll){
     expect(coll.length,1);
-    var authFromMongo = coll[0];
+    Author authFromMongo = coll[0];
     expect(authFromMongo.age,4);
     authFromMongo.save();
     return objectory[Author].findOne(where.id(authFromMongo.id));
-  }).then((author1){
+  }).then((Author author1){
     expect(author1.age,4);
     expect(author1.name,'DAN'); // Converted to uppecase in setter
     expect(author1.email,'who@cares.net');
@@ -101,7 +101,7 @@ Future testMatch(){
     return objectory[Person].find(where.match('firstName','^niCk.*y\$', caseInsensitive: true));
   }).then((coll){
       expect(coll.length,1);
-      var personFromMongo = coll[0];
+      Person personFromMongo = coll[0];
       expect(personFromMongo.firstName,'Nickolay');
       objectory.close();
   });
@@ -121,7 +121,7 @@ Future testJsQuery(){
     return objectory[Person].find(where.jsQuery('this.firstName.charAt(2) == "d"'));
   }).then((coll){
     expect(coll.length,1);
-    var personFromMongo = coll[0];
+    Person personFromMongo = coll[0];
     expect(personFromMongo.firstName,'Vadim');
     objectory.close();
   });
@@ -154,7 +154,7 @@ Future testCompoundObject(){
     person.firstName = 'Dick';
     person.save();
     return objectory[Person].findOne(where.id(person.id));
-  }).then((savedPerson){
+  }).then((Person savedPerson){
     expect(savedPerson.firstName,'Dick');
     expect(savedPerson.address.streetName,'Elm');
     expect(savedPerson.address.cityName,'Tyumen');
@@ -162,7 +162,7 @@ Future testCompoundObject(){
     savedPerson.address.cityName = 'Moscow';
     savedPerson.save();
     return objectory[Person].findOne(where.id(savedPerson.id));
-  }).then((savedPerson){
+  }).then((Person savedPerson){
     expect(savedPerson.firstName,'Fred');
     expect(savedPerson.address.streetName,'Elm');
     expect(savedPerson.address.cityName,'Moscow');
@@ -170,7 +170,7 @@ Future testCompoundObject(){
   });
 }
 Future testObjectWithExternalRefs(){
-  var sonFromObjectory;
+  Person sonFromObjectory;
   return objectory.initDomainModel().then((_) {
     Person father = new Person();
     father.firstName = 'Father';
@@ -290,7 +290,7 @@ Future testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
     _setupArticle(objectory);
     return objectory[Article].find(where.sortBy('title'));
   }).then((articles) {
-    var artcl = articles[0];
+    Article artcl = articles[0];
     expect(artcl.comments[0] is EmbeddedPersistentObject, isTrue);
     for (var each in artcl.comments) {
       expect(each is EmbeddedPersistentObject, isTrue);
@@ -299,7 +299,7 @@ Future testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
     //expect(()=>artcl.comments[0].user,throws);
     return artcl.fetchLinks();
 
-  }).then((artcl) {
+  }).then((Article artcl) {
     expect(artcl.comments[0].user.name,'Joe Great');
     expect(artcl.comments[1].user.name,'Lisa Fine');
     expect(artcl.author.name,'VADIM');
@@ -319,7 +319,7 @@ Future  testLimit(){
     return objectory[Author].find(where.skip(20).limit(10));
   }).then((coll){
     expect(coll.length,10);
-    var authFromMongo = coll[0];
+    Author authFromMongo = coll[0];
     expect(authFromMongo.age,20);
     objectory.close();
   });
@@ -346,7 +346,7 @@ Future testFindWithFetchLinksMode() {
     _setupArticle(objectory);
     return objectory[Article].find(where.sortBy('title').fetchLinks());
   }).then((artciles) {
-    var artcl = artciles[0];
+    Article artcl = artciles[0];
     expect(artcl.comments[0].user.name,'Joe Great');
     expect(artcl.comments[1].user.name,'Lisa Fine');
     expect(artcl.author.name,'VADIM');
@@ -358,7 +358,7 @@ Future testFindOneWithFetchLinksMode() {
   return objectory.initDomainModel().then((_) {
     _setupArticle(objectory);
     return objectory[Article].findOne(where.sortBy('title').fetchLinks());
-  }).then((artcl) {
+  }).then((Article artcl) {
     expect(artcl.comments[0].user.name,'Joe Great');
     expect(artcl.comments[1].user.name,'Lisa Fine');
     expect(artcl.author.name,'VADIM');
