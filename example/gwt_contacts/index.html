@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>GWT Contacts Port to Dart and Polymer.dart</title>
+    <link rel="import" href="contacts_view.html">
+    <script src="packages/polymer/boot.js"></script>
+  </head>
+  <body>
+    <h1>GWT Contacts Port to Dart and Polymer.dart</h1>
+    
+    <p>
+      This is a port of the GWT Contacts example to Dart and Polymer.dart.
+      The original example can be
+      found <a href="http://www.gwtproject.org/articles/mvp-architecture.html">here</a>.
+    </p>
+    
+    <template id="contactsTemplate" bind>
+      <contacts-view contacts="{{}}"></contacts-view>
+    </template>
+    
+    <script type="application/dart" src="index.dart"></script>
+  </body>
+</html>

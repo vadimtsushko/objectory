@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<link rel="import" href="edit_contact_view.html">
+
+<polymer-element name="contacts-view" attributes="contacts">
+  <template>
+    <style>
+      #container {
+        border: 5px solid #d0e4f6;
+        border-radius: 5px;
+      }
+      
+      header {
+        background: #d0e4f6;
+        padding: 5px;
+      }
+      
+      #contact-list {
+        padding: 5px;
+      }
+      
+      input[type="checkbox"] {
+        margin-right: 10px;
+      }
+      
+      span[data-id] {
+        cursor: pointer;
+      }
+    </style>
+    
+    <div id="container">
+      <template if="{{_hasSelectedContact}}">
+        <edit-contact-view
+            contact="{{selectedContact}}"
+            on-ready="editReady">
+        </edit-contact-view>
+      </template>
+      
+      <template if="{{!_hasSelectedContact}}">
+        <header>
+          <button on-click="add">Add</button>
+          <button on-click="delete">Delete</button>
+        </header>
+        
+        <div id="contact-list">
+          <template repeat="{{contacts}}">
+            <div>
+              <input type="checkbox">
+              <span on-click="selectContact" data-id="{{id}}">{{name}}</span>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+  </template>
+  
+  <script type="application/dart" src="contacts_view.dart"></script>
+</polymer-element>

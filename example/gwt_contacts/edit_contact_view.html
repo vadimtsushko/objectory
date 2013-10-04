@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+<polymer-element name="edit-contact-view" attributes="contact">
+  <template>
+    <table>
+      <tr>
+        <td>First Name:</td>
+        <td><input type="text" value="{{contact.firstName}}"/></td>
+      </tr>
+      <tr>
+        <td>Last Name:</td>
+        <td><input type="text" value="{{contact.lastName}}"/></td>
+      </tr>
+      <tr>
+        <td>E-mail Address:</td>
+        <td><input type="text" value="{{contact.emailAddress}}"/></td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <button on-click="save">Save</button>
+          <button on-click="cancel">Cancel</button>
+        </td>
+      </tr>
+    </table>
+  </template>
+  
+  <script type="application/dart" src="edit_contact_view.dart"></script>
+</polymer-element>
