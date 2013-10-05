@@ -1,4 +1,12 @@
 #Recent change notes
+
+###0.3.12
+
+- Port of polymer GwtContacts sample added 
+- Bugfix to PersistentObject save method
+- Many minor changes
+- dbType deprecated, use collectionName instead.
+
 ###0.3.11
 
 - Added datamapDecorator property to Objectory, so PersistentObject's data map may be substituted by arbitrary

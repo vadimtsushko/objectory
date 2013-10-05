@@ -4,7 +4,9 @@ import 'package:objectory/objectory.dart';
 const DefaultUri = '127.0.0.1:8080';
 
 class ContactDO extends PersistentObject  {
-  String get dbType => 'Contact';
+  /// You need set collectionName explicitly only if it should differ from class name
+  String get collectionName => 'Contact';
+
   String get firstName => getProperty('firstName');
   set firstName(String value) => setProperty('firstName',value);
 

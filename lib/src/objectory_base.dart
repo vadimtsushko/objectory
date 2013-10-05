@@ -6,9 +6,6 @@ import 'dart:async';
 import 'package:bson/bson.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart' hide where;
 
-
-//Objectory get objectory => Objectory.objectoryImpl;
-//set objectory(Objectory impl) => Objectory.objectoryImpl = impl;
 Objectory objectory;
 
 class ObjectoryCollection {
@@ -23,7 +20,6 @@ typedef Object FactoryMethod();
 typedef Map DatamapDecorator(Map map);
 
 class Objectory{
-//  static Objectory objectoryImpl;
   String uri;
   Function registerClassesCallback;
   bool dropCollectionsOnStartup;

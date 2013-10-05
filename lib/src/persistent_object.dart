@@ -110,7 +110,7 @@ class BasePersistentObject {
   
   /// Name of MongoDB collection where instance of this class would  be persistet in DB.
   /// By default equals to class name, but may be overwritten
-  String get collectionName => runtimeType.toString();
+  String get collectionName => dbType;
 
   Future<PersistentObject> fetchLinks(){
     var dbRefs = new List<DbRef>();
