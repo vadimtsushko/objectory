@@ -7,15 +7,12 @@ import "model.dart";
 @CustomTag("contacts-view")
 class ContactsView extends PolymerElement with ObservableMixin {
   @observable ObservableList<Contact> contacts;
-  @observable Contact selectedContact;
-  
-  bool get _hasSelectedContact => selectedContact != null;
-  
+  @observable Contact selectedContact;  
+  bool get hasSelectedContact => selectedContact != null;
   void created() {
     super.created();
-    
-    bindProperty(this, const Symbol("selectedContact"), () =>
-        notifyProperty(this, const Symbol("_hasSelectedContact")));
+    new PathObserver(this, "selectedContact").changes.listen((e) => 
+        notifyProperty(this, #hasSelectedContact));
   }
   
   void add() {
@@ -37,17 +34,10 @@ class ContactsView extends PolymerElement with ObservableMixin {
     selectedContact = contacts.firstWhere((Contact contact) => contact.id.toString() == id);
   }
   
-  void editReady(CustomEvent event, bool canceled) {
-    if (!canceled) {
-      var needToAdd = selectedContact.id == null;
-      selectedContact.save().then((_) {
-        if (needToAdd) { 
-          contacts.add(selectedContact);
-        }  
-        selectedContact = null;      
-      });
-    } else {
-      selectedContact = null;
-    }
+  void editReady(CustomEvent event, bool addContact) {
+    if (addContact) { 
+      contacts.add(selectedContact);
+    }  
+    selectedContact = null;
   }
 }

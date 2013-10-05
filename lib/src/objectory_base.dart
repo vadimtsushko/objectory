@@ -7,8 +7,9 @@ import 'package:bson/bson.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart' hide where;
 
 
-Objectory get objectory => Objectory.objectoryImpl;
-set objectory(Objectory impl) => Objectory.objectoryImpl = impl;
+//Objectory get objectory => Objectory.objectoryImpl;
+//set objectory(Objectory impl) => Objectory.objectoryImpl = impl;
+Objectory objectory;
 
 class ObjectoryCollection {
   String collectionName;
@@ -22,7 +23,7 @@ typedef Object FactoryMethod();
 typedef Map DatamapDecorator(Map map);
 
 class Objectory{
-  static Objectory objectoryImpl;
+//  static Objectory objectoryImpl;
   String uri;
   Function registerClassesCallback;
   bool dropCollectionsOnStartup;
@@ -122,7 +123,7 @@ class Objectory{
     _listFactories[classType] = (listFactory==null ? ()=>new List<PersistentObject>() : listFactory);
     BasePersistentObject obj = factory();
     if (obj is PersistentObject) {
-      var collectionName = obj.dbType;
+      var collectionName = obj.collectionName;
       _collectionNameToTypeMap[collectionName] = classType;
       _collections[classType] = createObjectoryCollection(classType,collectionName);
     }
@@ -159,7 +160,7 @@ class Objectory{
     if (toUpdate.isEmpty) {
       return new Future.value({'ok': 1.0, 'warn': 'Update operation called without actual changes'});
     }
-    doUpdate(persistentObject.dbType,id,toUpdate);
+    return doUpdate(persistentObject.collectionName,id,toUpdate);
   }
   completeFindOne(Map map,Completer completer,ObjectoryQueryBuilder selector,Type classType) {
     var obj;

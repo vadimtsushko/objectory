@@ -38,7 +38,7 @@ main(){
     print(">> Adding contacts");
     var saveResults = [];
     for (int i = 0; i < _contactsFirstNameData.length; ++i) {
-     var contact = new ContactData()
+     var contact = new ContactDO()
         ..firstName = _contactsFirstNameData[i]
         ..lastName = _contactsLastNameData[i]
         ..emailAddress = _contactsEmailData[i];

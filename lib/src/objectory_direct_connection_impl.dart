@@ -54,13 +54,13 @@ class ObjectoryDirectConnectionImpl extends Objectory{
     return db.open();
   }
   Future insert(PersistentObject persistentObject) =>
-      db.collection(persistentObject.dbType).insert(persistentObject.map);
+      db.collection(persistentObject.collectionName).insert(persistentObject.map);
 
   Future doUpdate(String collection,ObjectId id, Map toUpdate) =>
         db.collection(collection).update({"_id": id},toUpdate);
 
   Future remove(PersistentObject persistentObject) =>
-      db.collection(persistentObject.dbType).remove({"_id":persistentObject.id});
+      db.collection(persistentObject.collectionName).remove({"_id":persistentObject.id});
   
   ObjectoryCollection createObjectoryCollection(Type classType, String collectionName){
     return new ObjectoryCollectionDirectConnectionImpl(this)

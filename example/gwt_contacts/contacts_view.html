@@ -29,14 +29,14 @@
     </style>
     
     <div id="container">
-      <template if="{{_hasSelectedContact}}">
+      <template if="{{hasSelectedContact}}">
         <edit-contact-view
             contact="{{selectedContact}}"
             on-ready="editReady">
         </edit-contact-view>
       </template>
       
-      <template if="{{!_hasSelectedContact}}">
+      <template if="{{!hasSelectedContact}}">
         <header>
           <button on-click="add">Add</button>
           <button on-click="delete">Delete</button>

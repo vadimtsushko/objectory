@@ -4,6 +4,7 @@ import 'package:bson/bson.dart';
 import 'objectory_base.dart';
 import 'dart:async';
 import 'dart:collection';
+import 'package:meta/meta.dart';
 part 'persistent_list.dart';
 
 class BasePersistentObject {
@@ -101,13 +102,15 @@ class BasePersistentObject {
     return this.map[property];
   }
 
-  String toString()=>"$dbType($map)";
+  String toString()=>"$collectionName($map)";
 
   void init(){}
-
-  // TODO Apparently [this] part is redundant, but dart2js compilation breaks up without it
-  // TODO get rid of it when possible
-  String get dbType => this.runtimeType.toString();
+  
+  @deprecated String get dbType => runtimeType.toString();
+  
+  /// Name of MongoDB collection where instance of this class would  be persistet in DB.
+  /// By default equals to class name, but may be overwritten
+  String get collectionName => runtimeType.toString();
 
   Future<PersistentObject> fetchLinks(){
     var dbRefs = new List<DbRef>();
@@ -148,7 +151,7 @@ class BasePersistentObject {
 }
 class PersistentObject extends BasePersistentObject{
   ObjectId get id => map['_id'];
-  DbRef get dbRef => new DbRef(this.dbType,this.id);
+  DbRef get dbRef => new DbRef(this.collectionName,this.id);
   set id (ObjectId value) => map['_id'] = value;
   bool notFetched = false;
   void _initMap() {
@@ -162,7 +165,7 @@ class PersistentObject extends BasePersistentObject{
     return objectory.save(this);
   }
   Future getMeFromDb() {
-    return objectory[objectory.getClassTypeByCollection(this.dbType)].findOne(where.id(this.id));
+    return objectory[objectory.getClassTypeByCollection(this.collectionName)].findOne(where.id(this.id));
   }
   void setProperty(String property, value){
     super.setProperty(property,value);

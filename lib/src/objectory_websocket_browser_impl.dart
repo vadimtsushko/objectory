@@ -152,10 +152,10 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
 
 
   Future insert(PersistentObject persistentObject) =>
-      _postMessage(_createCommand('insert',persistentObject.dbType),persistentObject.map);
+      _postMessage(_createCommand('insert',persistentObject.collectionName),persistentObject.map);
 
   Future remove(PersistentObject persistentObject) =>
-    _postMessage(_createCommand('remove',persistentObject.dbType),persistentObject.map);
+    _postMessage(_createCommand('remove',persistentObject.collectionName),persistentObject.map);
 
   Future<Map> dropDb() {
     return _postMessage(_createCommand('dropDb',null),{});

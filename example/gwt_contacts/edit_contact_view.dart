@@ -12,22 +12,21 @@ class EditContactView extends PolymerElement with ObservableMixin {
   
   static const EventStreamProvider<CustomEvent> _READY_EVENT = const EventStreamProvider("ready");
   Stream<CustomEvent> get onReady => _READY_EVENT.forTarget(this);
-  static void _dispatchReadyEvent(Element element, bool canceled) {
-    element.dispatchEvent(new CustomEvent("ready", detail: canceled));
+  static void _dispatchReadyEvent(Element element, bool appendContact) {
+    element.dispatchEvent(new CustomEvent("ready", detail: appendContact));
   }
   
   Contact get contact => _contact;
   void set contact(Contact contact) {
     _contact = contact;
-    notifyProperty(this, const Symbol("contact"));
+    notifyProperty(this, #contact);
   }
   
   void save() {
-    _dispatchReadyEvent(this, false);
+    bool appendMode = contact.id == null;
+    contact.save().then((_) => _dispatchReadyEvent(this,appendMode));
   }
-  
   void cancel() {
-    contact.refresh();
-    _dispatchReadyEvent(this, true);
+    contact.refresh().then((_) => _dispatchReadyEvent(this,false));
   }
 }
