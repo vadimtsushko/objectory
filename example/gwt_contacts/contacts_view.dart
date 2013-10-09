@@ -13,7 +13,6 @@ class ContactsView extends PolymerElement with ObservableMixin {
     super.created();
     new PathObserver(this, "selectedContact").changes.listen((e) => 
         notifyProperty(this, #hasSelectedContact));
-//    contacts.changes.listen(onData)
   }
   
   void add() {
