@@ -5,7 +5,7 @@ import 'objectory_query_builder.dart';
 import 'objectory_base.dart';
 import 'package:bson/bson.dart';
 import 'dart:async';
-import 'dart:json' as json;
+import 'dart:convert';
 
 const IP = '127.0.0.1';
 const PORT = 8080;
@@ -119,7 +119,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     if (data is! List) {
       data = new Uint8List.view(data);
     }*/
-    var jdata = new BSON().deserialize(new BsonBinary.from(json.parse(data)));
+    var jdata = new BSON().deserialize(new BsonBinary.from(JSON.decode(data)));
     //log.info('onmessage: $jdata');
     var message = new ObjectoryMessage.fromMessage(jdata);      
     int receivedRequestId = message.command['requestId'];
@@ -137,7 +137,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future _postMessage(Map command, Map content, [Map extParams]) {
     requestId++;
     command['requestId'] = requestId;
-    webSocket.send(json.stringify(new BSON().serialize({'header':command, 'content':content, 'extParams': extParams}).byteList));
+    webSocket.send(JSON.encode(new BSON().serialize({'header':command, 'content':content, 'extParams': extParams}).byteList));
     var completer = new Completer();
     awaitedRequests[requestId] = completer;
     return completer.future;
