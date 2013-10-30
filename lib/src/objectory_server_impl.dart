@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:logging/logging.dart';
 import 'dart:async';
-import 'dart:json' as json;
 import 'dart:convert';
 
 final Logger _log = new Logger('Objectory server');
@@ -32,7 +31,7 @@ class ObjectoryClient {
     socket.done.catchError((e) {closed = true;});
     socket.listen((message) {
       try {
-        var binary = new BsonBinary.from(json.parse(message));
+        var binary = new BsonBinary.from(JSON.decode(message));
         var jdata = new BSON().deserialize(binary);
         var header = new RequestHeader.fromMap(jdata['header']);
         Map content = jdata['content'];
@@ -108,7 +107,7 @@ class ObjectoryClient {
     }
   }
   sendMessage(header, content) {
-    socket.add(json.stringify(new BSON().serialize({'header': header,'content': content}).byteList));
+    socket.add(JSON.encode(new BSON().serialize({'header': header,'content': content}).byteList));
   }
   save(RequestHeader header, Map mapToSave, [Map idMap]) {
     if (header.command == 'insert') {
