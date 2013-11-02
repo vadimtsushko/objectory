@@ -8,7 +8,7 @@ void main() {
     return objectory[Contact].find();
   }).then((List<Contact> _contacts) {
     var contacts = new ObservableList<Contact>();
-    query("#contactsTemplate").model = contacts;
+    querySelector("#contactsTemplate").model = contacts;
     for (var each in _contacts) {
       contacts.add(each);
     }

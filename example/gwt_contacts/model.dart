@@ -4,27 +4,27 @@ import 'package:observe/observe.dart';
 import 'package:objectory/objectory.dart';
 import 'dart:async';
 
-class Contact extends ContactDO with ObservableMixin {
+class Contact extends ContactDO with Observable {
 
   set firstName(String value) {
     super.setProperty('firstName',value);
-    notifyProperty(this, #firstName);
-    notifyProperty(this,#name);
-    notifyProperty(this,#isEmpty);
+    notifyPropertyChange(#firstName, null, null);
+    notifyPropertyChange(#name, null, null);
+    notifyPropertyChange(#isEmpty, null, null);
   }
 
   String get emailAddress => getProperty('emailAddress');
   set emailAddress(String value) {
     super.setProperty('emailAddress',value);
-    notifyProperty(this, #emailAddress);
-    notifyProperty(this,#isEmpty);
+    notifyPropertyChange(#emailAddress, null, null);
+    notifyPropertyChange(#isEmpty, null, null);
   }
 
   set lastName(String value) {
     super.setProperty('lastName',value);
-    notifyProperty(this, #lastName);
-    notifyProperty(this,#name);
-    notifyProperty(this,#isEmty);
+    notifyPropertyChange(#lastName, null, null);
+    notifyPropertyChange(#name, null, null);
+    notifyPropertyChange(#isEmty, null, null);
   }
   Future refresh() {
     return getMeFromDb().then((Contact meFromDb) {

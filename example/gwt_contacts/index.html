@@ -4,7 +4,8 @@
   <head>
     <title>GWT Contacts Port to Dart and Polymer.dart</title>
     <link rel="import" href="contacts_view.html">
-    <script src="packages/polymer/boot.js"></script>
+    <script type="application/dart">import 'package:polymer/init.dart';</script>
+    <script src="packages/browser/dart.js"></script>
   </head>
   <body>
     <h1>GWT Contacts Port to Dart and Polymer.dart</h1>
@@ -15,10 +16,6 @@
       found <a href="http://www.gwtproject.org/articles/mvp-architecture.html">here</a>.
     </p>
     
-    <template id="contactsTemplate" bind>
-      <contacts-view contacts="{{}}"></contacts-view>
-    </template>
-    
-    <script type="application/dart" src="index.dart"></script>
+    <contacts-view></contacts-view>
   </body>
 </html>

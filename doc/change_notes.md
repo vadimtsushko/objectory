@@ -1,5 +1,9 @@
 #Recent change notes
+###0.3.13
 
+- Upgrade for Dart SDK version 0.1.2.0_r29782. Gwt_Contacts sample is broken, waiting for fix in original 
+dart-polyhmer-dart-examples
+ 
 ###0.3.12
 
 - Port of polymer GwtContacts sample added 

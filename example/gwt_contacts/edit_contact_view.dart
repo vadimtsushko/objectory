@@ -7,9 +7,9 @@ import 'package:objectory/objectory_browser.dart';
 import "model.dart";
 
 @CustomTag("edit-contact-view")
-class EditContactView extends PolymerElement with ObservableMixin {
+class EditContactView extends PolymerElement{
   @observable Contact _contact;
-  
+  EditContactView.created() : super.created();
   static const EventStreamProvider<CustomEvent> _READY_EVENT = const EventStreamProvider("ready");
   Stream<CustomEvent> get onReady => _READY_EVENT.forTarget(this);
   static void _dispatchReadyEvent(Element element, bool appendContact) {

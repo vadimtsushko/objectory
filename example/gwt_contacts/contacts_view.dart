@@ -5,14 +5,13 @@ import "dart:html";
 import "model.dart";
 
 @CustomTag("contacts-view")
-class ContactsView extends PolymerElement with ObservableMixin {
+class ContactsView extends PolymerElement {
   @observable ObservableList<Contact> contacts;
   @observable Contact selectedContact;  
   bool get hasSelectedContact => selectedContact != null;
-  void created() {
-    super.created();
+  ContactsView.created(): super.created() {
     new PathObserver(this, "selectedContact").changes.listen((e) => 
-        notifyProperty(this, #hasSelectedContact));
+        notifyPropertyChange(#hasSelectedContact,null,null));
   }
   
   void add() {
