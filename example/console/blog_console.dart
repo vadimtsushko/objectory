@@ -5,7 +5,6 @@ import '../domain_model/domain_model.dart';
 
 const Uri = 'mongodb://127.0.0.1/objectory_blog';
 main(){
-  print(where);
   objectory = new ObjectoryDirectConnectionImpl(Uri,registerClasses,true);
   var authors = new Map<String,Author>();
   var users = new Map<String,User>();

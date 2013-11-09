@@ -1,4 +1,10 @@
 #Recent change notes
+###0.3.14
+
+- Bug fix: PersistentObject map setter was setting id to null
+- Name change: Objectory datamapDecorator renamed to dataMapDecorator
+- dataListDecorator added to Objectory 
+
 ###0.3.13
 
 - Upgrade for Dart SDK version 0.1.2.0_r29782. Gwt_Contacts sample is broken, waiting for fix in original 

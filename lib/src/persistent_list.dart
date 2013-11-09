@@ -30,10 +30,12 @@ class PersistentList<E> extends ListBase<E>{
   List get internalList => _list;
   _ValueConverter valueConverter;
   PersistentList._internal(this._parent, this.elementType, this._pathToMe) {
-    if (_parent.map[_pathToMe] == null) {
-      _parent.map[_pathToMe] = [];
+    List lst = _parent.map[_pathToMe];
+    if (lst == null) {
+      lst = [];
     }
-    _list = _parent.map[_pathToMe];
+    _list = objectory.dataListDecorator(lst);
+    _parent.map[_pathToMe] = _list;
     if (objectory.newInstance(elementType) is EmbeddedPersistentObject) {
       isEmbeddedObject = true;
     }

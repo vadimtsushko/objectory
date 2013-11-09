@@ -4,11 +4,10 @@ import 'package:bson/bson.dart';
 import 'objectory_base.dart';
 import 'dart:async';
 import 'dart:collection';
-import 'package:meta/meta.dart';
 part 'persistent_list.dart';
 
 class BasePersistentObject {
-  final Map _map = objectory.datamapDecorator(new LinkedHashMap());
+  final Map _map = objectory.dataMapDecorator(new LinkedHashMap());
   Map get map => _map;
   set map(Map newValue) {
     _setMap(newValue);
@@ -20,12 +19,13 @@ class BasePersistentObject {
     _setMap(map);
   }
   void _setMap(Map newValue) {
-    _compoundProperties = new Map<String,dynamic>();
-    _map.clear();
-    if (newValue != null) {
+    if (newValue == null || newValue.isEmpty) {
+      _initMap();
+    } else {
+      _map.clear();
       newValue.forEach((k, v) => _map[k] = v);
     }
-    _initMap();
+    _compoundProperties = new Map<String,dynamic>();
     init();
     _dirtyFields = new Set<String>();
   }
@@ -166,6 +166,14 @@ class PersistentObject extends BasePersistentObject{
   }
   Future getMeFromDb() {
     return objectory[objectory.getClassTypeByCollection(this.collectionName)].findOne(where.id(this.id));
+  }
+  Future reRead() {
+    return getMeFromDb()
+      .then((PersistentObject fromDb) {
+        if (fromDb != null) {
+          this.map = fromDb.map;
+        }  
+      });
   }
   void setProperty(String property, value){
     super.setProperty(property,value);
