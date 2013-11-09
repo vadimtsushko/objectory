@@ -1,9 +1,11 @@
 #Recent change notes
+
 ###0.3.14
 
 - Bug fix: PersistentObject map setter was setting id to null
 - Name change: Objectory datamapDecorator renamed to dataMapDecorator
 - dataListDecorator added to Objectory 
+- Package prepared to Dart 1.0
 
 ###0.3.13
 

@@ -86,7 +86,7 @@ main(){
 }
 
 print(message) {
-  var textElement = html.query('#text');
+  var textElement = html.querySelector('#text');
   textElement.innerHtml = '${textElement.innerHtml}<br>\n${message.toString()}';
 }
 
