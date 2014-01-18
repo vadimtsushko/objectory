@@ -25,12 +25,14 @@ It may be used in future optionally for scaffold code generations, query validat
       set birthday(Date value) => setProperty('birthday',value);  
     }
 
-Class User extends class PersistentObject. That means that in MongoDb we'll have respective collection in application db - by default named 'User'.
+Class User extends class PersistentObject. That means that in MongoDb we'll have respective collection in application database - by default named 'User'.
 Individual document in that collection may look in MongoDB like 
     
 	{ "_id" : ObjectId("5073e1ec10c273e788000000"), "birthday" : ISODate("1979-12-31T19:00:00Z"), "name" : "John" }
 
 So simple value type ( null, boolean, String, int, double and Date) properties of MongoDb documents are mapped to pairs of setter/getters annotated by respective type. 
+List can be represented or as simple value type or as persistent list, see below.
+Map can be represented or as simple value type or as embedded object, see below
 
 #####Embedded objects
 Firstly we must create class for objects to be embedded. Inheritance from EmbeddedPersistentObject indicate that corresponding MongoDb collection will not be created. 
@@ -128,7 +130,7 @@ For example we can define Article which contains list of comments so
       
     }
 
-So firstly we define class for embedded object BlogComment, then in class Article define getter for list of comments. Getter invokes factory of PersistentList class, with referense on entity object, type of elements for list and name of property as parameters.
+So firstly we define class for embedded object BlogComment, then in class Article define getter for list of comments. Getter invokes factory of PersistentList class, with reference on persistent object, type of elements for list and name of property as parameters.
 
 In MongoDB such a document may look like:
 
@@ -165,7 +167,7 @@ Typical snipped to save new object may be:
     author.name = 'Vadim';
     objectory.save(author);      
 
-For newly created entity object objectory's method `save` generate new id and insert object into MongoDb. For existing entity object this method update MongoDB with current state of whole object. Selective updates are not supported for now. 
+For newly created persistent object objectory's method `save` generate new id and insert object into MongoDb. For existing persistent object this method update MongoDB with current state of whole object. Selective updates are not supported for now. 
 PersistentObject have helper method `save()` so snipped above may be rewritten to 
 
     var author = new Author();
@@ -177,7 +179,7 @@ Objectory and PersistentObject also have method `remove()`.
 #####Data querying
 
 To query data objectory have methods `find` (returning result as `Future` of list of `PersistenObject`'s) and `finOne` (returning `Future` of `PeristentObject`)
-For example that script prints some information for all Articles in db:
+For example that script prints some information for all Articles in database:
 
     initDomainModel().then((_) {    
       return objectory[Article].find();
@@ -211,7 +213,7 @@ To print all articles having comments in 2011 year and later with word "new" in 
 
 Persistent objects with links to other objects initially have just shallow proxy of that linked objects.   
 
-Consider class `Person` shown above and Db populated by snippet
+Consider class `Person` shown above and database populated by snippet
 
     var toWait = [];
     Person grandpa = new Person();
@@ -233,34 +235,34 @@ Consider class `Person` shown above and Db populated by snippet
       return son.save();
     });
 
-We have nice family here. Now lets query Db starting from son.
+We have nice family here. Now lets query database starting from son.
 
     objectory[Person].findOne(where.eq('name','son')).then((Person son){
       print(son.father.name); // Prints null. father is shallow proxy yet
       return son.fetchLinks();
     }).then((Person son) {
-      print(son.father.name); // Prints `father`. Father have been fetched from db
+      print(son.father.name); // Prints `father`. Father have been fetched from database
       print(son.father.father.name); // Prints null. Grandpa is shallow proxy yet
       return son.father.fetchLinks();
     }).then((Person father) {
-      print(father.father.name); // Prints `grandpa`. Grandpa have been fetched om db.
+      print(father.father.name); // Prints `grandpa`. Grandpa have been fetched om database.
       objectory.close();
     });
 
 Objectory query builder has helper method `fetchLinks`. Using it you can tell objectory to fetch links of each object returned from query. So snippet above can be changed to
 
     objectory[Person].findOne(where.eq('name','son').fetchLinks()).then((Person son {
-      print(son.father.name); // Prints `father`. Father have been fetched from db.
+      print(son.father.name); // Prints `father`. Father have been fetched from database.
       print(son.father.father.name); // Prints null. Grandpa is shallow proxy yet
       return son.father.fetchLinks();
     }).then((Person father) {
-      print(father.father.name); // Prints `grandpa`. Grandpa have been fetched from db.
+      print(father.father.name); // Prints `grandpa`. Grandpa have been fetched from database.
       objectory.close();
     });
 
 #####Caching scheme
 
-While fetching objects by links objectory first tries to get objects from its cache and use query to db only if necessary. Also you can use helper method `get` of objectory collection to lookup object in cache or db.
+While fetching objects by links objectory first tries to get objects from its cache and use query to database only if necessary. Also you can use helper method `get` of objectory collection to lookup object in cache or database.
 
     objectory[Person].get(savedId).then((Person person) {
       print(person.name);
@@ -268,4 +270,4 @@ While fetching objects by links objectory first tries to get objects from its ca
 
 #####More information
 
-See tests and examples.
+See tests, examples, [API docs](http://vadimtsushko.github.io/objectory/) and [full stack sample web application](https://github.com/vadimtsushko/angular_objectory_demo).
