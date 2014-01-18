@@ -91,7 +91,7 @@ class Comment extends EmbeddedPersistentObject {
 
 void registerClasses() {
   objectory.registerClass(Author,()=>new Author());
-  objectory.registerClass(Address,()=>new Address());
+  objectory.registerClass(Address,()=>new Address(),()=>new List<Address>());
   objectory.registerClass(Person,()=>new Person());
   objectory.registerClass(Customer,()=>new Customer());
   objectory.registerClass(User,()=>new User());

@@ -43,8 +43,8 @@ class Objectory{
   Objectory(this.uri,this.registerClassesCallback,this.dropCollectionsOnStartup);
 
   void _addToCache(PersistentObject obj) {
-    cache[obj.id.toString()] = obj;
-    obj.markAsFetched();
+      cache[obj.id.toString()] = obj;
+      obj.markAsFetched();
   }
   Type getClassTypeByCollection(String collectionName) => _collectionNameToTypeMap[collectionName];
   PersistentObject _findInCache(var id) {

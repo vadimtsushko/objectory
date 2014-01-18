@@ -243,7 +243,11 @@ Objectory query builder has helper method `fetchLinks`. Using it you can tell ob
 
 #####Caching scheme
 
-While fetching objects by links 
+While fetching objects by links objectory first tries to get objects from its cache and use query to db only if necessary. Also you can use helper method `get` of objectory collection to lookup object in cache or db.
+
+    objectory[Person].get(savedId).then((Person person) {
+      print(person.name);
+    })
 
 #####More information
 
