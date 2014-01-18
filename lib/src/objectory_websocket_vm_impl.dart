@@ -84,11 +84,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
   Future open(){
     return setupWebsocket(uri);
   }
-  ObjectoryCollection createObjectoryCollection(Type classType, String collectionName){
-    return new ObjectoryCollectionWebsocketConnectionImpl(this)
-      ..collectionName = collectionName
-      ..classType = classType;
-  }
+  ObjectoryCollection constructCollection() => new ObjectoryCollectionWebsocketConnectionImpl(this);
 
   Future<bool> setupWebsocket(String uri) {
     Completer completer = new Completer();

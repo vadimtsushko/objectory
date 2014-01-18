@@ -62,11 +62,7 @@ class ObjectoryDirectConnectionImpl extends Objectory{
   Future remove(PersistentObject persistentObject) =>
       db.collection(persistentObject.collectionName).remove({"_id":persistentObject.id});
   
-  ObjectoryCollection createObjectoryCollection(Type classType, String collectionName){
-    return new ObjectoryCollectionDirectConnectionImpl(this)
-      ..collectionName = collectionName
-      ..classType = classType;
-  }
+  ObjectoryCollection constructCollection() => new ObjectoryCollectionDirectConnectionImpl(this);
 
   Future<Map> dropDb(){
     return db.drop();

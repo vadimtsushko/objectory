@@ -370,7 +370,7 @@ Future testFindOneDontGetObjectFromCache() {
   return objectory.initDomainModel().then((_) {
     var article = new Article();
     article.id = new ObjectId();
-    objectory.addToCache(article);
+    objectory.cache[article.id.toString()] = article;
     return objectory[Article].findOne(where.id(article.id));
   }).then((artcl) {
     expect(artcl, isNull);

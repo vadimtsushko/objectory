@@ -83,11 +83,9 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future open(){
     return setupWebsocket(uri);
   }
-  ObjectoryCollection createObjectoryCollection(Type classType, String collectionName){
-    return new ObjectoryCollectionWebsocketBrowserImpl(this)
-      ..collectionName = collectionName
-      ..classType = classType;
-  }
+  
+  ObjectoryCollection constructCollection() => new ObjectoryCollectionWebsocketBrowserImpl(this);
+ 
   Future<bool> setupWebsocket(String uri) {
     Completer completer = new Completer();
     webSocket = new WebSocket("ws://$uri/ws");

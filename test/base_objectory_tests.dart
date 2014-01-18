@@ -1,7 +1,10 @@
 import 'package:objectory/objectory_console.dart';
 import 'domain_model.dart';
 import 'package:unittest/unittest.dart';
-
+_addToObjectoryCache(PersistentObject obj) {
+  objectory.cache[obj.id.toString()] = obj;
+  obj.markAsFetched();
+}
 testAuthorCreation(){
   var author = new Author();
   author.name = 'vadim';
@@ -111,19 +114,19 @@ testObjectWithListtOfExternalRefs2Map() {
   father.firstName = 'Father';
   father.id = new ObjectId();
   father.map["_id"] = father.id;
-  objectory.addToCache(father);
+  _addToObjectoryCache(father);
   son = new Person();
   son.firstName = 'Son';
   son.father = father;
   son.id = new ObjectId();
   son.map["_id"] = son.id;
-  objectory.addToCache(son);
+  _addToObjectoryCache(son);
   daughter = new Person();
   daughter.father = father;
   daughter.firstName = 'daughter';
   daughter.id = new ObjectId();
   daughter.map["_id"] = daughter.id;
-  objectory.addToCache(daughter);
+  _addToObjectoryCache(daughter);
   father.children.add(son);
   father.children.add(null);
   father.children[1] = daughter;
@@ -136,7 +139,7 @@ testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   user.name = 'TestUser';
   user.id = new ObjectId();
   user.map["_id"] = user.id;
-  objectory.addToCache(user);
+  _addToObjectoryCache(user);
   Map articleMap = {"title": "test article", "body": "sasdfasdfasdf",
                     "comments": [{"body": "Excellent", "user": user.dbRef}]};
   Article article = objectory.map2Object(Article,articleMap);

@@ -125,9 +125,9 @@ class Objectory{
   Future dropCollections() { throw new Exception('Must be implemented'); }
 
   Future open() { throw new Exception('Must be implemented'); }
-
+  ObjectoryCollection constructCollection(){ throw new Exception('Must be implemented'); }
   ObjectoryCollection _createObjectoryCollection(Type classType, String collectionName){
-    return new ObjectoryCollection()
+    return constructCollection()
       ..classType = classType
       ..collectionName = collectionName;
   }
