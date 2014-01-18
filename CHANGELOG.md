@@ -1,5 +1,17 @@
 #Recent change notes
 
+###0.3.15
+
+- `get` method added to objectory collection
+- Objectory `addToCache` method made private 
+- Quick tour somewhat updated
+- Changelog moved to root in accordance with pub site preferences
+- some refactoring in objectory initialization
+- `fetch` method of PersistentObject returns future of itself now
+- previously deprecated method `dbType` on PersistenObject removed
+- `isFetched` getter added to PersistentObject (false for shallow proxy)
+
+
 ###0.3.14
 
 - Bug fix: PersistentObject map setter was setting id to null

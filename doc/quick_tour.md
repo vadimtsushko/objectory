@@ -138,6 +138,23 @@ Embedded lists may contain elements of concrete mongodb types, embedded document
 
 Embedded objects, lists, and linked objects may freely combine. So for example Article may contain list of Comments (embedded objects), and Comment in turn may contain link to User (linked object).
 
+#####Plain list and maps
+
+You can use simpe list and maps as attributes of persistent objects.
+For example, given model
+
+    class UserModel extends PersistentObject {
+      String get name => getProperty('name');
+      set name(String value) => setProperty('name',value);
+      List<String> get hobbies => getProperty('hobbies');
+      set hobbies(List<String> value) => setProperty('hobbies', value);
+    }
+
+you can use it as:
+
+    UserModel buyer = new UserModel()
+      ..name = "I'm a buyer"
+      ..hobbies = ['movies','books'];
 
 #####Data manipulation
 
@@ -155,7 +172,7 @@ PersistentObject have helper method `save()` so snipped above may be rewritten t
     author.name = 'Vadim';
     author.save();
 
-Objectory and PersistentObject have method remove().
+Objectory and PersistentObject also have method `remove()`.
 
 #####Data querying
 
