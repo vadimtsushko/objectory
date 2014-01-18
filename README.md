@@ -4,6 +4,7 @@ Objectory provides typed, checked environment to model, save and query data pers
 
 Objectory provides identical API for server side and browser applications (both Dartium and dart2js supported).
 
+[![Build Status](https://drone.io/github.com/vadimtsushko/objectory/status.png)](https://drone.io/github.com/vadimtsushko/objectory/latest)
 ###Getting started
 
 - Clone Objectory from [github repository](https://github.com/vadimtsushko/objectory)
