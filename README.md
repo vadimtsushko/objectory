@@ -23,7 +23,7 @@ Now you may run server side objectory tests: *test/base_objectory_tests.dart* an
 Now you may run browser tests and blog example (port of server-side example to browser) both in Dartium and as JavaScript. JavaScript launches do not require any special setup.
 
 See [Quick tour](https://github.com/vadimtsushko/objectory/blob/master/doc/quick_tour.md) for futher information
-
+See [API documentation](http://vadimtsushko.github.io/objectory/)
 
 See also [Sample full stack application](https://github.com/vadimtsushko/angular_objectory_demo) with
 
