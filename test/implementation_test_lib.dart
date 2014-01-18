@@ -377,6 +377,28 @@ Future testFindOneDontGetObjectFromCache() {
     objectory.close();
   });
 }
+Future testCollectionGet() {
+  return objectory.initDomainModel().then((_) {
+    var person = new Person();
+    person.firstName = '111';
+    person.lastName = 'initial setup';
+    return person.save();
+  }).then((_) {
+    return objectory[Person].findOne(where.eq('firstName','111'));
+  }).then((Person person) {
+    expect(person, isNotNull);
+    expect(person.lastName, 'initial setup');
+    person.lastName = 'unsaved changes';
+    return objectory[Person].findOne(where.eq('firstName','111'));
+  }).then((Person person) {
+    expect(person.lastName, 'initial setup',reason: 'Find operations should get objects from Db');
+    person.lastName = 'unsaved changes';
+    return objectory[Person].get(person.id);
+  }).then((Person person) {
+    expect(person.lastName, 'unsaved changes',reason: 'Collection get method should get objects from objectory cache');
+    objectory.close();
+  });
+}
 
 
 _setupArticle(objectory) {
@@ -427,6 +449,6 @@ allImplementationTests(){
     test('testCount',testCount);
     test('testFindWithFetchLinksMode',testFindWithFetchLinksMode);
     test('testFindOneWithFetchLinksMode',testFindOneWithFetchLinksMode);    
-    test('testFindOneDontGetObjectFromCache',testFindOneDontGetObjectFromCache);    
-    
+    test('testFindOneDontGetObjectFromCache',testFindOneDontGetObjectFromCache);
+    test('testCollectionGet',testCollectionGet);   
 }

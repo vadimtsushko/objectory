@@ -14,6 +14,15 @@ class ObjectoryCollection {
   Future<PersistentObject> findOne([ObjectoryQueryBuilder selector]) { throw new Exception('method findOne must be implemented'); }
   Future<int> count([ObjectoryQueryBuilder selector]) { throw new Exception('method count must be implemented'); }  
   Future<List<PersistentObject>> find([ObjectoryQueryBuilder selector]) { throw new Exception('method find must be implemented'); }
+  Future<PersistentObject> get(ObjectId id) => objectory.findInCacheOrGetProxy(id, this.classType).fetch();  
+}
+
+class RawDbCollection {
+  String collectionName;
+  Future<Map> findOne([selector]) { throw new Exception('method findOne must be implemented'); }
+  Future<int> count([selector]) { throw new Exception('method count must be implemented'); }  
+  Future<List<Map>> find([selector]) { throw new Exception('method find must be implemented'); }
+  Future remove([selector]) { throw new Exception('method find must be implemented');} 
 }
 
 typedef Object FactoryMethod();
@@ -33,11 +42,12 @@ class Objectory{
   bool useFieldLevelUpdate = true;
   Objectory(this.uri,this.registerClassesCallback,this.dropCollectionsOnStartup);
 
-  void addToCache(PersistentObject obj) {
+  void _addToCache(PersistentObject obj) {
     cache[obj.id.toString()] = obj;
+    obj.markAsFetched();
   }
   Type getClassTypeByCollection(String collectionName) => _collectionNameToTypeMap[collectionName];
-  PersistentObject findInCache(var id) {
+  PersistentObject _findInCache(var id) {
     if (id == null) {
       return null;
     }
@@ -47,11 +57,10 @@ class Objectory{
     if (id == null) {
       return null;
     }
-    PersistentObject result = findInCache(id);
+    PersistentObject result = _findInCache(id);
     if (result == null) {
       result = objectory.newInstance(classType);
       result.id = id;
-      result.notFetched = true;
     }
     return result;
   }
@@ -75,7 +84,7 @@ class Objectory{
     }
     if (result is PersistentObject) {
       if (result.id != null) {
-        objectory.addToCache(result);
+        objectory._addToCache(result);
       }
     }
     return result;
@@ -85,19 +94,7 @@ class Objectory{
   }
 
   List<String> getCollections() => _collections.values.map((ObjectoryCollection oc) => oc.collectionName).toList();
-  /**
-   * Returns the collection name for the given model instance.
-   */
-  String getCollectionByModel(PersistentObject model) {
-    var collection;
-
-    _factories.forEach((key, value) {
-      if (value().runtimeType == model.runtimeType) collection = key;
-    });
-
-    return collection;
-  }
-
+  
   Future save(PersistentObject persistentObject){
     Future res;
     if (persistentObject.id != null){
@@ -106,7 +103,7 @@ class Objectory{
     else{
       persistentObject.id = generateId();
       persistentObject.map["_id"] = persistentObject.id;
-      objectory.addToCache(persistentObject);
+      objectory._addToCache(persistentObject);
       res =  insert(persistentObject);
     }
     persistentObject.dirtyFields.clear();
@@ -122,14 +119,14 @@ class Objectory{
     if (obj is PersistentObject) {
       var collectionName = obj.collectionName;
       _collectionNameToTypeMap[collectionName] = classType;
-      _collections[classType] = createObjectoryCollection(classType,collectionName);
+      _collections[classType] = _createObjectoryCollection(classType,collectionName);
     }
   }
   Future dropCollections() { throw new Exception('Must be implemented'); }
 
   Future open() { throw new Exception('Must be implemented'); }
 
-  ObjectoryCollection createObjectoryCollection(Type classType, String collectionName){
+  ObjectoryCollection _createObjectoryCollection(Type classType, String collectionName){
     return new ObjectoryCollection()
       ..classType = classType
       ..collectionName = collectionName;
@@ -153,7 +150,7 @@ class Objectory{
     if (id == null) {
       return new Future.error(new Exception('Update operation on object with null id'));
     }
-    Map toUpdate = getMapForUpdateCommand(persistentObject);
+    Map toUpdate = _getMapForUpdateCommand(persistentObject);
     if (toUpdate.isEmpty) {
       return new Future.value({'ok': 1.0, 'warn': 'Update operation called without actual changes'});
     }
@@ -166,7 +163,6 @@ class Objectory{
     }
     else {
       obj = objectory.map2Object(classType,map);
-      addToCache(obj);
       if ((selector == null) ||  !selector.paramFetchLinks) {
         completer.complete(obj);
       } else {
@@ -177,7 +173,7 @@ class Objectory{
     }
   }
 
-  Map getMapForUpdateCommand(PersistentObject object) {
+  Map _getMapForUpdateCommand(PersistentObject object) {
     if (!useFieldLevelUpdate) {
       return object.map;
     }

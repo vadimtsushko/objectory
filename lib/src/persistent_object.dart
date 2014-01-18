@@ -106,19 +106,15 @@ class BasePersistentObject {
 
   void init(){}
   
-  @deprecated String get dbType => runtimeType.toString();
-  
   /// Name of MongoDB collection where instance of this class would  be persistet in DB.
   /// By default equals to class name, but may be overwritten
-  String get collectionName => dbType;
+  String get collectionName => runtimeType.toString();
 
   Future<PersistentObject> fetchLinks(){
     var dbRefs = new List<DbRef>();
     getDbRefsFromMap(map, dbRefs);
     var objects = dbRefs.map((each) => objectory.dbRef2Object(each));
-    Completer completer = new Completer();
-    Future.wait(objects.map((each) => each.fetch())).then((_) => completer.complete(this));
-    return completer.future;
+    return Future.forEach(objects,(each) => each.fetch()).then((_)=>new Future.value(this));
   }
 
   getDbRefsFromMap(Map map, List result){
@@ -153,10 +149,14 @@ class PersistentObject extends BasePersistentObject{
   ObjectId get id => map['_id'];
   DbRef get dbRef => new DbRef(this.collectionName,this.id);
   set id (ObjectId value) => map['_id'] = value;
-  bool notFetched = false;
   void _initMap() {
     map["_id"] = null;
     super._initMap();
+  }
+  bool _fetchedFromDb = false;
+  bool get isFetched => _fetchedFromDb;
+  void markAsFetched() { 
+    _fetchedFromDb = true;
   }
   Future remove() {
     return objectory.remove(this);
@@ -182,12 +182,12 @@ class PersistentObject extends BasePersistentObject{
     }
   }
 
-  Future<bool> fetch() {
-    Completer completer = new Completer();
-    objectory[this.runtimeType].findOne(new ObjectoryQueryBuilder().id(id)).then((res){
-      completer.complete(true);
-    });
-    return completer.future;
+  Future<PersistentObject> fetch() {
+    if (this.isFetched) {
+      return new Future.value(this);
+    } else {
+      return objectory[this.runtimeType].findOne(where.id(id));
+    }
   }
 }
 class EmbeddedPersistentObject extends BasePersistentObject{

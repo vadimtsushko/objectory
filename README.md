@@ -9,7 +9,7 @@ Objectory provides identical API for server side and browser applications (both 
 - Clone Objectory from [github repository](https://github.com/vadimtsushko/objectory)
 - Run **pub install** in the root of Objectory.
 
-Now you may run server-side blog example: */example/vm/blog.dart*. This example uses connection to free MongoLab account 
+Now you may run server-side blog example: */example/console/blog_console.dart*. This example uses connection to free MongoLab account 
 
 - Install MongoDb locally. Ensure that MongoDB is running  with default parameters (host 127.0.0.7, port 27017, authentication disabled)
 
@@ -21,6 +21,13 @@ Now you may run server side objectory tests: *test/base_objectory_tests.dart* an
 
 Now you may run browser tests and blog example (port of server-side example to browser) both in Dartium and as JavaScript. JavaScript launches do not require any special setup.
 
-See also clone of Dart WebComponents [TodoMVC sample application with added by Objectory persistency](https://github.com/vadimtsushko/todomvc_objectory_indexeddb)  
-
 See [Quick tour](https://github.com/vadimtsushko/objectory/blob/master/doc/quick_tour.md) for futher information
+
+
+See also [Sample full stack application](https://github.com/vadimtsushko/angular_objectory_demo) with
+
+- Angular.dart as primary framework
+- MongoDb as backend DB
+- Objectory as object/document mapper
+- Rikulo Stream Web server to serve static content and as a container for Objectory WebSocket handler. 
+

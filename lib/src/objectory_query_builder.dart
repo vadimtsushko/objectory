@@ -54,11 +54,11 @@ class ObjectoryQueryBuilder extends SelectorBuilder{
     return this;
   }
   
-  ObjectoryQueryBuilder references(String propertyName, PersistentObject model) => eq(propertyName, new DbRef(objectory.getCollectionByModel(model), model.id));
-  ObjectoryQueryBuilder containsReference(String propertyName, PersistentObject model) => oneFrom(propertyName, [new DbRef(objectory.getCollectionByModel(model), model.id)]);
+  ObjectoryQueryBuilder references(String propertyName, PersistentObject model) => eq(propertyName, new DbRef(model.collectionName, model.id));
+  ObjectoryQueryBuilder containsReference(String propertyName, PersistentObject model) => oneFrom(propertyName, [new DbRef(model.collectionName, model.id)]);
   
   ObjectoryQueryBuilder clone() {
-    var copy = where.eq('foo', 'bar');
+    var copy = where;
     copy.map = new Map.from(map);
     return copy;
   }
