@@ -1,0 +1,549 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>ObjectoryDirectConnectionImpl class / objectory_direct_connection Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="objectory_direct_connection" data-type="ObjectoryDirectConnectionImpl">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../objectory_direct_connection.html">objectory_direct_connection</a> &rsaquo; <a href="../objectory_direct_connection/ObjectoryDirectConnectionImpl.html">ObjectoryDirectConnectionImpl</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>ObjectoryDirectConnectionImpl</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class ObjectoryDirectConnectionImpl extends Objectory{
+ Db db;
+ ObjectoryDirectConnectionImpl(String uri,Function registerClassesCallback,bool dropCollectionsOnStartup):
+   super(uri, registerClassesCallback, dropCollectionsOnStartup);
+ Future open(){
+   if (db != null){
+     db.close();
+   }
+   db = new Db(uri);
+   return db.open();
+ }
+ Future insert(PersistentObject persistentObject) =&gt;
+     db.collection(persistentObject.collectionName).insert(persistentObject.map);
+
+ Future doUpdate(String collection,ObjectId id, Map toUpdate) =&gt;
+       db.collection(collection).update({"_id": id},toUpdate);
+
+ Future remove(PersistentObject persistentObject) =&gt;
+     db.collection(persistentObject.collectionName).remove({"_id":persistentObject.id});
+ 
+ ObjectoryCollection constructCollection() =&gt; new ObjectoryCollectionDirectConnectionImpl(this);
+
+ Future&lt;Map&gt; dropDb(){
+   return db.drop();
+ }
+
+ Future&lt;Map&gt; wait(){
+   return db.wait();
+ }
+
+
+ void close(){
+   db.close();
+ }
+ Future dropCollections() {
+   return Future.wait(getCollections().map(
+       (collection) =&gt; db.collection(collection).drop()));
+ }
+}
+</pre>
+</div>
+<h3>Extends</h3>
+<p>
+<span class="type-box"><span class="icon-class"></span><a href="../objectory_base/Objectory.html">Objectory</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>ObjectoryDirectConnectionImpl</strong></span></p>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="">
+<button class="show-code">Code</button>
+new <strong>ObjectoryDirectConnectionImpl</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> uri, <a href="http://api.dartlang.org/dart_core/Function.html" ref="external">Function</a> registerClassesCallback, <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> dropCollectionsOnStartup) <a class="anchor-link" href="#"
+              title="Permalink to ObjectoryDirectConnectionImpl.ObjectoryDirectConnectionImpl">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Creates a new <a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instance.</p>
+<p><a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instances have no meaningful state, and are only useful
+through their identity. An <a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instance is equal to itself
+only.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html" ref="external">Object</a> </div></div>
+<pre class="source">
+ObjectoryDirectConnectionImpl(String uri,Function registerClassesCallback,bool dropCollectionsOnStartup):
+ super(uri, registerClassesCallback, dropCollectionsOnStartup);
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field inherited"><h4 id="cache">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>, <a href="../persistent_object/BasePersistentObject.html">BasePersistentObject</a>&gt;         <strong>cache</strong> <a class="anchor-link"
+            href="#cache"
+            title="Permalink to ObjectoryDirectConnectionImpl.cache">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+final Map&lt;String,BasePersistentObject&gt; cache = new  Map&lt;String,BasePersistentObject&gt;()
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="dataListDecorator">
+<button class="show-code">Code</button>
+<a href="../objectory_base/DataListDecorator.html">DataListDecorator</a>         <strong>dataListDecorator</strong> <a class="anchor-link"
+            href="#dataListDecorator"
+            title="Permalink to ObjectoryDirectConnectionImpl.dataListDecorator">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+DataListDecorator dataListDecorator = (List list) =&gt; list
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="dataMapDecorator">
+<button class="show-code">Code</button>
+<a href="../objectory_base/DataMapDecorator.html">DataMapDecorator</a>         <strong>dataMapDecorator</strong> <a class="anchor-link"
+            href="#dataMapDecorator"
+            title="Permalink to ObjectoryDirectConnectionImpl.dataMapDecorator">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+DataMapDecorator dataMapDecorator = (Map map) =&gt; map
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="db">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/Db.html">Db</a>         <strong>db</strong> <a class="anchor-link"
+            href="#db"
+            title="Permalink to ObjectoryDirectConnectionImpl.db">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Db db
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="dropCollectionsOnStartup">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a>         <strong>dropCollectionsOnStartup</strong> <a class="anchor-link"
+            href="#dropCollectionsOnStartup"
+            title="Permalink to ObjectoryDirectConnectionImpl.dropCollectionsOnStartup">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+bool dropCollectionsOnStartup
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="registerClassesCallback">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Function.html" ref="external">Function</a>         <strong>registerClassesCallback</strong> <a class="anchor-link"
+            href="#registerClassesCallback"
+            title="Permalink to ObjectoryDirectConnectionImpl.registerClassesCallback">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+Function registerClassesCallback
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="uri">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>uri</strong> <a class="anchor-link"
+            href="#uri"
+            title="Permalink to ObjectoryDirectConnectionImpl.uri">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+String uri
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="useFieldLevelUpdate">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a>         <strong>useFieldLevelUpdate</strong> <a class="anchor-link"
+            href="#useFieldLevelUpdate"
+            title="Permalink to ObjectoryDirectConnectionImpl.useFieldLevelUpdate">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+bool useFieldLevelUpdate = true
+</pre>
+</div>
+</div>
+</div>
+<div class="inherited">
+<h3>Operators</h3>
+<div class="method inherited"><h4 id="[]">
+<button class="show-code">Code</button>
+<a href="../objectory_base/ObjectoryCollection.html">ObjectoryCollection</a> <strong>operator []</strong>(<a href="http://api.dartlang.org/dart_core/Type.html" ref="external">Type</a> classType) <a class="anchor-link" href="#[]"
+              title="Permalink to ObjectoryDirectConnectionImpl.operator []">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+ObjectoryCollection operator[](Type classType) =&gt; _collections[classType];
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="close">
+<button class="show-code">Code</button>
+void <strong>close</strong>() <a class="anchor-link" href="#close"
+              title="Permalink to ObjectoryDirectConnectionImpl.close">#</a></h4>
+<div class="doc">
+<pre class="source">
+void close(){
+ db.close();
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="completeFindOne">
+<button class="show-code">Code</button>
+dynamic <strong>completeFindOne</strong>(<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> map, <a href="http://api.dartlang.org/dart_async/Completer.html" ref="external">Completer</a> completer, <a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> selector, <a href="http://api.dartlang.org/dart_core/Type.html" ref="external">Type</a> classType) <a class="anchor-link" href="#completeFindOne"
+              title="Permalink to ObjectoryDirectConnectionImpl.completeFindOne">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+completeFindOne(Map map,Completer completer,ObjectoryQueryBuilder selector,Type classType) {
+ var obj;
+ if (map == null) {
+   completer.complete(null);
+ }
+ else {
+   obj = objectory.map2Object(classType,map);
+   if ((selector == null) ||  !selector.paramFetchLinks) {
+     completer.complete(obj);
+   } else {
+     obj.fetchLinks().then((_) {
+       completer.complete(obj);
+     });  
+   }
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="constructCollection">
+<button class="show-code">Code</button>
+<a href="../objectory_base/ObjectoryCollection.html">ObjectoryCollection</a> <strong>constructCollection</strong>() <a class="anchor-link" href="#constructCollection"
+              title="Permalink to ObjectoryDirectConnectionImpl.constructCollection">#</a></h4>
+<div class="doc">
+<pre class="source">
+ObjectoryCollection constructCollection() =&gt; new ObjectoryCollectionDirectConnectionImpl(this);
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="createTypedList">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> <strong>createTypedList</strong>(<a href="http://api.dartlang.org/dart_core/Type.html" ref="external">Type</a> classType) <a class="anchor-link" href="#createTypedList"
+              title="Permalink to ObjectoryDirectConnectionImpl.createTypedList">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+List createTypedList(Type classType) {
+ return _listFactories[classType]();
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="dbRef2Object">
+<button class="show-code">Code</button>
+<a href="../persistent_object/PersistentObject.html">PersistentObject</a> <strong>dbRef2Object</strong>(<a href="../bson/DbRef.html">DbRef</a> dbRef) <a class="anchor-link" href="#dbRef2Object"
+              title="Permalink to ObjectoryDirectConnectionImpl.dbRef2Object">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+PersistentObject dbRef2Object(DbRef dbRef) {
+ return findInCacheOrGetProxy(dbRef.id, objectory.getClassTypeByCollection(dbRef.collection));
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="doUpdate">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>doUpdate</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> collection, <a href="../bson/ObjectId.html">ObjectId</a> id, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> toUpdate) <a class="anchor-link" href="#doUpdate"
+              title="Permalink to ObjectoryDirectConnectionImpl.doUpdate">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future doUpdate(String collection,ObjectId id, Map toUpdate) =&gt;
+     db.collection(collection).update({"_id": id},toUpdate);
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="dropCollections">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>dropCollections</strong>() <a class="anchor-link" href="#dropCollections"
+              title="Permalink to ObjectoryDirectConnectionImpl.dropCollections">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future dropCollections() {
+ return Future.wait(getCollections().map(
+     (collection) =&gt; db.collection(collection).drop()));
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="dropDb">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>&gt; <strong>dropDb</strong>() <a class="anchor-link" href="#dropDb"
+              title="Permalink to ObjectoryDirectConnectionImpl.dropDb">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;Map&gt; dropDb(){
+ return db.drop();
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="findInCacheOrGetProxy">
+<button class="show-code">Code</button>
+<a href="../persistent_object/PersistentObject.html">PersistentObject</a> <strong>findInCacheOrGetProxy</strong>(id, <a href="http://api.dartlang.org/dart_core/Type.html" ref="external">Type</a> classType) <a class="anchor-link" href="#findInCacheOrGetProxy"
+              title="Permalink to ObjectoryDirectConnectionImpl.findInCacheOrGetProxy">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+PersistentObject findInCacheOrGetProxy(var id, Type classType) {
+ if (id == null) {
+   return null;
+ }
+ PersistentObject result = _findInCache(id);
+ if (result == null) {
+   result = objectory.newInstance(classType);
+   result.id = id;
+ }
+ return result;
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="generateId">
+<button class="show-code">Code</button>
+<a href="../bson/ObjectId.html">ObjectId</a> <strong>generateId</strong>() <a class="anchor-link" href="#generateId"
+              title="Permalink to ObjectoryDirectConnectionImpl.generateId">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+ObjectId generateId() =&gt; new ObjectId();
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="getClassTypeByCollection">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Type.html" ref="external">Type</a> <strong>getClassTypeByCollection</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> collectionName) <a class="anchor-link" href="#getClassTypeByCollection"
+              title="Permalink to ObjectoryDirectConnectionImpl.getClassTypeByCollection">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+Type getClassTypeByCollection(String collectionName) =&gt; _collectionNameToTypeMap[collectionName];
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="getCollections">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>&gt; <strong>getCollections</strong>() <a class="anchor-link" href="#getCollections"
+              title="Permalink to ObjectoryDirectConnectionImpl.getCollections">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+List&lt;String&gt; getCollections() =&gt; _collections.values.map((ObjectoryCollection oc) =&gt; oc.collectionName).toList();
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="initDomainModel">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a>&gt; <strong>initDomainModel</strong>() <a class="anchor-link" href="#initDomainModel"
+              title="Permalink to ObjectoryDirectConnectionImpl.initDomainModel">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+Future&lt;bool&gt; initDomainModel() {
+ registerClassesCallback();
+ return open().then((_){
+   if (dropCollectionsOnStartup) {
+     return objectory.dropCollections();
+   }
+ });
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="insert">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>insert</strong>(<a href="../persistent_object/PersistentObject.html">PersistentObject</a> persistentObject) <a class="anchor-link" href="#insert"
+              title="Permalink to ObjectoryDirectConnectionImpl.insert">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future insert(PersistentObject persistentObject) =&gt;
+   db.collection(persistentObject.collectionName).insert(persistentObject.map);
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="map2Object">
+<button class="show-code">Code</button>
+<a href="../persistent_object/BasePersistentObject.html">BasePersistentObject</a> <strong>map2Object</strong>(<a href="http://api.dartlang.org/dart_core/Type.html" ref="external">Type</a> classType, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> map) <a class="anchor-link" href="#map2Object"
+              title="Permalink to ObjectoryDirectConnectionImpl.map2Object">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+BasePersistentObject map2Object(Type classType, Map map){
+ if (map == null) {
+   map = new LinkedHashMap();
+ }
+ var result = newInstance(classType);
+ result.map = map;
+ if (result is PersistentObject){
+   result.id = map["_id"];
+ }
+ if (result is PersistentObject) {
+   if (result.id != null) {
+     objectory._addToCache(result);
+   }
+ }
+ return result;
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="newInstance">
+<button class="show-code">Code</button>
+<a href="../persistent_object/BasePersistentObject.html">BasePersistentObject</a> <strong>newInstance</strong>(<a href="http://api.dartlang.org/dart_core/Type.html" ref="external">Type</a> classType) <a class="anchor-link" href="#newInstance"
+              title="Permalink to ObjectoryDirectConnectionImpl.newInstance">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+BasePersistentObject newInstance(Type classType){
+ if (_factories.containsKey(classType)){
+   return _factories[classType]();
+ }
+ throw new Exception('Class $classType have not been registered in Objectory');
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="open">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>open</strong>() <a class="anchor-link" href="#open"
+              title="Permalink to ObjectoryDirectConnectionImpl.open">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future open(){
+ if (db != null){
+   db.close();
+ }
+ db = new Db(uri);
+ return db.open();
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="registerClass">
+<button class="show-code">Code</button>
+void <strong>registerClass</strong>(<a href="http://api.dartlang.org/dart_core/Type.html" ref="external">Type</a> classType, <a href="../objectory_base/FactoryMethod.html">FactoryMethod</a> factory, [<a href="../objectory_base/FactoryMethod.html">FactoryMethod</a> listFactory]) <a class="anchor-link" href="#registerClass"
+              title="Permalink to ObjectoryDirectConnectionImpl.registerClass">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+void registerClass(Type classType,FactoryMethod factory,[FactoryMethod listFactory]){
+ _factories[classType] = factory;
+ _listFactories[classType] = (listFactory==null ? ()=&gt;new List&lt;PersistentObject&gt;() : listFactory);
+ BasePersistentObject obj = factory();
+ if (obj is PersistentObject) {
+   var collectionName = obj.collectionName;
+   _collectionNameToTypeMap[collectionName] = classType;
+   _collections[classType] = _createObjectoryCollection(classType,collectionName);
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="remove">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>remove</strong>(<a href="../persistent_object/PersistentObject.html">PersistentObject</a> persistentObject) <a class="anchor-link" href="#remove"
+              title="Permalink to ObjectoryDirectConnectionImpl.remove">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future remove(PersistentObject persistentObject) =&gt;
+   db.collection(persistentObject.collectionName).remove({"_id":persistentObject.id});
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="save">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>save</strong>(<a href="../persistent_object/PersistentObject.html">PersistentObject</a> persistentObject) <a class="anchor-link" href="#save"
+              title="Permalink to ObjectoryDirectConnectionImpl.save">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+Future save(PersistentObject persistentObject){
+ Future res;
+ if (persistentObject.id != null){
+   res = update(persistentObject);
+ }
+ else{
+   persistentObject.id = generateId();
+   persistentObject.map["_id"] = persistentObject.id;
+   objectory._addToCache(persistentObject);
+   res =  insert(persistentObject);
+ }
+ persistentObject.dirtyFields.clear();
+ return res;
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="update">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>update</strong>(<a href="../persistent_object/PersistentObject.html">PersistentObject</a> persistentObject) <a class="anchor-link" href="#update"
+              title="Permalink to ObjectoryDirectConnectionImpl.update">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/Objectory.html">Objectory</a> </div><div class="doc">
+<pre class="source">
+Future update(PersistentObject persistentObject) {
+ var id = persistentObject.id;
+ if (id == null) {
+   return new Future.error(new Exception('Update operation on object with null id'));
+ }
+ Map toUpdate = _getMapForUpdateCommand(persistentObject);
+ if (toUpdate.isEmpty) {
+   return new Future.value({'ok': 1.0, 'warn': 'Update operation called without actual changes'});
+ }
+ return doUpdate(persistentObject.collectionName,id,toUpdate);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="wait">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>&gt; <strong>wait</strong>() <a class="anchor-link" href="#wait"
+              title="Permalink to ObjectoryDirectConnectionImpl.wait">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;Map&gt; wait(){
+ return db.wait();
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

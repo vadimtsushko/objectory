@@ -1,0 +1,280 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>Option class / options Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="options" data-type="Option">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../options.html">options</a> &rsaquo; <a href="../options/Option.html">Option</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>Option</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<p>A command-line option. Includes both flags and options which take a value.</p>
+<pre class="source">
+class Option {
+ final String name;
+ final String abbreviation;
+ final List&lt;String&gt; allowed;
+ final defaultValue;
+ final Function callback;
+ final String help;
+ final Map&lt;String, String&gt; allowedHelp;
+ final bool isFlag;
+ final bool negatable;
+ final bool allowMultiple;
+ final bool hide;
+
+ Option(this.name, this.abbreviation, this.help, List&lt;String&gt; allowed,
+     Map&lt;String, String&gt; allowedHelp, this.defaultValue, this.callback,
+     {this.isFlag, this.negatable, this.allowMultiple: false,
+     this.hide: false}) :
+       this.allowed = allowed == null ?
+           null : new UnmodifiableListView(allowed),
+       this.allowedHelp = allowedHelp == null ?
+           null : new UnmodifiableMapView(allowedHelp) {
+
+   if (name.isEmpty) {
+     throw new ArgumentError('Name cannot be empty.');
+   } else if (name.startsWith('-')) {
+     throw new ArgumentError('Name $name cannot start with "-".');
+   }
+
+   // Ensure name does not contain any invalid characters.
+   if (_invalidChars.hasMatch(name)) {
+     throw new ArgumentError('Name "$name" contains invalid characters.');
+   }
+
+   if (abbreviation != null) {
+     if (abbreviation.length != 1) {
+       throw new ArgumentError('Abbreviation must be null or have length 1.');
+     } else if(abbreviation == '-') {
+       throw new ArgumentError('Abbreviation cannot be "-".');
+     }
+
+     if (_invalidChars.hasMatch(abbreviation)) {
+       throw new ArgumentError('Abbreviation is an invalid character.');
+     }
+   }
+ }
+
+ static final _invalidChars = new RegExp(r'''[ \t\r\n"'\\/]''');
+}
+</pre>
+</div>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="">
+<button class="show-code">Code</button>
+new <strong>Option</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> name, <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> abbreviation, <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> help, <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>&gt; allowed, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>, <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>&gt; allowedHelp, defaultValue, <a href="http://api.dartlang.org/dart_core/Function.html" ref="external">Function</a> callback, {<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> isFlag, <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> negatable, <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> allowMultiple: false, <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> hide: false}) <a class="anchor-link" href="#"
+              title="Permalink to Option.Option">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Creates a new <a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instance.</p>
+<p><a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instances have no meaningful state, and are only useful
+through their identity. An <a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instance is equal to itself
+only.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html" ref="external">Object</a> </div></div>
+<pre class="source">
+Option(this.name, this.abbreviation, this.help, List&lt;String&gt; allowed,
+   Map&lt;String, String&gt; allowedHelp, this.defaultValue, this.callback,
+   {this.isFlag, this.negatable, this.allowMultiple: false,
+   this.hide: false}) :
+     this.allowed = allowed == null ?
+         null : new UnmodifiableListView(allowed),
+     this.allowedHelp = allowedHelp == null ?
+         null : new UnmodifiableMapView(allowedHelp) {
+
+ if (name.isEmpty) {
+   throw new ArgumentError('Name cannot be empty.');
+ } else if (name.startsWith('-')) {
+   throw new ArgumentError('Name $name cannot start with "-".');
+ }
+
+ // Ensure name does not contain any invalid characters.
+ if (_invalidChars.hasMatch(name)) {
+   throw new ArgumentError('Name "$name" contains invalid characters.');
+ }
+
+ if (abbreviation != null) {
+   if (abbreviation.length != 1) {
+     throw new ArgumentError('Abbreviation must be null or have length 1.');
+   } else if(abbreviation == '-') {
+     throw new ArgumentError('Abbreviation cannot be "-".');
+   }
+
+   if (_invalidChars.hasMatch(abbreviation)) {
+     throw new ArgumentError('Abbreviation is an invalid character.');
+   }
+ }
+}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="abbreviation">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>abbreviation</strong> <a class="anchor-link"
+            href="#abbreviation"
+            title="Permalink to Option.abbreviation">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final String abbreviation
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="allowed">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>&gt;         <strong>allowed</strong> <a class="anchor-link"
+            href="#allowed"
+            title="Permalink to Option.allowed">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final List&lt;String&gt; allowed
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="allowedHelp">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>, <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>&gt;         <strong>allowedHelp</strong> <a class="anchor-link"
+            href="#allowedHelp"
+            title="Permalink to Option.allowedHelp">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final Map&lt;String, String&gt; allowedHelp
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="allowMultiple">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a>         <strong>allowMultiple</strong> <a class="anchor-link"
+            href="#allowMultiple"
+            title="Permalink to Option.allowMultiple">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final bool allowMultiple
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="callback">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/Function.html" ref="external">Function</a>         <strong>callback</strong> <a class="anchor-link"
+            href="#callback"
+            title="Permalink to Option.callback">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final Function callback
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="defaultValue">
+<button class="show-code">Code</button>
+final         <strong>defaultValue</strong> <a class="anchor-link"
+            href="#defaultValue"
+            title="Permalink to Option.defaultValue">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final defaultValue
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="help">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>help</strong> <a class="anchor-link"
+            href="#help"
+            title="Permalink to Option.help">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final String help
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="hide">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a>         <strong>hide</strong> <a class="anchor-link"
+            href="#hide"
+            title="Permalink to Option.hide">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final bool hide
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="isFlag">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a>         <strong>isFlag</strong> <a class="anchor-link"
+            href="#isFlag"
+            title="Permalink to Option.isFlag">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final bool isFlag
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="name">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>name</strong> <a class="anchor-link"
+            href="#name"
+            title="Permalink to Option.name">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final String name
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="negatable">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a>         <strong>negatable</strong> <a class="anchor-link"
+            href="#negatable"
+            title="Permalink to Option.negatable">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final bool negatable
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

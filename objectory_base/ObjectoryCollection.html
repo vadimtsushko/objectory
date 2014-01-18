@@ -1,0 +1,127 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>ObjectoryCollection class / objectory_base Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="objectory_base" data-type="ObjectoryCollection">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../objectory_base.html">objectory_base</a> &rsaquo; <a href="../objectory_base/ObjectoryCollection.html">ObjectoryCollection</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>ObjectoryCollection</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class ObjectoryCollection {
+ String collectionName;
+ Type classType;
+ Future&lt;PersistentObject&gt; findOne([ObjectoryQueryBuilder selector]) { throw new Exception('method findOne must be implemented'); }
+ Future&lt;int&gt; count([ObjectoryQueryBuilder selector]) { throw new Exception('method count must be implemented'); }  
+ Future&lt;List&lt;PersistentObject&gt;&gt; find([ObjectoryQueryBuilder selector]) { throw new Exception('method find must be implemented'); }
+ Future&lt;PersistentObject&gt; get(ObjectId id) =&gt; objectory.findInCacheOrGetProxy(id, this.classType).fetch();  
+}
+</pre>
+</div>
+<h3>Subclasses</h3>
+<p>
+<span class="type-box"><span class="icon-class"></span><a href="../objectory_direct_connection/ObjectoryCollectionDirectConnectionImpl.html">ObjectoryCollectionDirectConnectionImpl</a></span>, <span class="type-box"><span class="icon-class"></span><a href="../objectory_impl/ObjectoryCollectionWebsocketBrowserImpl.html">ObjectoryCollectionWebsocketBrowserImpl</a></span></p>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="classType">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Type.html" ref="external">Type</a>         <strong>classType</strong> <a class="anchor-link"
+            href="#classType"
+            title="Permalink to ObjectoryCollection.classType">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Type classType
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="collectionName">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>collectionName</strong> <a class="anchor-link"
+            href="#collectionName"
+            title="Permalink to ObjectoryCollection.collectionName">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+String collectionName
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="count">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>&gt; <strong>count</strong>([<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> selector]) <a class="anchor-link" href="#count"
+              title="Permalink to ObjectoryCollection.count">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;int&gt; count([ObjectoryQueryBuilder selector]) { throw new Exception('method count must be implemented'); }
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="find">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>&lt;<a href="../persistent_object/PersistentObject.html">PersistentObject</a>&gt;&gt; <strong>find</strong>([<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> selector]) <a class="anchor-link" href="#find"
+              title="Permalink to ObjectoryCollection.find">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;List&lt;PersistentObject&gt;&gt; find([ObjectoryQueryBuilder selector]) { throw new Exception('method find must be implemented'); }
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="findOne">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="../persistent_object/PersistentObject.html">PersistentObject</a>&gt; <strong>findOne</strong>([<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> selector]) <a class="anchor-link" href="#findOne"
+              title="Permalink to ObjectoryCollection.findOne">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;PersistentObject&gt; findOne([ObjectoryQueryBuilder selector]) { throw new Exception('method findOne must be implemented'); }
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="get">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="../persistent_object/PersistentObject.html">PersistentObject</a>&gt; <strong>get</strong>(<a href="../bson/ObjectId.html">ObjectId</a> id) <a class="anchor-link" href="#get"
+              title="Permalink to ObjectoryCollection.get">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;PersistentObject&gt; get(ObjectId id) =&gt; objectory.findInCacheOrGetProxy(id, this.classType).fetch();
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

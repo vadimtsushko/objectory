@@ -1,0 +1,882 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>NonGrowableListMixin&lt;E&gt; abstract class / dart.pkg.collection.wrappers Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="dart.pkg.collection.wrappers" data-type="NonGrowableListMixin&amp;lt;E&amp;gt;">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../dart.pkg.collection.wrappers.html">dart.pkg.collection.wrappers</a> &rsaquo; <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">NonGrowableListMixin&lt;E&gt;</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>NonGrowableListMixin&lt;E&gt;</strong>
+          abstract class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<p>Mixin class that implements a throwing version of all list operations that
+change the List's length.</p>
+<pre class="source">
+abstract class NonGrowableListMixin&lt;E&gt; implements List&lt;E&gt; {
+ static void _throw() {
+   throw new UnsupportedError(
+       "Cannot change the length of a fixed-length list");
+ }
+
+ /**
+  * Throws an [UnsupportedError];
+  * operations that change the length of the list are disallowed.
+  */
+ void set length(int newLength) =&gt; _throw();
+
+ /**
+  * Throws an [UnsupportedError];
+  * operations that change the length of the list are disallowed.
+  */
+ bool add(E value) {
+   _throw();
+ }
+
+ /**
+  * Throws an [UnsupportedError];
+  * operations that change the length of the list are disallowed.
+  */
+ void addAll(Iterable&lt;E&gt; iterable) =&gt; _throw();
+
+ /**
+  * Throws an [UnsupportedError];
+  * operations that change the length of the list are disallowed.
+  */
+ void insert(int index, E element) =&gt; _throw();
+
+ /**
+  * Throws an [UnsupportedError];
+  * operations that change the length of the list are disallowed.
+  */
+ void insertAll(int index, Iterable&lt;E&gt; iterable) =&gt; _throw();
+
+ /**
+  * Throws an [UnsupportedError];
+  * operations that change the length of the list are disallowed.
+  */
+ bool remove(Object value) { _throw(); }
+
+ /**
+  * Throws an [UnsupportedError];
+  * operations that change the length of the list are disallowed.
+  */
+ E removeAt(int index) { _throw(); }
+
+ /**
+  * Throws an [UnsupportedError];
+  * operations that change the length of the list are disallowed.
+  */
+ E removeLast() { _throw(); }
+
+ /**
+  * Throws an [UnsupportedError];
+  * operations that change the length of the list are disallowed.
+  */
+ void removeWhere(bool test(E element)) =&gt; _throw();
+
+ /**
+  * Throws an [UnsupportedError];
+  * operations that change the length of the list are disallowed.
+  */
+ void retainWhere(bool test(E element)) =&gt; _throw();
+
+ /**
+  * Throws an [UnsupportedError];
+  * operations that change the length of the list are disallowed.
+  */
+ void removeRange(int start, int end) =&gt; _throw();
+
+ /**
+  * Throws an [UnsupportedError];
+  * operations that change the length of the list are disallowed.
+  */
+ void replaceRange(int start, int end, Iterable&lt;E&gt; iterable) =&gt; _throw();
+
+ /**
+  * Throws an [UnsupportedError];
+  * operations that change the length of the list are disallowed.
+  */
+ void clear() =&gt; _throw();
+}
+</pre>
+</div>
+<h3>Implements</h3>
+<p>
+<span class="type-box"><span class="icon-class"></span><a href="http://api.dartlang.org/dart_core/List.html" ref="external">List&lt;E&gt;</a></span></p>
+<div>
+<h3>Properties</h3>
+<div class="field inherited"><h4 id="first">
+<button class="show-code">Code</button>
+final <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>         <strong>first</strong> <a class="anchor-link"
+            href="#first"
+            title="Permalink to NonGrowableListMixin&lt;E&gt;.first">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns the first element.</p>
+<p>If <code>this</code> is empty throws a <a class="crossref" href="http://api.dartlang.org/dart_core/StateError.html">StateError</a>. Otherwise this method is
+equivalent to <code>this.elementAt(0)</code></p>
+<pre class="source">
+E get first;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="isEmpty">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a>         <strong>isEmpty</strong> <a class="anchor-link"
+            href="#isEmpty"
+            title="Permalink to NonGrowableListMixin&lt;E&gt;.isEmpty">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns true if there is no element in this collection.</p>
+<pre class="source">
+bool get isEmpty;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="isNotEmpty">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a>         <strong>isNotEmpty</strong> <a class="anchor-link"
+            href="#isNotEmpty"
+            title="Permalink to NonGrowableListMixin&lt;E&gt;.isNotEmpty">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns true if there is at least one element in this collection.</p>
+<pre class="source">
+bool get isNotEmpty;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="iterator">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/Iterator.html" ref="external">Iterator</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt;         <strong>iterator</strong> <a class="anchor-link"
+            href="#iterator"
+            title="Permalink to NonGrowableListMixin&lt;E&gt;.iterator">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns an Iterator that iterates over this Iterable object.</p>
+<pre class="source">
+Iterator&lt;E&gt; get iterator;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="last">
+<button class="show-code">Code</button>
+final <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>         <strong>last</strong> <a class="anchor-link"
+            href="#last"
+            title="Permalink to NonGrowableListMixin&lt;E&gt;.last">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns the last element.</p>
+<p>If <code>this</code> is empty throws a <a class="crossref" href="http://api.dartlang.org/dart_core/StateError.html">StateError</a>.</p>
+<pre class="source">
+E get last;
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="length">
+abstract <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> <strong>get length</strong> <a class="anchor-link" href="#length"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.get length">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> </div><div class="doc">
+<p>Returns the number of objects in this list.</p>
+<p>The valid indices for a list are <code>0</code> through <code>length - 1</code>.</p>
+</div>
+</div>
+<div class="method"><h4 id="length=">
+<button class="show-code">Code</button>
+void <strong>set length</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> newLength) <a class="anchor-link" href="#length="
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.set length">#</a></h4>
+<div class="doc">
+<p>Throws an <a class="crossref" href="http://api.dartlang.org/dart_core/UnsupportedError.html">UnsupportedError</a>;
+operations that change the length of the list are disallowed.</p>
+<pre class="source">
+void set length(int newLength) =&gt; _throw();
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="reversed">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt;         <strong>reversed</strong> <a class="anchor-link"
+            href="#reversed"
+            title="Permalink to NonGrowableListMixin&lt;E&gt;.reversed">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> </div><div class="doc">
+<p>Returns an <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a> of the objects in this list in reverse order.</p>
+<pre class="source">
+Iterable&lt;E&gt; get reversed;
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="single">
+<button class="show-code">Code</button>
+final <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>         <strong>single</strong> <a class="anchor-link"
+            href="#single"
+            title="Permalink to NonGrowableListMixin&lt;E&gt;.single">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns the single element in <code>this</code>.</p>
+<p>If <code>this</code> is empty or has more than one element throws a <a class="crossref" href="http://api.dartlang.org/dart_core/StateError.html">StateError</a>.</p>
+<pre class="source">
+E get single;
+</pre>
+</div>
+</div>
+</div>
+<div class="inherited">
+<h3>Operators</h3>
+<div class="method inherited"><h4 id="[]">
+abstract <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> <strong>operator []</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> index) <a class="anchor-link" href="#[]"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.operator []">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> </div><div class="doc">
+<p>Returns the object at the given 
+<span class="param">index</span> in the list
+or throws a <a class="crossref" href="http://api.dartlang.org/dart_core/RangeError.html">RangeError</a> if 
+<span class="param">index</span> is out of bounds.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="[]=">
+abstract void <strong>operator []=</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> index, <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> value) <a class="anchor-link" href="#[]="
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.operator []=">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> </div><div class="doc">
+<p>Sets the value at the given 
+<span class="param">index</span> in the list to 
+<span class="param">value</span>
+or throws a <a class="crossref" href="http://api.dartlang.org/dart_core/RangeError.html">RangeError</a> if 
+<span class="param">index</span> is out of bounds.</p>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="add">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>add</strong>(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> value) <a class="anchor-link" href="#add"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.add">#</a></h4>
+<div class="doc">
+<p>Throws an <a class="crossref" href="http://api.dartlang.org/dart_core/UnsupportedError.html">UnsupportedError</a>;
+operations that change the length of the list are disallowed.</p>
+<pre class="source">
+bool add(E value) {
+ _throw();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="addAll">
+<button class="show-code">Code</button>
+void <strong>addAll</strong>(<a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; iterable) <a class="anchor-link" href="#addAll"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.addAll">#</a></h4>
+<div class="doc">
+<p>Throws an <a class="crossref" href="http://api.dartlang.org/dart_core/UnsupportedError.html">UnsupportedError</a>;
+operations that change the length of the list are disallowed.</p>
+<pre class="source">
+void addAll(Iterable&lt;E&gt; iterable) =&gt; _throw();
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="any">
+abstract <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>any</strong>(<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> test(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element)) <a class="anchor-link" href="#any"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.any">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns true if one element of this collection satisfies the
+predicate 
+<span class="param">test</span>. Returns false otherwise.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="asMap">
+abstract <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>, <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; <strong>asMap</strong>() <a class="anchor-link" href="#asMap"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.asMap">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> </div><div class="doc">
+<p>Returns an unmodifiable <a class="crossref" href="http://api.dartlang.org/dart_core/Map.html">Map</a> view of <code>this</code>.</p>
+<p>The map uses the indices of this list as keys and the corresponding objects
+as values. The <code>Map.keys</code> <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a> iterates the indices of this list
+in numerical order.</p>
+<pre><code>List&lt;String&gt; words = ['fee', 'fi', 'fo', 'fum'];
+Map&lt;int, String&gt; map = words.asMap();
+map[0] + map[1];   // 'feefi';
+map.keys.toList(); // [0, 1, 2, 3]
+</code></pre>
+</div>
+</div>
+<div class="method"><h4 id="clear">
+<button class="show-code">Code</button>
+void <strong>clear</strong>() <a class="anchor-link" href="#clear"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.clear">#</a></h4>
+<div class="doc">
+<p>Throws an <a class="crossref" href="http://api.dartlang.org/dart_core/UnsupportedError.html">UnsupportedError</a>;
+operations that change the length of the list are disallowed.</p>
+<pre class="source">
+void clear() =&gt; _throw();
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="contains">
+abstract <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>contains</strong>(<a href="http://api.dartlang.org/dart_core/Object.html" ref="external">Object</a> element) <a class="anchor-link" href="#contains"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.contains">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns true if the collection contains an element equal to 
+<span class="param">element</span>.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="elementAt">
+abstract <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> <strong>elementAt</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> index) <a class="anchor-link" href="#elementAt"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.elementAt">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns the 
+<span class="param">index</span>th element.</p>
+<p>If <code>this</code> has fewer than 
+<span class="param">index</span> elements throws a <a class="crossref" href="http://api.dartlang.org/dart_core/RangeError.html">RangeError</a>.</p>
+<p>Note: if <code>this</code> does not have a deterministic iteration order then the
+function may simply return any element without any iteration if there are
+at least 
+<span class="param">index</span> elements in <code>this</code>.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="every">
+abstract <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>every</strong>(<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> test(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element)) <a class="anchor-link" href="#every"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.every">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns true if every elements of this collection satisify the
+predicate 
+<span class="param">test</span>. Returns <code>false</code> otherwise.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="expand">
+abstract <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> <strong>expand</strong>(<a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> f(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element)) <a class="anchor-link" href="#expand"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.expand">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Expands each element of this <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a> into zero or more elements.</p>
+<p>The resulting Iterable runs through the elements returned
+by 
+<span class="param">f</span> for each element of this, in order.</p>
+<p>The returned <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a> is lazy, and calls 
+<span class="param">f</span> for each element
+of this every time it's iterated.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="fillRange">
+abstract void <strong>fillRange</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> start, <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> end, [<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> fillValue]) <a class="anchor-link" href="#fillRange"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.fillRange">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> </div><div class="doc">
+<p>Sets the objects in the range 
+<span class="param">start</span> inclusive to 
+<span class="param">end</span> exclusive
+to the given 
+<span class="param">fillValue</span>.</p>
+<p>An error occurs if 
+<span class="param">start</span>..
+<span class="param">end</span> is not a valid range for <code>this</code>.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="firstWhere">
+abstract <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> <strong>firstWhere</strong>(<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> test(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element), {<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> orElse()}) <a class="anchor-link" href="#firstWhere"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.firstWhere">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns the first element that satisfies the given predicate 
+<span class="param">test</span>.</p>
+<p>If none matches, the result of invoking the 
+<span class="param">orElse</span> function is
+returned. By default, when 
+<span class="param">orElse</span> is <code>null</code>, a <a class="crossref" href="http://api.dartlang.org/dart_core/StateError.html">StateError</a> is
+thrown.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="fold">
+abstract dynamic <strong>fold</strong>(initialValue, combine(previousValue, <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element)) <a class="anchor-link" href="#fold"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.fold">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Reduces a collection to a single value by iteratively combining each
+element of the collection with an existing value using the provided
+function.</p>
+<p>Use 
+<span class="param">initialValue</span> as the initial value, and the function 
+<span class="param">combine</span> to
+create a new value from the previous one and an element.</p>
+<p>Example of calculating the sum of an iterable:</p>
+<pre><code>iterable.fold(0, (prev, element) =&gt; prev + element);
+</code></pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="forEach">
+abstract void <strong>forEach</strong>(void f(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element)) <a class="anchor-link" href="#forEach"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.forEach">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Applies the function 
+<span class="param">f</span> to each element of this collection.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="getRange">
+abstract <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; <strong>getRange</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> start, <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> end) <a class="anchor-link" href="#getRange"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.getRange">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> </div><div class="doc">
+<p>Returns an <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a> that iterates over the objects in the range
+
+<span class="param">start</span> inclusive to 
+<span class="param">end</span> exclusive.</p>
+<p>An error occurs if 
+<span class="param">end</span> is before 
+<span class="param">start</span>.</p>
+<p>An error occurs if the 
+<span class="param">start</span> and 
+<span class="param">end</span> are not valid ranges at the time
+of the call to this method. The returned <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a> behaves like
+<code>skip(start).take(end - start)</code>. That is, it does not throw exceptions
+if <code>this</code> changes size.</p>
+<pre><code>List&lt;String&gt; colors = ['red', 'green', 'blue', 'orange', 'pink'];
+Iterable&lt;String&gt; range = colors.getRange(1, 4);
+range.join(', ');  // 'green, blue, orange'
+colors.length = 3;
+range.join(', ');  // 'green, blue'
+</code></pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="indexOf">
+abstract <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> <strong>indexOf</strong>(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element, [<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> start = 0]) <a class="anchor-link" href="#indexOf"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.indexOf">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> </div><div class="doc">
+<p>Returns the first index of 
+<span class="param">element</span> in this list.</p>
+<p>Searches the list from index 
+<span class="param">start</span> to the end of the list.
+The first time an object <code>o</code> is encountered so that <code>o == element</code>,
+the index of <code>o</code> is returned.</p>
+<pre><code>List&lt;String&gt; notes = ['do', 're', 'mi', 're'];
+notes.indexOf('re');    // 1
+notes.indexOf('re', 2); // 3
+</code></pre>
+<p>Returns -1 if 
+<span class="param">element</span> is not found.</p>
+<pre><code>notes.indexOf('fa');    // -1
+</code></pre>
+</div>
+</div>
+<div class="method"><h4 id="insert">
+<button class="show-code">Code</button>
+void <strong>insert</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> index, <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element) <a class="anchor-link" href="#insert"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.insert">#</a></h4>
+<div class="doc">
+<p>Throws an <a class="crossref" href="http://api.dartlang.org/dart_core/UnsupportedError.html">UnsupportedError</a>;
+operations that change the length of the list are disallowed.</p>
+<pre class="source">
+void insert(int index, E element) =&gt; _throw();
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="insertAll">
+<button class="show-code">Code</button>
+void <strong>insertAll</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> index, <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; iterable) <a class="anchor-link" href="#insertAll"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.insertAll">#</a></h4>
+<div class="doc">
+<p>Throws an <a class="crossref" href="http://api.dartlang.org/dart_core/UnsupportedError.html">UnsupportedError</a>;
+operations that change the length of the list are disallowed.</p>
+<pre class="source">
+void insertAll(int index, Iterable&lt;E&gt; iterable) =&gt; _throw();
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="join">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> <strong>join</strong>([<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> separator = ""]) <a class="anchor-link" href="#join"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.join">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Converts each element to a <a class="crossref" href="http://api.dartlang.org/dart_core/String.html">String</a> and concatenates the strings.</p>
+<p>Converts each element to a <a class="crossref" href="http://api.dartlang.org/dart_core/String.html">String</a> by calling <a class="crossref" href="http://api.dartlang.org/dart_core/Object.html#toString">Object.toString</a> on it.
+Then concatenates the strings, optionally separated by the 
+<span class="param">separator</span>
+string.</p>
+<pre class="source">
+String join([String separator = ""]) {
+ StringBuffer buffer = new StringBuffer();
+ buffer.writeAll(this, separator);
+ return buffer.toString();
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="lastIndexOf">
+abstract <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> <strong>lastIndexOf</strong>(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element, [<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> start]) <a class="anchor-link" href="#lastIndexOf"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.lastIndexOf">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> </div><div class="doc">
+<p>Returns the last index of 
+<span class="param">element</span> in this list.</p>
+<p>Searches the list backwards from index 
+<span class="param">start</span> to 0.</p>
+<p>The first time an object <code>o</code> is encountered so that <code>o == element</code>,
+the index of <code>o</code> is returned.</p>
+<pre><code>List&lt;String&gt; notes = ['do', 're', 'mi', 're'];
+notes.lastIndexOf('re', 2); // 1
+</code></pre>
+<p>If 
+<span class="param">start</span> is not provided, this method searches from the end of the
+list./Returns</p>
+<pre><code>notes.lastIndexOf('re');  // 3
+</code></pre>
+<p>Returns -1 if 
+<span class="param">element</span> is not found.</p>
+<pre><code>notes.lastIndexOf('fa');  // -1
+</code></pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="lastWhere">
+abstract <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> <strong>lastWhere</strong>(<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> test(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element), {<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> orElse()}) <a class="anchor-link" href="#lastWhere"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.lastWhere">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns the last element that satisfies the given predicate 
+<span class="param">test</span>.</p>
+<p>If none matches, the result of invoking the 
+<span class="param">orElse</span> function is
+returned. By default, when 
+<span class="param">orElse</span> is <code>null</code>, a <a class="crossref" href="http://api.dartlang.org/dart_core/StateError.html">StateError</a> is
+thrown.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="map">
+abstract <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> <strong>map</strong>(f(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element)) <a class="anchor-link" href="#map"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.map">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns a lazy <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a> where each element <code>e</code> of <code>this</code> is replaced
+by the result of <code>f(e)</code>.</p>
+<p>This method returns a view of the mapped elements. As long as the
+returned <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a> is not iterated over, the supplied function 
+<span class="param">f</span> will
+not be invoked. The transformed elements will not be cached. Iterating
+multiple times over the the returned <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a> will invoke the supplied
+function 
+<span class="param">f</span> multiple times on the same element.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="reduce">
+abstract <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> <strong>reduce</strong>(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> combine(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> value, <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element)) <a class="anchor-link" href="#reduce"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.reduce">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Reduces a collection to a single value by iteratively combining elements
+of the collection using the provided function.</p>
+<p>Example of calculating the sum of an iterable:</p>
+<pre><code>iterable.reduce((value, element) =&gt; value + element);
+</code></pre>
+</div>
+</div>
+<div class="method"><h4 id="remove">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>remove</strong>(<a href="http://api.dartlang.org/dart_core/Object.html" ref="external">Object</a> value) <a class="anchor-link" href="#remove"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.remove">#</a></h4>
+<div class="doc">
+<p>Throws an <a class="crossref" href="http://api.dartlang.org/dart_core/UnsupportedError.html">UnsupportedError</a>;
+operations that change the length of the list are disallowed.</p>
+<pre class="source">
+bool remove(Object value) { _throw(); }
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="removeAt">
+<button class="show-code">Code</button>
+<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> <strong>removeAt</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> index) <a class="anchor-link" href="#removeAt"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.removeAt">#</a></h4>
+<div class="doc">
+<p>Throws an <a class="crossref" href="http://api.dartlang.org/dart_core/UnsupportedError.html">UnsupportedError</a>;
+operations that change the length of the list are disallowed.</p>
+<pre class="source">
+E removeAt(int index) { _throw(); }
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="removeLast">
+<button class="show-code">Code</button>
+<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> <strong>removeLast</strong>() <a class="anchor-link" href="#removeLast"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.removeLast">#</a></h4>
+<div class="doc">
+<p>Throws an <a class="crossref" href="http://api.dartlang.org/dart_core/UnsupportedError.html">UnsupportedError</a>;
+operations that change the length of the list are disallowed.</p>
+<pre class="source">
+E removeLast() { _throw(); }
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="removeRange">
+<button class="show-code">Code</button>
+void <strong>removeRange</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> start, <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> end) <a class="anchor-link" href="#removeRange"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.removeRange">#</a></h4>
+<div class="doc">
+<p>Throws an <a class="crossref" href="http://api.dartlang.org/dart_core/UnsupportedError.html">UnsupportedError</a>;
+operations that change the length of the list are disallowed.</p>
+<pre class="source">
+void removeRange(int start, int end) =&gt; _throw();
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="removeWhere">
+<button class="show-code">Code</button>
+void <strong>removeWhere</strong>(<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> test(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element)) <a class="anchor-link" href="#removeWhere"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.removeWhere">#</a></h4>
+<div class="doc">
+<p>Throws an <a class="crossref" href="http://api.dartlang.org/dart_core/UnsupportedError.html">UnsupportedError</a>;
+operations that change the length of the list are disallowed.</p>
+<pre class="source">
+void removeWhere(bool test(E element)) =&gt; _throw();
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="replaceRange">
+<button class="show-code">Code</button>
+void <strong>replaceRange</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> start, <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> end, <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; iterable) <a class="anchor-link" href="#replaceRange"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.replaceRange">#</a></h4>
+<div class="doc">
+<p>Throws an <a class="crossref" href="http://api.dartlang.org/dart_core/UnsupportedError.html">UnsupportedError</a>;
+operations that change the length of the list are disallowed.</p>
+<pre class="source">
+void replaceRange(int start, int end, Iterable&lt;E&gt; iterable) =&gt; _throw();
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="retainWhere">
+<button class="show-code">Code</button>
+void <strong>retainWhere</strong>(<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> test(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element)) <a class="anchor-link" href="#retainWhere"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.retainWhere">#</a></h4>
+<div class="doc">
+<p>Throws an <a class="crossref" href="http://api.dartlang.org/dart_core/UnsupportedError.html">UnsupportedError</a>;
+operations that change the length of the list are disallowed.</p>
+<pre class="source">
+void retainWhere(bool test(E element)) =&gt; _throw();
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="setAll">
+abstract void <strong>setAll</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> index, <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; iterable) <a class="anchor-link" href="#setAll"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.setAll">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> </div><div class="doc">
+<p>Overwrites objects of <code>this</code> with the objects of 
+<span class="param">iterable</span>, starting
+at position 
+<span class="param">index</span> in this list.</p>
+<pre><code>List&lt;String&gt; list = ['a', 'b', 'c'];
+list.setAll(1, ['bee', 'sea']);
+list.join(', '); // 'a, bee, sea'
+</code></pre>
+<p>This operation does not increase the length of <code>this</code>.</p>
+<p>The 
+<span class="param">index</span> must be non-negative and no greater than <a class="crossref" href="http://api.dartlang.org/dart_core/List.html#length">length</a>.</p>
+<p>The 
+<span class="param">iterable</span> must not have more elements than what can fit from 
+<span class="param">index</span>
+to <a class="crossref" href="http://api.dartlang.org/dart_core/List.html#length">length</a>.</p>
+<p>If <code>iterable</code> is based on this list, its values may change /during/ the
+<code>setAll</code> operation.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="setRange">
+abstract void <strong>setRange</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> start, <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> end, <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; iterable, [<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> skipCount = 0]) <a class="anchor-link" href="#setRange"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.setRange">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> </div><div class="doc">
+<p>Copies the objects of 
+<span class="param">iterable</span>, skipping 
+<span class="param">skipCount</span> objects first,
+into the range 
+<span class="param">start</span>, inclusive, to 
+<span class="param">end</span>, exclusive, of the list.</p>
+<pre><code>List&lt;int&gt; list1 = [1, 2, 3, 4];
+List&lt;int&gt; list2 = [5, 6, 7, 8, 9];
+// Copies the 4th and 5th items in list2 as the 2nd and 3rd items
+// of list1.
+list1.setRange(1, 3, list2, 3);
+list1.join(', '); // '1, 8, 9, 4'
+</code></pre>
+<p>The 
+<span class="param">start</span> and 
+<span class="param">end</span> indices must satisfy <code>0 ≤ start ≤ end ≤ length</code>.
+If 
+<span class="param">start</span> equals 
+<span class="param">end</span>, this method has no effect.</p>
+<p>The 
+<span class="param">iterable</span> must have enough objects to fill the range from <code>start</code>
+to <code>end</code> after skipping 
+<span class="param">skipCount</span> objects.</p>
+<p>If <code>iterable</code> is this list, the operation will copy the elements originally
+in the range from <code>skipCount</code> to <code>skipCount + (end - start)</code> to the
+range <code>start</code> to <code>end</code>, even if the two ranges overlap.</p>
+<p>If <code>iterable</code> depends on this list in some other way, no guarantees are
+made.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="shuffle">
+abstract void <strong>shuffle</strong>([<a href="http://api.dartlang.org/dart_math/Random.html" ref="external">Random</a> random]) <a class="anchor-link" href="#shuffle"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.shuffle">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> </div><div class="doc">
+<p>Shuffles the elements of this list randomly.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="singleWhere">
+abstract <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> <strong>singleWhere</strong>(<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> test(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element)) <a class="anchor-link" href="#singleWhere"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.singleWhere">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns the single element that satisfies 
+<span class="param">test</span>. If no or more than one
+element match then a <a class="crossref" href="http://api.dartlang.org/dart_core/StateError.html">StateError</a> is thrown.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="skip">
+abstract <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; <strong>skip</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> n) <a class="anchor-link" href="#skip"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.skip">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns an Iterable that skips the first 
+<span class="param">n</span> elements.</p>
+<p>If <code>this</code> has fewer than 
+<span class="param">n</span> elements, then the resulting Iterable is
+empty.</p>
+<p>It is an error if 
+<span class="param">n</span> is negative.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="skipWhile">
+abstract <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; <strong>skipWhile</strong>(<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> test(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> value)) <a class="anchor-link" href="#skipWhile"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.skipWhile">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns an Iterable that skips elements while 
+<span class="param">test</span> is satisfied.</p>
+<p>The filtering happens lazily. Every new Iterator of the returned
+Iterable iterates over all elements of <code>this</code>.</p>
+<p>As long as the iterator's elements satisfy 
+<span class="param">test</span> they are
+discarded. Once an element does not satisfy the 
+<span class="param">test</span> the iterator stops
+testing and uses every later element unconditionally. That is, the elements
+of the returned Iterable are the elements of <code>this</code> starting from the
+first element that does not satisfy 
+<span class="param">test</span>.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="sort">
+abstract void <strong>sort</strong>([<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> compare(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> a, <a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> b)]) <a class="anchor-link" href="#sort"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.sort">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> </div><div class="doc">
+<p>Sorts this list according to the order specified by the 
+<span class="param">compare</span> function.</p>
+<p>The 
+<span class="param">compare</span> function must act as a <a class="crossref" href="http://api.dartlang.org/dart_core/Comparator.html">Comparator</a>.</p>
+<pre><code>List&lt;String&gt; numbers = ['one', 'two', 'three', 'four'];
+// Sort from shortest to longest.
+numbers.sort((x, y) =&gt; x.length.compareTo(y.length));
+numbers.join(', '); // 'one, two, four, three'
+</code></pre>
+<p>The default List implementations use <a class="crossref" href="http://api.dartlang.org/dart_core/Comparable.html#compare">Comparable.compare</a> if
+
+<span class="param">compare</span> is omitted.</p>
+<pre><code>List&lt;int&gt; nums = [13, 2, -11];
+nums.sort();
+     nums.join(', '); // '-11, 2, 13'
+</code></pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="sublist">
+abstract <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; <strong>sublist</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> start, [<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> end]) <a class="anchor-link" href="#sublist"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.sublist">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a> </div><div class="doc">
+<p>Returns a new list containing the objects from 
+<span class="param">start</span> inclusive to 
+<span class="param">end</span>
+exclusive.</p>
+<pre><code>List&lt;String&gt; colors = ['red', 'green', 'blue', 'orange', 'pink'];
+colors.sublist(1, 3); // ['green', 'blue']
+</code></pre>
+<p>If 
+<span class="param">end</span> is omitted, the <a class="crossref" href="http://api.dartlang.org/dart_core/List.html#length">length</a> of <code>this</code> is used.</p>
+<pre><code>colors.sublist(1);  // ['green', 'blue', 'orange', 'pink']
+</code></pre>
+<p>An error occurs if 
+<span class="param">start</span> is outside the range <code>0</code> .. <code>length</code> or if
+
+<span class="param">end</span> is outside the range <code>start</code> .. <code>length</code>.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="take">
+abstract <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; <strong>take</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> n) <a class="anchor-link" href="#take"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.take">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns an <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a> with at most 
+<span class="param">n</span> elements.</p>
+<p>The returned <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a> may contain fewer than 
+<span class="param">n</span> elements, if <code>this</code>
+contains fewer than 
+<span class="param">n</span> elements.</p>
+<p>It is an error if 
+<span class="param">n</span> is negative.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="takeWhile">
+abstract <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; <strong>takeWhile</strong>(<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> test(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> value)) <a class="anchor-link" href="#takeWhile"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.takeWhile">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns an Iterable that stops once 
+<span class="param">test</span> is not satisfied anymore.</p>
+<p>The filtering happens lazily. Every new Iterator of the returned
+Iterable starts iterating over the elements of <code>this</code>.</p>
+<p>When the iterator encounters an element <code>e</code> that does not satisfy 
+<span class="param">test</span>,
+it discards <code>e</code> and moves into the finished state. That is, it does not
+get or provide any more elements.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="toList">
+abstract <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; <strong>toList</strong>({<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> growable: true}) <a class="anchor-link" href="#toList"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.toList">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Creates a <a class="crossref" href="http://api.dartlang.org/dart_core/List.html">List</a> containing the elements of this <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a>.</p>
+<p>The elements are in iteration order. The list is fixed-length
+if 
+<span class="param">growable</span> is false.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="toSet">
+abstract <a href="http://api.dartlang.org/dart_core/Set.html" ref="external">Set</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; <strong>toSet</strong>() <a class="anchor-link" href="#toSet"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.toSet">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Creates a <a class="crossref" href="http://api.dartlang.org/dart_core/Set.html">Set</a> containing the elements of this <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a>.</p>
+</div>
+</div>
+<div class="method inherited"><h4 id="where">
+abstract <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a>&lt;<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a>&gt; <strong>where</strong>(<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> test(<a href="../dart.pkg.collection.wrappers/NonGrowableListMixin.html">E</a> element)) <a class="anchor-link" href="#where"
+              title="Permalink to NonGrowableListMixin&lt;E&gt;.where">#</a></h4>
+<div class="inherited-from">inherited from <a href="http://api.dartlang.org/dart_core/Iterable.html" ref="external">Iterable</a> </div><div class="doc">
+<p>Returns a lazy <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a> with all elements that satisfy the
+predicate 
+<span class="param">test</span>.</p>
+<p>This method returns a view of the mapped elements. As long as the
+returned <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a> is not iterated over, the supplied function 
+<span class="param">test</span> will
+not be invoked. Iterating will not cache results, and thus iterating
+multiple times over the returned <a class="crossref" href="http://api.dartlang.org/dart_core/Iterable.html">Iterable</a> will invoke the supplied
+function 
+<span class="param">test</span> multiple times on the same element.</p>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

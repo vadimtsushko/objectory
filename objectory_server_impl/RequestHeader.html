@@ -1,0 +1,140 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>RequestHeader class / objectory_server_impl Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="objectory_server_impl" data-type="RequestHeader">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../objectory_server_impl.html">objectory_server_impl</a> &rsaquo; <a href="../objectory_server_impl/RequestHeader.html">RequestHeader</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>RequestHeader</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class RequestHeader {
+ String command;
+ String collection;
+ int requestId;
+ RequestHeader.fromMap(Map commandMap) {
+   command = commandMap['command'];
+   collection = commandMap['collection'];
+   requestId = commandMap['requestId'];
+ }
+ Map toMap() =&gt; {'command': command, 'collection': collection, 'requestId': requestId};
+ String toString() =&gt; 'RequestHeader(${toMap()})';
+}
+</pre>
+</div>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="fromMap">
+<button class="show-code">Code</button>
+new <strong>RequestHeader.fromMap</strong>(<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> commandMap) <a class="anchor-link" href="#fromMap"
+              title="Permalink to RequestHeader.RequestHeader.fromMap">#</a></h4>
+<div class="doc">
+<pre class="source">
+RequestHeader.fromMap(Map commandMap) {
+ command = commandMap['command'];
+ collection = commandMap['collection'];
+ requestId = commandMap['requestId'];
+}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="collection">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>collection</strong> <a class="anchor-link"
+            href="#collection"
+            title="Permalink to RequestHeader.collection">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+String collection
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="command">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>command</strong> <a class="anchor-link"
+            href="#command"
+            title="Permalink to RequestHeader.command">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+String command
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="requestId">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>         <strong>requestId</strong> <a class="anchor-link"
+            href="#requestId"
+            title="Permalink to RequestHeader.requestId">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int requestId
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="toMap">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> <strong>toMap</strong>() <a class="anchor-link" href="#toMap"
+              title="Permalink to RequestHeader.toMap">#</a></h4>
+<div class="doc">
+<pre class="source">
+Map toMap() =&gt; {'command': command, 'collection': collection, 'requestId': requestId};
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toString">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to RequestHeader.toString">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Returns a string representation of this object.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html" ref="external">Object</a> </div></div>
+<pre class="source">
+String toString() =&gt; 'RequestHeader(${toMap()})';
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

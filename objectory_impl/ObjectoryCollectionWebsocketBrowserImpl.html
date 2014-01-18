@@ -1,0 +1,242 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>ObjectoryCollectionWebsocketBrowserImpl class / objectory_impl Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="objectory_impl" data-type="ObjectoryCollectionWebsocketBrowserImpl">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../objectory_impl.html">objectory_impl</a> &rsaquo; <a href="../objectory_impl/ObjectoryCollectionWebsocketBrowserImpl.html">ObjectoryCollectionWebsocketBrowserImpl</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>ObjectoryCollectionWebsocketBrowserImpl</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class ObjectoryCollectionWebsocketBrowserImpl extends ObjectoryCollection{
+ ObjectoryWebsocketBrowserImpl objectoryImpl;
+ ObjectoryCollectionWebsocketBrowserImpl(this.objectoryImpl);
+ Future&lt;int&gt; count([ObjectoryQueryBuilder selector]) { 
+   Completer completer = new Completer();
+   if (selector == null) {
+     selector = new ObjectoryQueryBuilder();
+   }
+   var obj;
+   objectoryImpl._postMessage(objectoryImpl._createCommand('count', collectionName), selector.map, selector.extParamsMap)
+     .then((int _count){
+       completer.complete(_count); 
+     });
+    return completer.future; 
+ }
+ Future&lt;List&lt;PersistentObject&gt;&gt; find([ObjectoryQueryBuilder selector]){
+   Completer completer = new Completer();
+   if (selector == null) {
+     selector = new ObjectoryQueryBuilder();
+   }
+   var result = objectory.createTypedList(classType);
+   objectoryImpl._postMessage(objectoryImpl._createCommand('find',collectionName), selector.map, selector.extParamsMap).then((list) {
+     for (var map in list) {
+       PersistentObject obj = objectory.map2Object(classType,map);
+       result.add(obj);
+     }
+     if (!selector.paramFetchLinks) {
+       completer.complete(result);
+     } else {
+       Future
+       .wait(result.map((item) =&gt; item.fetchLinks()))
+       .then((res) {completer.complete(res);}); 
+     }
+   });
+   return completer.future;
+ }  
+ 
+ Future&lt;PersistentObject&gt; findOne([ObjectoryQueryBuilder selector]){
+   Completer completer = new Completer();
+   if (selector == null) {
+     selector = new ObjectoryQueryBuilder();
+   }
+   var obj;
+   objectoryImpl._postMessage(objectoryImpl._createCommand('findOne',collectionName), selector.map, selector.extParamsMap)
+   .then((map){
+     objectoryImpl.completeFindOne(map,completer,selector, classType); 
+   });
+   return completer.future;
+ }
+}
+</pre>
+</div>
+<h3>Extends</h3>
+<p>
+<span class="type-box"><span class="icon-class"></span><a href="../objectory_base/ObjectoryCollection.html">ObjectoryCollection</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>ObjectoryCollectionWebsocketBrowserImpl</strong></span></p>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="">
+<button class="show-code">Code</button>
+new <strong>ObjectoryCollectionWebsocketBrowserImpl</strong>(<a href="../objectory_impl/ObjectoryWebsocketBrowserImpl.html">ObjectoryWebsocketBrowserImpl</a> objectoryImpl) <a class="anchor-link" href="#"
+              title="Permalink to ObjectoryCollectionWebsocketBrowserImpl.ObjectoryCollectionWebsocketBrowserImpl">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Creates a new <a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instance.</p>
+<p><a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instances have no meaningful state, and are only useful
+through their identity. An <a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instance is equal to itself
+only.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html" ref="external">Object</a> </div></div>
+<pre class="source">
+ObjectoryCollectionWebsocketBrowserImpl(this.objectoryImpl);
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field inherited"><h4 id="classType">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Type.html" ref="external">Type</a>         <strong>classType</strong> <a class="anchor-link"
+            href="#classType"
+            title="Permalink to ObjectoryCollectionWebsocketBrowserImpl.classType">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../objectory_base/ObjectoryCollection.html">ObjectoryCollection</a> </div><div class="doc">
+<pre class="source">
+Type classType
+</pre>
+</div>
+</div>
+<div class="field inherited"><h4 id="collectionName">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>collectionName</strong> <a class="anchor-link"
+            href="#collectionName"
+            title="Permalink to ObjectoryCollectionWebsocketBrowserImpl.collectionName">#</a>
+        </h4>
+        <div class="inherited-from">inherited from <a href="../objectory_base/ObjectoryCollection.html">ObjectoryCollection</a> </div><div class="doc">
+<pre class="source">
+String collectionName
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="objectoryImpl">
+<button class="show-code">Code</button>
+<a href="../objectory_impl/ObjectoryWebsocketBrowserImpl.html">ObjectoryWebsocketBrowserImpl</a>         <strong>objectoryImpl</strong> <a class="anchor-link"
+            href="#objectoryImpl"
+            title="Permalink to ObjectoryCollectionWebsocketBrowserImpl.objectoryImpl">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+ObjectoryWebsocketBrowserImpl objectoryImpl
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="count">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>&gt; <strong>count</strong>([<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> selector]) <a class="anchor-link" href="#count"
+              title="Permalink to ObjectoryCollectionWebsocketBrowserImpl.count">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;int&gt; count([ObjectoryQueryBuilder selector]) { 
+ Completer completer = new Completer();
+ if (selector == null) {
+   selector = new ObjectoryQueryBuilder();
+ }
+ var obj;
+ objectoryImpl._postMessage(objectoryImpl._createCommand('count', collectionName), selector.map, selector.extParamsMap)
+   .then((int _count){
+     completer.complete(_count); 
+   });
+  return completer.future; 
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="find">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>&lt;<a href="../persistent_object/PersistentObject.html">PersistentObject</a>&gt;&gt; <strong>find</strong>([<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> selector]) <a class="anchor-link" href="#find"
+              title="Permalink to ObjectoryCollectionWebsocketBrowserImpl.find">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;List&lt;PersistentObject&gt;&gt; find([ObjectoryQueryBuilder selector]){
+ Completer completer = new Completer();
+ if (selector == null) {
+   selector = new ObjectoryQueryBuilder();
+ }
+ var result = objectory.createTypedList(classType);
+ objectoryImpl._postMessage(objectoryImpl._createCommand('find',collectionName), selector.map, selector.extParamsMap).then((list) {
+   for (var map in list) {
+     PersistentObject obj = objectory.map2Object(classType,map);
+     result.add(obj);
+   }
+   if (!selector.paramFetchLinks) {
+     completer.complete(result);
+   } else {
+     Future
+     .wait(result.map((item) =&gt; item.fetchLinks()))
+     .then((res) {completer.complete(res);}); 
+   }
+ });
+ return completer.future;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="findOne">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="../persistent_object/PersistentObject.html">PersistentObject</a>&gt; <strong>findOne</strong>([<a href="../objectory_query/ObjectoryQueryBuilder.html">ObjectoryQueryBuilder</a> selector]) <a class="anchor-link" href="#findOne"
+              title="Permalink to ObjectoryCollectionWebsocketBrowserImpl.findOne">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;PersistentObject&gt; findOne([ObjectoryQueryBuilder selector]){
+ Completer completer = new Completer();
+ if (selector == null) {
+   selector = new ObjectoryQueryBuilder();
+ }
+ var obj;
+ objectoryImpl._postMessage(objectoryImpl._createCommand('findOne',collectionName), selector.map, selector.extParamsMap)
+ .then((map){
+   objectoryImpl.completeFindOne(map,completer,selector, classType); 
+ });
+ return completer.future;
+}
+</pre>
+</div>
+</div>
+<div class="method inherited"><h4 id="get">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="../persistent_object/PersistentObject.html">PersistentObject</a>&gt; <strong>get</strong>(<a href="../bson/ObjectId.html">ObjectId</a> id) <a class="anchor-link" href="#get"
+              title="Permalink to ObjectoryCollectionWebsocketBrowserImpl.get">#</a></h4>
+<div class="inherited-from">inherited from <a href="../objectory_base/ObjectoryCollection.html">ObjectoryCollection</a> </div><div class="doc">
+<pre class="source">
+Future&lt;PersistentObject&gt; get(ObjectId id) =&gt; objectory.findInCacheOrGetProxy(id, this.classType).fetch();
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

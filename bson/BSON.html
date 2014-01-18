@@ -1,0 +1,105 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>BSON class / bson Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="bson" data-type="BSON">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../bson.html">bson</a> &rsaquo; <a href="../bson/BSON.html">BSON</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>BSON</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class BSON {
+ BsonBinary serialize(var object, [int offset = 0]) {
+   if (!((object is Map) || (object is List))){
+     throw new Exception("Invalid value for BSON serialize: $object");
+   }
+   BsonObject bsonObject = bsonObjectFrom(object);
+   BsonBinary buffer = new BsonBinary(bsonObject.byteLength()+offset);
+   buffer.offset = offset;
+   bsonObjectFrom(object).packValue(buffer);
+   return buffer;
+ }
+ deserialize(BsonBinary buffer){
+   if(buffer.byteList.length &lt; 5){
+     throw new Exception("corrupt bson message &lt; 5 bytes long");
+   }
+   var bsonMap = new BsonMap(null);
+   bsonMap.unpackValue(buffer);
+   return bsonMap.value;
+ }
+}
+</pre>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="deserialize">
+<button class="show-code">Code</button>
+dynamic <strong>deserialize</strong>(<a href="../bson/BsonBinary.html">BsonBinary</a> buffer) <a class="anchor-link" href="#deserialize"
+              title="Permalink to BSON.deserialize">#</a></h4>
+<div class="doc">
+<pre class="source">
+deserialize(BsonBinary buffer){
+ if(buffer.byteList.length &lt; 5){
+   throw new Exception("corrupt bson message &lt; 5 bytes long");
+ }
+ var bsonMap = new BsonMap(null);
+ bsonMap.unpackValue(buffer);
+ return bsonMap.value;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="serialize">
+<button class="show-code">Code</button>
+<a href="../bson/BsonBinary.html">BsonBinary</a> <strong>serialize</strong>(object, [<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> offset = 0]) <a class="anchor-link" href="#serialize"
+              title="Permalink to BSON.serialize">#</a></h4>
+<div class="doc">
+<pre class="source">
+BsonBinary serialize(var object, [int offset = 0]) {
+ if (!((object is Map) || (object is List))){
+   throw new Exception("Invalid value for BSON serialize: $object");
+ }
+ BsonObject bsonObject = bsonObjectFrom(object);
+ BsonBinary buffer = new BsonBinary(bsonObject.byteLength()+offset);
+ buffer.offset = offset;
+ bsonObjectFrom(object).packValue(buffer);
+ return buffer;
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

@@ -1,0 +1,140 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>MongoMessageHandler class / mongo_dart Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="mongo_dart" data-type="MongoMessageHandler">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../mongo_dart.html">mongo_dart</a> &rsaquo; <a href="../mongo_dart/MongoMessageHandler.html">MongoMessageHandler</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>MongoMessageHandler</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class MongoMessageHandler {
+ final _log = new Logger('MongoMessageTransformer');
+ final converter = new PacketConverter();
+//  final debugData = new File('debug_data1.bin').openSync(mode: FileMode.WRITE);
+void handleData(List&lt;int&gt; data, EventSink&lt;MongoReplyMessage&gt; sink) {
+ //    debugData.writeFromSync(data);
+ //    debugData.flushSync();
+ //_log.fine('handleData length=${data.length} $data');
+   converter.addPacket(data);
+   while (!converter.messages.isEmpty) {
+     var buffer = new BsonBinary.from(converter.messages.removeFirst());
+     MongoReplyMessage reply = new MongoReplyMessage();
+     reply.deserialize(buffer);
+     _log.fine(reply.toString());
+     sink.add(reply);
+   }
+ }
+ void handleDone(EventSink&lt;MongoReplyMessage&gt; sink) {
+   if (!converter.isClear) {
+     _log.warning('Invalid state of PacketConverter in handleDone: $converter');
+   }
+   sink.close();
+ }
+ StreamTransformer&lt;List&lt;int&gt;, MongoReplyMessage&gt; get transformer =&gt; new StreamTransformer&lt;List&lt;int&gt;, MongoReplyMessage&gt;.fromHandlers(
+     handleData: handleData,handleDone: handleDone);
+}
+</pre>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="converter">
+<button class="show-code">Code</button>
+final         <strong>converter</strong> <a class="anchor-link"
+            href="#converter"
+            title="Permalink to MongoMessageHandler.converter">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+final converter = new PacketConverter()
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="transformer">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_async/StreamTransformer.html" ref="external">StreamTransformer</a>&lt;<a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>&gt;, <a href="../mongo_dart/MongoReplyMessage.html">MongoReplyMessage</a>&gt;         <strong>transformer</strong> <a class="anchor-link"
+            href="#transformer"
+            title="Permalink to MongoMessageHandler.transformer">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+StreamTransformer&lt;List&lt;int&gt;, MongoReplyMessage&gt; get transformer =&gt; new StreamTransformer&lt;List&lt;int&gt;, MongoReplyMessage&gt;.fromHandlers(
+   handleData: handleData,handleDone: handleDone);
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="handleData">
+<button class="show-code">Code</button>
+void <strong>handleData</strong>(<a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>&lt;<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>&gt; data, <a href="http://api.dartlang.org/dart_async/EventSink.html" ref="external">EventSink</a>&lt;<a href="../mongo_dart/MongoReplyMessage.html">MongoReplyMessage</a>&gt; sink) <a class="anchor-link" href="#handleData"
+              title="Permalink to MongoMessageHandler.handleData">#</a></h4>
+<div class="doc">
+<pre class="source">
+void handleData(List&lt;int&gt; data, EventSink&lt;MongoReplyMessage&gt; sink) {
+ //    debugData.writeFromSync(data);
+ //    debugData.flushSync();
+ //_log.fine('handleData length=${data.length} $data');
+   converter.addPacket(data);
+   while (!converter.messages.isEmpty) {
+     var buffer = new BsonBinary.from(converter.messages.removeFirst());
+     MongoReplyMessage reply = new MongoReplyMessage();
+     reply.deserialize(buffer);
+     _log.fine(reply.toString());
+     sink.add(reply);
+   }
+ }
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="handleDone">
+<button class="show-code">Code</button>
+void <strong>handleDone</strong>(<a href="http://api.dartlang.org/dart_async/EventSink.html" ref="external">EventSink</a>&lt;<a href="../mongo_dart/MongoReplyMessage.html">MongoReplyMessage</a>&gt; sink) <a class="anchor-link" href="#handleDone"
+              title="Permalink to MongoMessageHandler.handleDone">#</a></h4>
+<div class="doc">
+<pre class="source">
+void handleDone(EventSink&lt;MongoReplyMessage&gt; sink) {
+ if (!converter.isClear) {
+   _log.warning('Invalid state of PacketConverter in handleDone: $converter');
+ }
+ sink.close();
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

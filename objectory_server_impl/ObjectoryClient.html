@@ -1,0 +1,662 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>ObjectoryClient class / objectory_server_impl Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="objectory_server_impl" data-type="ObjectoryClient">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../objectory_server_impl.html">objectory_server_impl</a> &rsaquo; <a href="../objectory_server_impl/ObjectoryClient.html">ObjectoryClient</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>ObjectoryClient</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class ObjectoryClient {
+ Db db;
+ int token;
+ WebSocket socket;
+ String oauthClientId;
+ bool authenticated = false;
+ bool closed = false;
+ ObjectoryClient(this.token, this.socket, this.db) {
+   socket.done.catchError((e) {closed = true;});
+   socket.listen((message) {
+     try {
+       var binary = new BsonBinary.from(JSON.decode(message));
+       var jdata = new BSON().deserialize(binary);
+       var header = new RequestHeader.fromMap(jdata['header']);
+       Map content = jdata['content'];
+       Map extParams = jdata['extParams'];
+       if (oauthClientId != null &amp;&amp; !authenticated) {
+         if (header.command == 'authenticate') {
+           authenticate(header,content);
+           return;
+         } else {
+           _log.shout('Unexpected first message: $message in oauthMode. Closing connection');
+           socket.close();
+         }
+       }
+       if (header.command == "insert") {
+         save(header,content);
+         return;
+       }
+       if (header.command == "update") {
+         save(header,content,extParams);
+         return;
+       }
+       if (header.command == "remove") {
+         remove(header,content);
+         return;
+       }
+       if (header.command == "findOne") {
+         findOne(header, content, extParams);
+         return;
+       }
+       if (header.command == "count") {
+         count(header, content, extParams);
+         return;
+       }
+       if (header.command == "find") {
+         find(header, content, extParams);
+         return;
+       }
+       if (header.command == "queryDb") {
+         queryDb(header,content);
+         return;
+       }
+       if (header.command == "dropDb") {
+         dropDb(header);
+         return;
+       }
+       if (header.command == "dropCollection") {
+         dropCollection(header);
+         return;
+       }
+       _log.shout('Unexpected message: $message');
+       sendResult(header,content);
+     } catch (e) {
+       _log.severe(e);
+     }
+   },
+     onDone: () {
+       closed = true;
+       socket.close();
+     },
+     onError: (error) {
+       _log.severe(error.toString());
+       socket.close();
+     }  
+   
+  );
+ }
+ sendResult(RequestHeader header, content) {
+   if (closed) {
+     _log.warning('WARNING: trying send on closed connection. token:$token $header, $content');
+   } else {
+     _log.fine('token:$token sendResult($header, $content) ');
+     sendMessage(header.toMap(),content);      
+   }
+ }
+ sendMessage(header, content) {
+   socket.add(JSON.encode(new BSON().serialize({'header': header,'content': content}).byteList));
+ }
+ save(RequestHeader header, Map mapToSave, [Map idMap]) {
+   if (header.command == 'insert') {
+     db.collection(header.collection).insert(mapToSave).then((responseData) {
+       sendResult(header, responseData);
+     });
+   }
+   else
+   {
+     ObjectId id = mapToSave['_id'];
+     if (id != null) {
+       db.collection(header.collection).update({'_id': id},mapToSave).then((responseData) {
+         sendResult(header, responseData);
+       });
+     }
+     else {
+       if (idMap != null) {
+         db.collection(header.collection).update(idMap,mapToSave).then((responseData) {
+           sendResult(header, responseData);
+         });
+       } else {
+         _log.shout('ERROR: Trying to update object without ObjectId set. $header, $mapToSave');
+         }  
+     }
+   }
+ }
+ SelectorBuilder _selectorBuilder(Map selector, Map extParams) {
+   SelectorBuilder selectorBuilder = new SelectorBuilder();
+   selectorBuilder.map = selector;
+   selectorBuilder.paramLimit = extParams['limit'];
+   selectorBuilder.paramSkip = extParams['skip'];
+   return selectorBuilder;
+ }
+ 
+ find(RequestHeader header, Map selector, Map extParams) {
+   _log.fine('find $header $selector $extParams');
+   db.collection(header.collection).find(_selectorBuilder(selector,extParams)).toList().
+   then((responseData) {
+     sendResult(header, responseData);
+   });
+ }
+
+ remove(RequestHeader header, Map selector) {
+   db.collection(header.collection).remove(selector)
+     .then((responseData) {
+       sendResult(header, responseData);
+   });
+ }
+
+ findOne(RequestHeader header, Map selector , Map extParams) {
+   db.collection(header.collection).findOne(_selectorBuilder(selector,extParams)).
+   then((responseData) {
+     sendResult(header, responseData);
+   });
+ }
+ authenticate(RequestHeader header, Map selector) {
+   String tokenData = selector['tokenData'];
+   Map token;
+   HttpClient client = new HttpClient();
+   client.getUrl(Uri.parse("https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=ya29.AHES6ZSUBWMUd2UfutTyvgqf5CXw3vVAc-sbzogKu-3iHw"))
+     .then((HttpClientRequest request) {
+       return request.close();
+     }).then((HttpClientResponse response) {
+         return response.transform(UTF8.decoder).toList();
+     }).then((data) {
+         client.close();
+         token = JSON.decode(data.join(''));
+         if (token['issued_to'] != oauthClientId) {
+           _log.shout('Invalid oauth token. Closing connection');
+           socket.close();
+         } else {
+           return db.collection(header.collection).findOne(where.eq('email',token['email']))
+           .then((responseData) {
+             if (responseData == null) {
+               _log.shout('Not found email ${token['email']} in collection ${header.collection}. Closing connection');
+               socket.close();                
+             } else {
+               authenticated = true;
+               sendResult(header, responseData);
+             }
+           });
+         }
+     }).catchError((_){
+       _log.shout('Authentification error. Closing connection');
+       socket.close();             
+     });
+ }
+
+ count(RequestHeader header, Map selector , Map extParams) {
+   db.collection(header.collection).count(_selectorBuilder(selector,extParams)).
+   then((responseData) {
+     sendResult(header, responseData);
+   });
+ }
+ queryDb(RequestHeader header,Map query) {
+   db.executeDbCommand(DbCommand.createQueryDBCommand(db,query))
+   .then((responseData) {
+     sendResult(header,responseData);
+   });
+ }
+ dropDb(RequestHeader header) {
+   db.drop()
+   .then((responseData) {
+     sendResult(header,responseData);
+   });
+ }
+
+ dropCollection(RequestHeader header) {
+   db.dropCollection(header.collection)
+   .then((responseData) {
+     sendResult(header,responseData);
+   });
+ }
+
+
+ protocolError(String errorMessage) {
+   _log.shout('PROTOCOL ERROR: $errorMessage');
+ }
+
+
+ String toString() {
+   return "ObjectoryClient_${token}";
+ }
+}
+</pre>
+</div>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="">
+<button class="show-code">Code</button>
+new <strong>ObjectoryClient</strong>(<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> token, <a href="http://api.dartlang.org/dart_io/WebSocket.html" ref="external">WebSocket</a> socket, <a href="../mongo_dart/Db.html">Db</a> db) <a class="anchor-link" href="#"
+              title="Permalink to ObjectoryClient.ObjectoryClient">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Creates a new <a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instance.</p>
+<p><a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instances have no meaningful state, and are only useful
+through their identity. An <a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instance is equal to itself
+only.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html" ref="external">Object</a> </div></div>
+<pre class="source">
+ObjectoryClient(this.token, this.socket, this.db) {
+ socket.done.catchError((e) {closed = true;});
+ socket.listen((message) {
+   try {
+     var binary = new BsonBinary.from(JSON.decode(message));
+     var jdata = new BSON().deserialize(binary);
+     var header = new RequestHeader.fromMap(jdata['header']);
+     Map content = jdata['content'];
+     Map extParams = jdata['extParams'];
+     if (oauthClientId != null &amp;&amp; !authenticated) {
+       if (header.command == 'authenticate') {
+         authenticate(header,content);
+         return;
+       } else {
+         _log.shout('Unexpected first message: $message in oauthMode. Closing connection');
+         socket.close();
+       }
+     }
+     if (header.command == "insert") {
+       save(header,content);
+       return;
+     }
+     if (header.command == "update") {
+       save(header,content,extParams);
+       return;
+     }
+     if (header.command == "remove") {
+       remove(header,content);
+       return;
+     }
+     if (header.command == "findOne") {
+       findOne(header, content, extParams);
+       return;
+     }
+     if (header.command == "count") {
+       count(header, content, extParams);
+       return;
+     }
+     if (header.command == "find") {
+       find(header, content, extParams);
+       return;
+     }
+     if (header.command == "queryDb") {
+       queryDb(header,content);
+       return;
+     }
+     if (header.command == "dropDb") {
+       dropDb(header);
+       return;
+     }
+     if (header.command == "dropCollection") {
+       dropCollection(header);
+       return;
+     }
+     _log.shout('Unexpected message: $message');
+     sendResult(header,content);
+   } catch (e) {
+     _log.severe(e);
+   }
+ },
+   onDone: () {
+     closed = true;
+     socket.close();
+   },
+   onError: (error) {
+     _log.severe(error.toString());
+     socket.close();
+   }  
+ 
+);
+}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="authenticated">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a>         <strong>authenticated</strong> <a class="anchor-link"
+            href="#authenticated"
+            title="Permalink to ObjectoryClient.authenticated">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+bool authenticated = false
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="closed">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a>         <strong>closed</strong> <a class="anchor-link"
+            href="#closed"
+            title="Permalink to ObjectoryClient.closed">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+bool closed = false
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="db">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/Db.html">Db</a>         <strong>db</strong> <a class="anchor-link"
+            href="#db"
+            title="Permalink to ObjectoryClient.db">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Db db
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="oauthClientId">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>oauthClientId</strong> <a class="anchor-link"
+            href="#oauthClientId"
+            title="Permalink to ObjectoryClient.oauthClientId">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+String oauthClientId
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="socket">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_io/WebSocket.html" ref="external">WebSocket</a>         <strong>socket</strong> <a class="anchor-link"
+            href="#socket"
+            title="Permalink to ObjectoryClient.socket">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+WebSocket socket
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="token">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a>         <strong>token</strong> <a class="anchor-link"
+            href="#token"
+            title="Permalink to ObjectoryClient.token">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+int token
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="authenticate">
+<button class="show-code">Code</button>
+dynamic <strong>authenticate</strong>(<a href="../objectory_server_impl/RequestHeader.html">RequestHeader</a> header, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> selector) <a class="anchor-link" href="#authenticate"
+              title="Permalink to ObjectoryClient.authenticate">#</a></h4>
+<div class="doc">
+<pre class="source">
+authenticate(RequestHeader header, Map selector) {
+ String tokenData = selector['tokenData'];
+ Map token;
+ HttpClient client = new HttpClient();
+ client.getUrl(Uri.parse("https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=ya29.AHES6ZSUBWMUd2UfutTyvgqf5CXw3vVAc-sbzogKu-3iHw"))
+   .then((HttpClientRequest request) {
+     return request.close();
+   }).then((HttpClientResponse response) {
+       return response.transform(UTF8.decoder).toList();
+   }).then((data) {
+       client.close();
+       token = JSON.decode(data.join(''));
+       if (token['issued_to'] != oauthClientId) {
+         _log.shout('Invalid oauth token. Closing connection');
+         socket.close();
+       } else {
+         return db.collection(header.collection).findOne(where.eq('email',token['email']))
+         .then((responseData) {
+           if (responseData == null) {
+             _log.shout('Not found email ${token['email']} in collection ${header.collection}. Closing connection');
+             socket.close();                
+           } else {
+             authenticated = true;
+             sendResult(header, responseData);
+           }
+         });
+       }
+   }).catchError((_){
+     _log.shout('Authentification error. Closing connection');
+     socket.close();             
+   });
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="count">
+<button class="show-code">Code</button>
+dynamic <strong>count</strong>(<a href="../objectory_server_impl/RequestHeader.html">RequestHeader</a> header, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> selector, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> extParams) <a class="anchor-link" href="#count"
+              title="Permalink to ObjectoryClient.count">#</a></h4>
+<div class="doc">
+<pre class="source">
+count(RequestHeader header, Map selector , Map extParams) {
+ db.collection(header.collection).count(_selectorBuilder(selector,extParams)).
+ then((responseData) {
+   sendResult(header, responseData);
+ });
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="dropCollection">
+<button class="show-code">Code</button>
+dynamic <strong>dropCollection</strong>(<a href="../objectory_server_impl/RequestHeader.html">RequestHeader</a> header) <a class="anchor-link" href="#dropCollection"
+              title="Permalink to ObjectoryClient.dropCollection">#</a></h4>
+<div class="doc">
+<pre class="source">
+dropCollection(RequestHeader header) {
+ db.dropCollection(header.collection)
+ .then((responseData) {
+   sendResult(header,responseData);
+ });
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="dropDb">
+<button class="show-code">Code</button>
+dynamic <strong>dropDb</strong>(<a href="../objectory_server_impl/RequestHeader.html">RequestHeader</a> header) <a class="anchor-link" href="#dropDb"
+              title="Permalink to ObjectoryClient.dropDb">#</a></h4>
+<div class="doc">
+<pre class="source">
+dropDb(RequestHeader header) {
+ db.drop()
+ .then((responseData) {
+   sendResult(header,responseData);
+ });
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="find">
+<button class="show-code">Code</button>
+dynamic <strong>find</strong>(<a href="../objectory_server_impl/RequestHeader.html">RequestHeader</a> header, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> selector, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> extParams) <a class="anchor-link" href="#find"
+              title="Permalink to ObjectoryClient.find">#</a></h4>
+<div class="doc">
+<pre class="source">
+find(RequestHeader header, Map selector, Map extParams) {
+ _log.fine('find $header $selector $extParams');
+ db.collection(header.collection).find(_selectorBuilder(selector,extParams)).toList().
+ then((responseData) {
+   sendResult(header, responseData);
+ });
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="findOne">
+<button class="show-code">Code</button>
+dynamic <strong>findOne</strong>(<a href="../objectory_server_impl/RequestHeader.html">RequestHeader</a> header, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> selector, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> extParams) <a class="anchor-link" href="#findOne"
+              title="Permalink to ObjectoryClient.findOne">#</a></h4>
+<div class="doc">
+<pre class="source">
+findOne(RequestHeader header, Map selector , Map extParams) {
+ db.collection(header.collection).findOne(_selectorBuilder(selector,extParams)).
+ then((responseData) {
+   sendResult(header, responseData);
+ });
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="protocolError">
+<button class="show-code">Code</button>
+dynamic <strong>protocolError</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> errorMessage) <a class="anchor-link" href="#protocolError"
+              title="Permalink to ObjectoryClient.protocolError">#</a></h4>
+<div class="doc">
+<pre class="source">
+protocolError(String errorMessage) {
+ _log.shout('PROTOCOL ERROR: $errorMessage');
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="queryDb">
+<button class="show-code">Code</button>
+dynamic <strong>queryDb</strong>(<a href="../objectory_server_impl/RequestHeader.html">RequestHeader</a> header, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> query) <a class="anchor-link" href="#queryDb"
+              title="Permalink to ObjectoryClient.queryDb">#</a></h4>
+<div class="doc">
+<pre class="source">
+queryDb(RequestHeader header,Map query) {
+ db.executeDbCommand(DbCommand.createQueryDBCommand(db,query))
+ .then((responseData) {
+   sendResult(header,responseData);
+ });
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="remove">
+<button class="show-code">Code</button>
+dynamic <strong>remove</strong>(<a href="../objectory_server_impl/RequestHeader.html">RequestHeader</a> header, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> selector) <a class="anchor-link" href="#remove"
+              title="Permalink to ObjectoryClient.remove">#</a></h4>
+<div class="doc">
+<pre class="source">
+remove(RequestHeader header, Map selector) {
+ db.collection(header.collection).remove(selector)
+   .then((responseData) {
+     sendResult(header, responseData);
+ });
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="save">
+<button class="show-code">Code</button>
+dynamic <strong>save</strong>(<a href="../objectory_server_impl/RequestHeader.html">RequestHeader</a> header, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> mapToSave, [<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> idMap]) <a class="anchor-link" href="#save"
+              title="Permalink to ObjectoryClient.save">#</a></h4>
+<div class="doc">
+<pre class="source">
+save(RequestHeader header, Map mapToSave, [Map idMap]) {
+ if (header.command == 'insert') {
+   db.collection(header.collection).insert(mapToSave).then((responseData) {
+     sendResult(header, responseData);
+   });
+ }
+ else
+ {
+   ObjectId id = mapToSave['_id'];
+   if (id != null) {
+     db.collection(header.collection).update({'_id': id},mapToSave).then((responseData) {
+       sendResult(header, responseData);
+     });
+   }
+   else {
+     if (idMap != null) {
+       db.collection(header.collection).update(idMap,mapToSave).then((responseData) {
+         sendResult(header, responseData);
+       });
+     } else {
+       _log.shout('ERROR: Trying to update object without ObjectId set. $header, $mapToSave');
+       }  
+   }
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="sendMessage">
+<button class="show-code">Code</button>
+dynamic <strong>sendMessage</strong>(header, content) <a class="anchor-link" href="#sendMessage"
+              title="Permalink to ObjectoryClient.sendMessage">#</a></h4>
+<div class="doc">
+<pre class="source">
+sendMessage(header, content) {
+ socket.add(JSON.encode(new BSON().serialize({'header': header,'content': content}).byteList));
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="sendResult">
+<button class="show-code">Code</button>
+dynamic <strong>sendResult</strong>(<a href="../objectory_server_impl/RequestHeader.html">RequestHeader</a> header, content) <a class="anchor-link" href="#sendResult"
+              title="Permalink to ObjectoryClient.sendResult">#</a></h4>
+<div class="doc">
+<pre class="source">
+sendResult(RequestHeader header, content) {
+ if (closed) {
+   _log.warning('WARNING: trying send on closed connection. token:$token $header, $content');
+ } else {
+   _log.fine('token:$token sendResult($header, $content) ');
+   sendMessage(header.toMap(),content);      
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toString">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to ObjectoryClient.toString">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Returns a string representation of this object.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html" ref="external">Object</a> </div></div>
+<pre class="source">
+String toString() {
+ return "ObjectoryClient_${token}";
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

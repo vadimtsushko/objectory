@@ -1,0 +1,766 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>Parser class / args.src.parser Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="args.src.parser" data-type="Parser">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../args.src.parser.html">args.src.parser</a> &rsaquo; <a href="../args.src.parser/Parser.html">Parser</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>Parser</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<p>The actual parsing class. Unlike <a class="crossref" href="../args/ArgParser.html">ArgParser</a> which is really more an "arg
+grammar", this is the class that does the parsing and holds the mutable
+state required during a parse.</p>
+<pre class="source">
+class Parser {
+ /**
+  * If parser is parsing a command's options, this will be the name of the
+  * command. For top-level results, this returns `null`.
+  */
+ final String commandName;
+
+ /**
+  * The parser for the supercommand of this command parser, or `null` if this
+  * is the top-level parser.
+  */
+ final Parser parent;
+
+ /** If `true`, parsing will continue after a non-option argument. */
+ final bool allowTrailingOptions;
+
+ /** The grammar being parsed. */
+ final ArgParser grammar;
+
+ /** The arguments being parsed. */
+ final List&lt;String&gt; args;
+
+ /** The remaining non-option, non-command arguments. */
+ final rest = &lt;String&gt;[];
+
+ /** The accumulated parsed options. */
+ final Map&lt;String, dynamic&gt; results = &lt;String, dynamic&gt;{};
+
+ Parser(this.commandName, this.grammar, this.args, this.parent, rest,
+     {this.allowTrailingOptions: false}) {
+   if (rest != null) this.rest.addAll(rest);
+ }
+
+
+ /** The current argument being parsed. */
+ String get current =&gt; args[0];
+
+ /** Parses the arguments. This can only be called once. */
+ ArgResults parse() {
+   var commandResults = null;
+
+   // Initialize flags to their defaults.
+   grammar.options.forEach((name, option) {
+     if (option.allowMultiple) {
+       results[name] = [];
+     } else {
+       results[name] = option.defaultValue;
+     }
+   });
+
+   // Parse the args.
+   while (args.length &gt; 0) {
+     if (current == '--') {
+       // Reached the argument terminator, so stop here.
+       args.removeAt(0);
+       break;
+     }
+
+     // Try to parse the current argument as a command. This happens before
+     // options so that commands can have option-like names.
+     var command = grammar.commands[current];
+     if (command != null) {
+       validate(rest.isEmpty, 'Cannot specify arguments before a command.');
+       var commandName = args.removeAt(0);
+       var commandParser = new Parser(commandName, command, args, this, rest,
+           allowTrailingOptions: allowTrailingOptions);
+       commandResults = commandParser.parse();
+
+       // All remaining arguments were passed to command so clear them here.
+       rest.clear();
+       break;
+     }
+
+     // Try to parse the current argument as an option. Note that the order
+     // here matters.
+     if (parseSoloOption()) continue;
+     if (parseAbbreviation(this)) continue;
+     if (parseLongOption()) continue;
+
+     // This argument is neither option nor command, so stop parsing unless
+     // the [allowTrailingOptions] option is set.
+     if (!allowTrailingOptions) break;
+     rest.add(args.removeAt(0));
+   }
+
+   // Set unspecified multivalued arguments to their default value,
+   // if any, and invoke the callbacks.
+   grammar.options.forEach((name, option) {
+     if (option.allowMultiple &amp;&amp;
+         results[name].length == 0 &amp;&amp;
+         option.defaultValue != null) {
+       results[name].add(option.defaultValue);
+     }
+     if (option.callback != null) option.callback(results[name]);
+   });
+
+   // Add in the leftover arguments we didn't parse to the innermost command.
+   rest.addAll(args);
+   args.clear();
+   return new ArgResults(results, commandName, commandResults, rest);
+ }
+
+ /**
+  * Pulls the value for [option] from the second argument in [args]. Validates
+  * that there is a valid value there.
+  */
+ void readNextArgAsValue(Option option) {
+   // Take the option argument from the next command line arg.
+   validate(args.length &gt; 0,
+       'Missing argument for "${option.name}".');
+
+   // Make sure it isn't an option itself.
+   validate(!_ABBR_OPT.hasMatch(current) &amp;&amp; !_LONG_OPT.hasMatch(current),
+       'Missing argument for "${option.name}".');
+
+   setOption(results, option, current);
+   args.removeAt(0);
+ }
+
+ /**
+  * Tries to parse the current argument as a "solo" option, which is a single
+  * hyphen followed by a single letter. We treat this differently than
+  * collapsed abbreviations (like "-abc") to handle the possible value that
+  * may follow it.
+  */
+ bool parseSoloOption() {
+   var soloOpt = _SOLO_OPT.firstMatch(current);
+   if (soloOpt == null) return false;
+
+   var option = grammar.findByAbbreviation(soloOpt[1]);
+   if (option == null) {
+     // Walk up to the parent command if possible.
+     validate(parent != null,
+         'Could not find an option or flag "-${soloOpt[1]}".');
+     return parent.parseSoloOption();
+   }
+
+   args.removeAt(0);
+
+   if (option.isFlag) {
+     setOption(results, option, true);
+   } else {
+     readNextArgAsValue(option);
+   }
+
+   return true;
+ }
+
+ /**
+  * Tries to parse the current argument as a series of collapsed abbreviations
+  * (like "-abc") or a single abbreviation with the value directly attached
+  * to it (like "-mrelease").
+  */
+ bool parseAbbreviation(Parser innermostCommand) {
+   var abbrOpt = _ABBR_OPT.firstMatch(current);
+   if (abbrOpt == null) return false;
+
+   // If the first character is the abbreviation for a non-flag option, then
+   // the rest is the value.
+   var c = abbrOpt[1].substring(0, 1);
+   var first = grammar.findByAbbreviation(c);
+   if (first == null) {
+     // Walk up to the parent command if possible.
+     validate(parent != null,
+         'Could not find an option with short name "-$c".');
+     return parent.parseAbbreviation(innermostCommand);
+   } else if (!first.isFlag) {
+     // The first character is a non-flag option, so the rest must be the
+     // value.
+     var value = '${abbrOpt[1].substring(1)}${abbrOpt[2]}';
+     setOption(results, first, value);
+   } else {
+     // If we got some non-flag characters, then it must be a value, but
+     // if we got here, it's a flag, which is wrong.
+     validate(abbrOpt[2] == '',
+       'Option "-$c" is a flag and cannot handle value '
+       '"${abbrOpt[1].substring(1)}${abbrOpt[2]}".');
+
+     // Not an option, so all characters should be flags.
+     // We use "innermostCommand" here so that if a parent command parses the
+     // *first* letter, subcommands can still be found to parse the other
+     // letters.
+     for (var i = 0; i &lt; abbrOpt[1].length; i++) {
+       var c = abbrOpt[1].substring(i, i + 1);
+       innermostCommand.parseShortFlag(c);
+     }
+   }
+
+   args.removeAt(0);
+   return true;
+ }
+
+ void parseShortFlag(String c) {
+   var option = grammar.findByAbbreviation(c);
+   if (option == null) {
+     // Walk up to the parent command if possible.
+     validate(parent != null,
+         'Could not find an option with short name "-$c".');
+     parent.parseShortFlag(c);
+     return;
+   }
+
+   // In a list of short options, only the first can be a non-flag. If
+   // we get here we've checked that already.
+   validate(option.isFlag,
+       'Option "-$c" must be a flag to be in a collapsed "-".');
+
+   setOption(results, option, true);
+ }
+
+ /**
+  * Tries to parse the current argument as a long-form named option, which
+  * may include a value like "--mode=release" or "--mode release".
+  */
+ bool parseLongOption() {
+   var longOpt = _LONG_OPT.firstMatch(current);
+   if (longOpt == null) return false;
+
+   var name = longOpt[1];
+   var option = grammar.options[name];
+   if (option != null) {
+     args.removeAt(0);
+     if (option.isFlag) {
+       validate(longOpt[3] == null,
+           'Flag option "$name" should not be given a value.');
+
+       setOption(results, option, true);
+     } else if (longOpt[3] != null) {
+       // We have a value like --foo=bar.
+       setOption(results, option, longOpt[3]);
+     } else {
+       // Option like --foo, so look for the value as the next arg.
+       readNextArgAsValue(option);
+     }
+   } else if (name.startsWith('no-')) {
+     // See if it's a negated flag.
+     name = name.substring('no-'.length);
+     option = grammar.options[name];
+     if (option == null) {
+       // Walk up to the parent command if possible.
+       validate(parent != null, 'Could not find an option named "$name".');
+       return parent.parseLongOption();
+     }
+
+     args.removeAt(0);
+     validate(option.isFlag, 'Cannot negate non-flag option "$name".');
+     validate(option.negatable, 'Cannot negate option "$name".');
+
+     setOption(results, option, false);
+   } else {
+     // Walk up to the parent command if possible.
+     validate(parent != null, 'Could not find an option named "$name".');
+     return parent.parseLongOption();
+   }
+
+   return true;
+ }
+
+ /**
+  * Called during parsing to validate the arguments. Throws a
+  * [FormatException] if [condition] is `false`.
+  */
+ void validate(bool condition, String message) {
+   if (!condition) throw new FormatException(message);
+ }
+
+ /** Validates and stores [value] as the value for [option]. */
+ void setOption(Map results, Option option, value) {
+   // See if it's one of the allowed values.
+   if (option.allowed != null) {
+     validate(option.allowed.any((allow) =&gt; allow == value),
+         '"$value" is not an allowed value for option "${option.name}".');
+   }
+
+   if (option.allowMultiple) {
+     results[option.name].add(value);
+   } else {
+     results[option.name] = value;
+   }
+ }
+}
+</pre>
+</div>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="">
+<button class="show-code">Code</button>
+new <strong>Parser</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> commandName, <a href="../args/ArgParser.html">ArgParser</a> grammar, <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>&gt; args, <a href="../args.src.parser/Parser.html">Parser</a> parent, rest, {<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> allowTrailingOptions: false}) <a class="anchor-link" href="#"
+              title="Permalink to Parser.Parser">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Creates a new <a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instance.</p>
+<p><a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instances have no meaningful state, and are only useful
+through their identity. An <a class="crossref" href="http://api.dartlang.org/dart_core/Object.html">Object</a> instance is equal to itself
+only.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html" ref="external">Object</a> </div></div>
+<pre class="source">
+Parser(this.commandName, this.grammar, this.args, this.parent, rest,
+   {this.allowTrailingOptions: false}) {
+ if (rest != null) this.rest.addAll(rest);
+}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="allowTrailingOptions">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a>         <strong>allowTrailingOptions</strong> <a class="anchor-link"
+            href="#allowTrailingOptions"
+            title="Permalink to Parser.allowTrailingOptions">#</a>
+        </h4>
+        <div class="doc">
+<p>If <code>true</code>, parsing will continue after a non-option argument. </p>
+<pre class="source">
+final bool allowTrailingOptions
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="args">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>&gt;         <strong>args</strong> <a class="anchor-link"
+            href="#args"
+            title="Permalink to Parser.args">#</a>
+        </h4>
+        <div class="doc">
+<p>The arguments being parsed. </p>
+<pre class="source">
+final List&lt;String&gt; args
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="commandName">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>commandName</strong> <a class="anchor-link"
+            href="#commandName"
+            title="Permalink to Parser.commandName">#</a>
+        </h4>
+        <div class="doc">
+<p>If parser is parsing a command's options, this will be the name of the
+command. For top-level results, this returns <code>null</code>.</p>
+<pre class="source">
+final String commandName
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="current">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>current</strong> <a class="anchor-link"
+            href="#current"
+            title="Permalink to Parser.current">#</a>
+        </h4>
+        <div class="doc">
+<p>The current argument being parsed. </p>
+<pre class="source">
+String get current =&gt; args[0];
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="grammar">
+<button class="show-code">Code</button>
+final <a href="../args/ArgParser.html">ArgParser</a>         <strong>grammar</strong> <a class="anchor-link"
+            href="#grammar"
+            title="Permalink to Parser.grammar">#</a>
+        </h4>
+        <div class="doc">
+<p>The grammar being parsed. </p>
+<pre class="source">
+final ArgParser grammar
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="parent">
+<button class="show-code">Code</button>
+final <a href="../args.src.parser/Parser.html">Parser</a>         <strong>parent</strong> <a class="anchor-link"
+            href="#parent"
+            title="Permalink to Parser.parent">#</a>
+        </h4>
+        <div class="doc">
+<p>The parser for the supercommand of this command parser, or <code>null</code> if this
+is the top-level parser.</p>
+<pre class="source">
+final Parser parent
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="rest">
+<button class="show-code">Code</button>
+final         <strong>rest</strong> <a class="anchor-link"
+            href="#rest"
+            title="Permalink to Parser.rest">#</a>
+        </h4>
+        <div class="doc">
+<p>The remaining non-option, non-command arguments. </p>
+<pre class="source">
+final rest = &lt;String&gt;[]
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="results">
+<button class="show-code">Code</button>
+final <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>&lt;<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>, dynamic&gt;         <strong>results</strong> <a class="anchor-link"
+            href="#results"
+            title="Permalink to Parser.results">#</a>
+        </h4>
+        <div class="doc">
+<p>The accumulated parsed options. </p>
+<pre class="source">
+final Map&lt;String, dynamic&gt; results = &lt;String, dynamic&gt;{}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="parse">
+<button class="show-code">Code</button>
+<a href="../args/ArgResults.html">ArgResults</a> <strong>parse</strong>() <a class="anchor-link" href="#parse"
+              title="Permalink to Parser.parse">#</a></h4>
+<div class="doc">
+<p>Parses the arguments. This can only be called once. </p>
+<pre class="source">
+ArgResults parse() {
+ var commandResults = null;
+
+ // Initialize flags to their defaults.
+ grammar.options.forEach((name, option) {
+   if (option.allowMultiple) {
+     results[name] = [];
+   } else {
+     results[name] = option.defaultValue;
+   }
+ });
+
+ // Parse the args.
+ while (args.length &gt; 0) {
+   if (current == '--') {
+     // Reached the argument terminator, so stop here.
+     args.removeAt(0);
+     break;
+   }
+
+   // Try to parse the current argument as a command. This happens before
+   // options so that commands can have option-like names.
+   var command = grammar.commands[current];
+   if (command != null) {
+     validate(rest.isEmpty, 'Cannot specify arguments before a command.');
+     var commandName = args.removeAt(0);
+     var commandParser = new Parser(commandName, command, args, this, rest,
+         allowTrailingOptions: allowTrailingOptions);
+     commandResults = commandParser.parse();
+
+     // All remaining arguments were passed to command so clear them here.
+     rest.clear();
+     break;
+   }
+
+   // Try to parse the current argument as an option. Note that the order
+   // here matters.
+   if (parseSoloOption()) continue;
+   if (parseAbbreviation(this)) continue;
+   if (parseLongOption()) continue;
+
+   // This argument is neither option nor command, so stop parsing unless
+   // the [allowTrailingOptions] option is set.
+   if (!allowTrailingOptions) break;
+   rest.add(args.removeAt(0));
+ }
+
+ // Set unspecified multivalued arguments to their default value,
+ // if any, and invoke the callbacks.
+ grammar.options.forEach((name, option) {
+   if (option.allowMultiple &amp;&amp;
+       results[name].length == 0 &amp;&amp;
+       option.defaultValue != null) {
+     results[name].add(option.defaultValue);
+   }
+   if (option.callback != null) option.callback(results[name]);
+ });
+
+ // Add in the leftover arguments we didn't parse to the innermost command.
+ rest.addAll(args);
+ args.clear();
+ return new ArgResults(results, commandName, commandResults, rest);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="parseAbbreviation">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>parseAbbreviation</strong>(<a href="../args.src.parser/Parser.html">Parser</a> innermostCommand) <a class="anchor-link" href="#parseAbbreviation"
+              title="Permalink to Parser.parseAbbreviation">#</a></h4>
+<div class="doc">
+<p>Tries to parse the current argument as a series of collapsed abbreviations
+(like "-abc") or a single abbreviation with the value directly attached
+to it (like "-mrelease").</p>
+<pre class="source">
+bool parseAbbreviation(Parser innermostCommand) {
+ var abbrOpt = _ABBR_OPT.firstMatch(current);
+ if (abbrOpt == null) return false;
+
+ // If the first character is the abbreviation for a non-flag option, then
+ // the rest is the value.
+ var c = abbrOpt[1].substring(0, 1);
+ var first = grammar.findByAbbreviation(c);
+ if (first == null) {
+   // Walk up to the parent command if possible.
+   validate(parent != null,
+       'Could not find an option with short name "-$c".');
+   return parent.parseAbbreviation(innermostCommand);
+ } else if (!first.isFlag) {
+   // The first character is a non-flag option, so the rest must be the
+   // value.
+   var value = '${abbrOpt[1].substring(1)}${abbrOpt[2]}';
+   setOption(results, first, value);
+ } else {
+   // If we got some non-flag characters, then it must be a value, but
+   // if we got here, it's a flag, which is wrong.
+   validate(abbrOpt[2] == '',
+     'Option "-$c" is a flag and cannot handle value '
+     '"${abbrOpt[1].substring(1)}${abbrOpt[2]}".');
+
+   // Not an option, so all characters should be flags.
+   // We use "innermostCommand" here so that if a parent command parses the
+   // *first* letter, subcommands can still be found to parse the other
+   // letters.
+   for (var i = 0; i &lt; abbrOpt[1].length; i++) {
+     var c = abbrOpt[1].substring(i, i + 1);
+     innermostCommand.parseShortFlag(c);
+   }
+ }
+
+ args.removeAt(0);
+ return true;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="parseLongOption">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>parseLongOption</strong>() <a class="anchor-link" href="#parseLongOption"
+              title="Permalink to Parser.parseLongOption">#</a></h4>
+<div class="doc">
+<p>Tries to parse the current argument as a long-form named option, which
+may include a value like "--mode=release" or "--mode release".</p>
+<pre class="source">
+bool parseLongOption() {
+ var longOpt = _LONG_OPT.firstMatch(current);
+ if (longOpt == null) return false;
+
+ var name = longOpt[1];
+ var option = grammar.options[name];
+ if (option != null) {
+   args.removeAt(0);
+   if (option.isFlag) {
+     validate(longOpt[3] == null,
+         'Flag option "$name" should not be given a value.');
+
+     setOption(results, option, true);
+   } else if (longOpt[3] != null) {
+     // We have a value like --foo=bar.
+     setOption(results, option, longOpt[3]);
+   } else {
+     // Option like --foo, so look for the value as the next arg.
+     readNextArgAsValue(option);
+   }
+ } else if (name.startsWith('no-')) {
+   // See if it's a negated flag.
+   name = name.substring('no-'.length);
+   option = grammar.options[name];
+   if (option == null) {
+     // Walk up to the parent command if possible.
+     validate(parent != null, 'Could not find an option named "$name".');
+     return parent.parseLongOption();
+   }
+
+   args.removeAt(0);
+   validate(option.isFlag, 'Cannot negate non-flag option "$name".');
+   validate(option.negatable, 'Cannot negate option "$name".');
+
+   setOption(results, option, false);
+ } else {
+   // Walk up to the parent command if possible.
+   validate(parent != null, 'Could not find an option named "$name".');
+   return parent.parseLongOption();
+ }
+
+ return true;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="parseShortFlag">
+<button class="show-code">Code</button>
+void <strong>parseShortFlag</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> c) <a class="anchor-link" href="#parseShortFlag"
+              title="Permalink to Parser.parseShortFlag">#</a></h4>
+<div class="doc">
+<pre class="source">
+void parseShortFlag(String c) {
+ var option = grammar.findByAbbreviation(c);
+ if (option == null) {
+   // Walk up to the parent command if possible.
+   validate(parent != null,
+       'Could not find an option with short name "-$c".');
+   parent.parseShortFlag(c);
+   return;
+ }
+
+ // In a list of short options, only the first can be a non-flag. If
+ // we get here we've checked that already.
+ validate(option.isFlag,
+     'Option "-$c" must be a flag to be in a collapsed "-".');
+
+ setOption(results, option, true);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="parseSoloOption">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> <strong>parseSoloOption</strong>() <a class="anchor-link" href="#parseSoloOption"
+              title="Permalink to Parser.parseSoloOption">#</a></h4>
+<div class="doc">
+<p>Tries to parse the current argument as a "solo" option, which is a single
+hyphen followed by a single letter. We treat this differently than
+collapsed abbreviations (like "-abc") to handle the possible value that
+may follow it.</p>
+<pre class="source">
+bool parseSoloOption() {
+ var soloOpt = _SOLO_OPT.firstMatch(current);
+ if (soloOpt == null) return false;
+
+ var option = grammar.findByAbbreviation(soloOpt[1]);
+ if (option == null) {
+   // Walk up to the parent command if possible.
+   validate(parent != null,
+       'Could not find an option or flag "-${soloOpt[1]}".');
+   return parent.parseSoloOption();
+ }
+
+ args.removeAt(0);
+
+ if (option.isFlag) {
+   setOption(results, option, true);
+ } else {
+   readNextArgAsValue(option);
+ }
+
+ return true;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="readNextArgAsValue">
+<button class="show-code">Code</button>
+void <strong>readNextArgAsValue</strong>(<a href="../options/Option.html">Option</a> option) <a class="anchor-link" href="#readNextArgAsValue"
+              title="Permalink to Parser.readNextArgAsValue">#</a></h4>
+<div class="doc">
+<p>Pulls the value for 
+<span class="param">option</span> from the second argument in <a class="crossref" href="../args.src.parser/Parser.html#args">args</a>. Validates
+that there is a valid value there.</p>
+<pre class="source">
+void readNextArgAsValue(Option option) {
+ // Take the option argument from the next command line arg.
+ validate(args.length &gt; 0,
+     'Missing argument for "${option.name}".');
+
+ // Make sure it isn't an option itself.
+ validate(!_ABBR_OPT.hasMatch(current) &amp;&amp; !_LONG_OPT.hasMatch(current),
+     'Missing argument for "${option.name}".');
+
+ setOption(results, option, current);
+ args.removeAt(0);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="setOption">
+<button class="show-code">Code</button>
+void <strong>setOption</strong>(<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> results, <a href="../options/Option.html">Option</a> option, value) <a class="anchor-link" href="#setOption"
+              title="Permalink to Parser.setOption">#</a></h4>
+<div class="doc">
+<p>Validates and stores 
+<span class="param">value</span> as the value for 
+<span class="param">option</span>. </p>
+<pre class="source">
+void setOption(Map results, Option option, value) {
+ // See if it's one of the allowed values.
+ if (option.allowed != null) {
+   validate(option.allowed.any((allow) =&gt; allow == value),
+       '"$value" is not an allowed value for option "${option.name}".');
+ }
+
+ if (option.allowMultiple) {
+   results[option.name].add(value);
+ } else {
+   results[option.name] = value;
+ }
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="validate">
+<button class="show-code">Code</button>
+void <strong>validate</strong>(<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> condition, <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> message) <a class="anchor-link" href="#validate"
+              title="Permalink to Parser.validate">#</a></h4>
+<div class="doc">
+<p>Called during parsing to validate the arguments. Throws a
+<a class="crossref" href="http://api.dartlang.org/dart_core/FormatException.html">FormatException</a> if 
+<span class="param">condition</span> is <code>false</code>.</p>
+<pre class="source">
+void validate(bool condition, String message) {
+ if (!condition) throw new FormatException(message);
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

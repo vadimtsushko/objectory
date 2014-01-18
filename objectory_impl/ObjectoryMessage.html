@@ -1,0 +1,114 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>ObjectoryMessage class / objectory_impl Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="objectory_impl" data-type="ObjectoryMessage">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../objectory_impl.html">objectory_impl</a> &rsaquo; <a href="../objectory_impl/ObjectoryMessage.html">ObjectoryMessage</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>ObjectoryMessage</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class ObjectoryMessage {
+ Map command;
+ var content;
+ ObjectoryMessage.fromMessage(Map jdata){
+   command = jdata['header'];
+   content = jdata['content'];
+ }
+ toString() =&gt; 'ObjectoryMessage(command: $command, content: $content)';
+}
+</pre>
+</div>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="fromMessage">
+<button class="show-code">Code</button>
+new <strong>ObjectoryMessage.fromMessage</strong>(<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> jdata) <a class="anchor-link" href="#fromMessage"
+              title="Permalink to ObjectoryMessage.ObjectoryMessage.fromMessage">#</a></h4>
+<div class="doc">
+<pre class="source">
+ObjectoryMessage.fromMessage(Map jdata){
+ command = jdata['header'];
+ content = jdata['content'];
+}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="command">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>         <strong>command</strong> <a class="anchor-link"
+            href="#command"
+            title="Permalink to ObjectoryMessage.command">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+Map command
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="content">
+<button class="show-code">Code</button>
+var         <strong>content</strong> <a class="anchor-link"
+            href="#content"
+            title="Permalink to ObjectoryMessage.content">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+var content
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="toString">
+<button class="show-code">Code</button>
+dynamic <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to ObjectoryMessage.toString">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Returns a string representation of this object.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html" ref="external">Object</a> </div></div>
+<pre class="source">
+toString() =&gt; 'ObjectoryMessage(command: $command, content: $content)';
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

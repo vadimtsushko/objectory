@@ -1,0 +1,698 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>Db class / mongo_dart Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="../styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="../favicon.ico">
+        
+        </head>
+        <body data-library="mongo_dart" data-type="Db">
+        <div class="page">
+        <div class="header">
+          <a href="../index.html"><div class="logo"></div></a>
+          <a href="../index.html">Dart Documentation</a>
+         &rsaquo; <a href="../mongo_dart.html">mongo_dart</a> &rsaquo; <a href="../mongo_dart/Db.html">Db</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+        <h2><strong>Db</strong>
+          class
+        </h2>
+        
+<button id="show-inherited" class="show-inherited">Hide inherited</button>
+<div class="doc">
+<pre class="source">
+class Db{
+ final _log = new Logger('Db');
+ String databaseName;
+ String _debugInfo;
+ ServerConfig serverConfig;
+ _Connection connection;
+ WriteConcern _writeConcern;
+ _validateDatabaseName(String dbName) {
+   if(dbName.length == 0) throw new MongoDartError('database name cannot be the empty string');
+   var invalidChars = [" ", ".", "\$", "/", "\\"];
+   for(var i = 0; i &lt; invalidChars.length; i++) {
+     if(dbName.indexOf(invalidChars[i]) != -1) throw new Exception("database names cannot contain the character '${invalidChars[i]}'");
+   }
+ }
+ String toString() =&gt; 'Db($databaseName,$_debugInfo)';
+ 
+/**
+* Db constructor expects [valid mongodb URI] (http://www.mongodb.org/display/DOCS/Connections).
+* For example next code points to local mongodb server on default mongodb port, database *testdb*
+*     var db = new Db('mongodb://127.0.0.1/testdb');
+* And that code direct to MongoLab server on 37637 port, database *testdb*, username *dart*, password *test*
+*     var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
+*/
+ Db(String uriString, [this._debugInfo]){
+   var uri = Uri.parse(uriString);
+   if (uri.scheme != 'mongodb') {
+     throw new MongoDartError('Invalid scheme in uri: $uriString ${uri.scheme}');
+   }
+   serverConfig = new ServerConfig();
+   serverConfig.host = uri.host;
+   serverConfig.port = uri.port;
+   if (serverConfig.port == null || serverConfig.port == 0){
+     serverConfig.port = 27017;
+   }
+   if (uri.userInfo != '') {
+     var userInfo = uri.userInfo.split(':');
+     if (userInfo.length != 2) {
+       throw new MongoDartError('Неверный формат поля userInfo: $uri.userInfo');
+     }
+     serverConfig.userName = userInfo[0];
+     serverConfig.password = userInfo[1];
+   }
+   if (uri.path != '') {
+     databaseName = uri.path.replaceAll('/','');
+   }
+   connection = new _Connection(serverConfig);
+ }
+ DbCollection collection(String collectionName){
+     return new DbCollection(this,collectionName);
+ }
+ Future queryMessage(MongoMessage queryMessage){
+   return connection.query(queryMessage);
+ }
+ executeMessage(MongoMessage message, WriteConcern writeConcern){
+   if (writeConcern == null) {
+     writeConcern = _writeConcern;
+   }
+   connection.execute(message,writeConcern == WriteConcern.ERRORS_IGNORED);
+ }
+ Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
+   
+   _writeConcern = writeConcern;
+   if (connection.connected){
+     connection.close();
+     connection = new _Connection(serverConfig);
+   }
+   
+   return connection.connect().then((v) {
+     if (serverConfig.userName == null) {
+       _log.fine('$this connected');
+       return v;
+     }
+     else {
+       return authenticate(serverConfig.userName,serverConfig.password).then((v) {
+         _log.fine('$this connected');
+         return v;
+       });
+     }
+   });    
+ }
+ Future executeDbCommand(MongoMessage message){
+     Completer&lt;Map&gt; result = new Completer();
+     connection.query(message).then((replyMessage){
+       String errMsg;
+       if (replyMessage.documents.length == 0) {
+         errMsg = "Error executing Db command, Document length 0 $replyMessage";
+         print("Error: $errMsg");
+         var m = new Map();
+         m["errmsg"]=errMsg;
+         result.completeError(m);
+       } else  if (replyMessage.documents[0]['ok'] == 1.0 &amp;&amp; replyMessage.documents[0]['err'] == null){
+         result.complete(replyMessage.documents[0]);
+       } else {
+         result.completeError(replyMessage.documents[0]);
+       }
+     });
+   return result.future;
+ }
+ Future dropCollection(String collectionName){
+   Completer completer = new Completer();
+   collectionsInfoCursor(collectionName).toList().then((v){
+     if (v.length == 1){
+       executeDbCommand(DbCommand.createDropCollectionCommand(this,collectionName))
+         .then((res)=&gt;completer.complete(res));
+       } else{
+         completer.complete(true);
+       }
+   });
+   return completer.future;
+ }
+/**
+*   Drop current database
+*/
+ Future drop(){
+   return executeDbCommand(DbCommand.createDropDatabaseCommand(this));
+ }
+
+ Future removeFromCollection(String collectionName, [Map selector = const {}, WriteConcern writeConcern]){
+   executeMessage(new MongoRemoveMessage("$databaseName.$collectionName", selector),writeConcern);
+   return _getAcknowledgement(writeConcern: writeConcern); 
+ }
+
+ Future&lt;Map&gt; getLastError({bool j: false, int w: 0}){
+   return executeDbCommand(DbCommand.createGetLastErrorCommand(this, j: j, w: w));
+ }
+ Future&lt;Map&gt; getNonce(){
+   return executeDbCommand(DbCommand.createGetNonceCommand(this));
+ }
+
+ Future&lt;Map&gt; wait(){
+   return getLastError();
+ }
+ void close(){
+   _log.fine('$this closed');
+   connection.close();
+ }
+
+ Cursor collectionsInfoCursor([String collectionName]) {
+   Map selector = {};
+   // If we are limiting the access to a specific collection name
+   if(collectionName != null){
+     selector["name"] = "${this.databaseName}.$collectionName";
+   }
+   // Return Cursor
+     return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
+ }
+
+ Future&lt;bool&gt; authenticate(String userName, String password){
+   return getNonce().then((msg) {
+     var nonce = msg["nonce"];
+     var command = DbCommand.createAuthenticationCommand(this,userName,password,nonce);
+     serverConfig.password = '***********';
+     return executeDbCommand(command);
+   }).then( (res) =&gt; res["ok"]==1 );
+ }
+ Future&lt;List&gt; indexInformation([String collectionName]) {
+   var selector = {};
+   if (collectionName != null) {
+     selector['ns'] = '$databaseName.$collectionName';
+   }
+   return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toList();
+ }
+ String _createIndexName(Map keys) {
+   var name = '';
+   keys.forEach((key,value) {
+     name = '${name}_${key}_$value';
+   });
+   return name;
+ }
+ Future createIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
+   var selector = {};
+   selector['ns'] = '$databaseName.$collectionName';
+   keys = _setKeys(key, keys);
+   selector['key'] = keys;
+   for (final order in keys.values) {
+     if (order != 1 &amp;&amp; order != -1) {
+       throw new ArgumentError('Keys may contain only 1 or -1');
+     }
+   }
+   if (unique == true) {
+     selector['unique'] = true;
+   } else {
+     selector['unique'] = false;
+   }
+   if (sparse == true) {
+     selector['sparse'] = true;
+   }
+   if (background == true) {
+     selector['background'] = true;
+   }
+   if (dropDups == true) {
+     selector['dropDups'] = true;
+   }
+   if (name ==  null) {
+     name = _createIndexName(keys);
+   }
+   selector['name'] = name;
+   MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);
+   executeMessage(insertMessage, _writeConcern);
+   return getLastError();
+ }
+
+ Map _setKeys(String key, Map keys) {
+   if (key != null &amp;&amp; keys != null) {
+     throw new ArgumentError('Only one parameter must be set: key or keys');
+   }
+   if (key != null) {
+     keys = new Map();
+     keys['$key'] = 1;
+   }
+   if (keys == null) {
+     throw new ArgumentError('key or keys parameter must be set');
+   }
+   return keys;
+ }
+ Future ensureIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
+   keys = _setKeys(key, keys);
+   var completer = new Completer();
+   indexInformation(collectionName).then((indexInfos) {
+     if (name == null) {
+       name = _createIndexName(keys);
+     }
+     if (indexInfos.any((info) =&gt; info['name'] == name)) {
+       completer.complete({'ok': 1.0, 'result': 'index preexists'});
+     } else {
+       createIndex(collectionName,keys: keys, unique: unique, sparse: sparse, background: background, dropDups: dropDups, name: name)
+         .then((res)=&gt;completer.complete(res));
+     }
+   });
+   return completer.future;
+ }
+ 
+ Future _getAcknowledgement({WriteConcern writeConcern}) {
+   if (writeConcern == null) {
+     writeConcern = _writeConcern;
+   }
+   if (writeConcern == WriteConcern.ERRORS_IGNORED) {
+     return new Future.value({'ok': 1.0});            
+   }
+   else
+   {
+     return getLastError(j: writeConcern == WriteConcern.JOURNALED, w: min(1, writeConcern.value));
+   }   
+ }
+}
+</pre>
+</div>
+<div>
+<h3>Constructors</h3>
+<div class="method"><h4 id="">
+<button class="show-code">Code</button>
+new <strong>Db</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> uriString, [<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> _debugInfo]) <a class="anchor-link" href="#"
+              title="Permalink to Db.Db">#</a></h4>
+<div class="doc">
+<p>Db constructor expects <a href="http://www.mongodb.org/display/DOCS/Connections">valid mongodb URI</a>.
+For example next code points to local mongodb server on default mongodb port, database <em>testdb</em></p>
+<pre><code>var db = new Db('mongodb://127.0.0.1/testdb');
+</code></pre>
+<p>And that code direct to MongoLab server on 37637 port, database <em>testdb</em>, username <em>dart</em>, password <em>test</em></p>
+<pre><code>var db = new Db('mongodb://dart:test@ds037637-a.mongolab.com:37637/objectory_blog');
+</code></pre>
+<pre class="source">
+Db(String uriString, [this._debugInfo]){
+ var uri = Uri.parse(uriString);
+ if (uri.scheme != 'mongodb') {
+   throw new MongoDartError('Invalid scheme in uri: $uriString ${uri.scheme}');
+ }
+ serverConfig = new ServerConfig();
+ serverConfig.host = uri.host;
+ serverConfig.port = uri.port;
+ if (serverConfig.port == null || serverConfig.port == 0){
+   serverConfig.port = 27017;
+ }
+ if (uri.userInfo != '') {
+   var userInfo = uri.userInfo.split(':');
+   if (userInfo.length != 2) {
+     throw new MongoDartError('Неверный формат поля userInfo: $uri.userInfo');
+   }
+   serverConfig.userName = userInfo[0];
+   serverConfig.password = userInfo[1];
+ }
+ if (uri.path != '') {
+   databaseName = uri.path.replaceAll('/','');
+ }
+ connection = new _Connection(serverConfig);
+}
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Properties</h3>
+<div class="field"><h4 id="connection">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/_Connection.html">_Connection</a>         <strong>connection</strong> <a class="anchor-link"
+            href="#connection"
+            title="Permalink to Db.connection">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+_Connection connection
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="databaseName">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a>         <strong>databaseName</strong> <a class="anchor-link"
+            href="#databaseName"
+            title="Permalink to Db.databaseName">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+String databaseName
+</pre>
+</div>
+</div>
+<div class="field"><h4 id="serverConfig">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/ServerConfig.html">ServerConfig</a>         <strong>serverConfig</strong> <a class="anchor-link"
+            href="#serverConfig"
+            title="Permalink to Db.serverConfig">#</a>
+        </h4>
+        <div class="doc">
+<pre class="source">
+ServerConfig serverConfig
+</pre>
+</div>
+</div>
+</div>
+<div>
+<h3>Methods</h3>
+<div class="method"><h4 id="authenticate">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a>&gt; <strong>authenticate</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> userName, <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> password) <a class="anchor-link" href="#authenticate"
+              title="Permalink to Db.authenticate">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;bool&gt; authenticate(String userName, String password){
+ return getNonce().then((msg) {
+   var nonce = msg["nonce"];
+   var command = DbCommand.createAuthenticationCommand(this,userName,password,nonce);
+   serverConfig.password = '***********';
+   return executeDbCommand(command);
+ }).then( (res) =&gt; res["ok"]==1 );
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="close">
+<button class="show-code">Code</button>
+void <strong>close</strong>() <a class="anchor-link" href="#close"
+              title="Permalink to Db.close">#</a></h4>
+<div class="doc">
+<pre class="source">
+void close(){
+ _log.fine('$this closed');
+ connection.close();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="collection">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/DbCollection.html">DbCollection</a> <strong>collection</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> collectionName) <a class="anchor-link" href="#collection"
+              title="Permalink to Db.collection">#</a></h4>
+<div class="doc">
+<pre class="source">
+DbCollection collection(String collectionName){
+   return new DbCollection(this,collectionName);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="collectionsInfoCursor">
+<button class="show-code">Code</button>
+<a href="../mongo_dart/Cursor.html">Cursor</a> <strong>collectionsInfoCursor</strong>([<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> collectionName]) <a class="anchor-link" href="#collectionsInfoCursor"
+              title="Permalink to Db.collectionsInfoCursor">#</a></h4>
+<div class="doc">
+<pre class="source">
+Cursor collectionsInfoCursor([String collectionName]) {
+ Map selector = {};
+ // If we are limiting the access to a specific collection name
+ if(collectionName != null){
+   selector["name"] = "${this.databaseName}.$collectionName";
+ }
+ // Return Cursor
+   return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_NAMESPACE_COLLECTION), selector);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="createIndex">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>createIndex</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> collectionName, {<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> key, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> keys, <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> unique, <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> sparse, <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> background, <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> dropDups, <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> name}) <a class="anchor-link" href="#createIndex"
+              title="Permalink to Db.createIndex">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future createIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
+ var selector = {};
+ selector['ns'] = '$databaseName.$collectionName';
+ keys = _setKeys(key, keys);
+ selector['key'] = keys;
+ for (final order in keys.values) {
+   if (order != 1 &amp;&amp; order != -1) {
+     throw new ArgumentError('Keys may contain only 1 or -1');
+   }
+ }
+ if (unique == true) {
+   selector['unique'] = true;
+ } else {
+   selector['unique'] = false;
+ }
+ if (sparse == true) {
+   selector['sparse'] = true;
+ }
+ if (background == true) {
+   selector['background'] = true;
+ }
+ if (dropDups == true) {
+   selector['dropDups'] = true;
+ }
+ if (name ==  null) {
+   name = _createIndexName(keys);
+ }
+ selector['name'] = name;
+ MongoInsertMessage insertMessage = new MongoInsertMessage('$databaseName.${DbCommand.SYSTEM_INDEX_COLLECTION}',[selector]);
+ executeMessage(insertMessage, _writeConcern);
+ return getLastError();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="drop">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>drop</strong>() <a class="anchor-link" href="#drop"
+              title="Permalink to Db.drop">#</a></h4>
+<div class="doc">
+<p>  Drop current database</p>
+<pre class="source">
+Future drop(){
+ return executeDbCommand(DbCommand.createDropDatabaseCommand(this));
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="dropCollection">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>dropCollection</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> collectionName) <a class="anchor-link" href="#dropCollection"
+              title="Permalink to Db.dropCollection">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future dropCollection(String collectionName){
+ Completer completer = new Completer();
+ collectionsInfoCursor(collectionName).toList().then((v){
+   if (v.length == 1){
+     executeDbCommand(DbCommand.createDropCollectionCommand(this,collectionName))
+       .then((res)=&gt;completer.complete(res));
+     } else{
+       completer.complete(true);
+     }
+ });
+ return completer.future;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="ensureIndex">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>ensureIndex</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> collectionName, {<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> key, <a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> keys, <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> unique, <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> sparse, <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> background, <a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> dropDups, <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> name}) <a class="anchor-link" href="#ensureIndex"
+              title="Permalink to Db.ensureIndex">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future ensureIndex(String collectionName, {String key, Map keys, bool unique, bool sparse, bool background, bool dropDups, String name}) {
+ keys = _setKeys(key, keys);
+ var completer = new Completer();
+ indexInformation(collectionName).then((indexInfos) {
+   if (name == null) {
+     name = _createIndexName(keys);
+   }
+   if (indexInfos.any((info) =&gt; info['name'] == name)) {
+     completer.complete({'ok': 1.0, 'result': 'index preexists'});
+   } else {
+     createIndex(collectionName,keys: keys, unique: unique, sparse: sparse, background: background, dropDups: dropDups, name: name)
+       .then((res)=&gt;completer.complete(res));
+   }
+ });
+ return completer.future;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="executeDbCommand">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>executeDbCommand</strong>(<a href="../mongo_dart/MongoMessage.html">MongoMessage</a> message) <a class="anchor-link" href="#executeDbCommand"
+              title="Permalink to Db.executeDbCommand">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future executeDbCommand(MongoMessage message){
+   Completer&lt;Map&gt; result = new Completer();
+   connection.query(message).then((replyMessage){
+     String errMsg;
+     if (replyMessage.documents.length == 0) {
+       errMsg = "Error executing Db command, Document length 0 $replyMessage";
+       print("Error: $errMsg");
+       var m = new Map();
+       m["errmsg"]=errMsg;
+       result.completeError(m);
+     } else  if (replyMessage.documents[0]['ok'] == 1.0 &amp;&amp; replyMessage.documents[0]['err'] == null){
+       result.complete(replyMessage.documents[0]);
+     } else {
+       result.completeError(replyMessage.documents[0]);
+     }
+   });
+ return result.future;
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="executeMessage">
+<button class="show-code">Code</button>
+dynamic <strong>executeMessage</strong>(<a href="../mongo_dart/MongoMessage.html">MongoMessage</a> message, <a href="../mongo_dart/WriteConcern.html">WriteConcern</a> writeConcern) <a class="anchor-link" href="#executeMessage"
+              title="Permalink to Db.executeMessage">#</a></h4>
+<div class="doc">
+<pre class="source">
+executeMessage(MongoMessage message, WriteConcern writeConcern){
+ if (writeConcern == null) {
+   writeConcern = _writeConcern;
+ }
+ connection.execute(message,writeConcern == WriteConcern.ERRORS_IGNORED);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="getLastError">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>&gt; <strong>getLastError</strong>({<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> j: false, <a href="http://api.dartlang.org/dart_core/int.html" ref="external">int</a> w: 0}) <a class="anchor-link" href="#getLastError"
+              title="Permalink to Db.getLastError">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;Map&gt; getLastError({bool j: false, int w: 0}){
+ return executeDbCommand(DbCommand.createGetLastErrorCommand(this, j: j, w: w));
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="getNonce">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>&gt; <strong>getNonce</strong>() <a class="anchor-link" href="#getNonce"
+              title="Permalink to Db.getNonce">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;Map&gt; getNonce(){
+ return executeDbCommand(DbCommand.createGetNonceCommand(this));
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="indexInformation">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/List.html" ref="external">List</a>&gt; <strong>indexInformation</strong>([<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> collectionName]) <a class="anchor-link" href="#indexInformation"
+              title="Permalink to Db.indexInformation">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;List&gt; indexInformation([String collectionName]) {
+ var selector = {};
+ if (collectionName != null) {
+   selector['ns'] = '$databaseName.$collectionName';
+ }
+ return new Cursor(this, new DbCollection(this, DbCommand.SYSTEM_INDEX_COLLECTION), selector).toList();
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="open">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>open</strong>({<a href="../mongo_dart/WriteConcern.html">WriteConcern</a> writeConcern: WriteConcern.ACKNOWLEDGED}) <a class="anchor-link" href="#open"
+              title="Permalink to Db.open">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future open({WriteConcern writeConcern: WriteConcern.ACKNOWLEDGED}){
+ 
+ _writeConcern = writeConcern;
+ if (connection.connected){
+   connection.close();
+   connection = new _Connection(serverConfig);
+ }
+ 
+ return connection.connect().then((v) {
+   if (serverConfig.userName == null) {
+     _log.fine('$this connected');
+     return v;
+   }
+   else {
+     return authenticate(serverConfig.userName,serverConfig.password).then((v) {
+       _log.fine('$this connected');
+       return v;
+     });
+   }
+ });    
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="queryMessage">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>queryMessage</strong>(<a href="../mongo_dart/MongoMessage.html">MongoMessage</a> queryMessage) <a class="anchor-link" href="#queryMessage"
+              title="Permalink to Db.queryMessage">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future queryMessage(MongoMessage queryMessage){
+ return connection.query(queryMessage);
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="removeFromCollection">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a> <strong>removeFromCollection</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> collectionName, [<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a> selector = const{}, <a href="../mongo_dart/WriteConcern.html">WriteConcern</a> writeConcern]) <a class="anchor-link" href="#removeFromCollection"
+              title="Permalink to Db.removeFromCollection">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future removeFromCollection(String collectionName, [Map selector = const {}, WriteConcern writeConcern]){
+ executeMessage(new MongoRemoveMessage("$databaseName.$collectionName", selector),writeConcern);
+ return _getAcknowledgement(writeConcern: writeConcern); 
+}
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="toString">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> <strong>toString</strong>() <a class="anchor-link" href="#toString"
+              title="Permalink to Db.toString">#</a></h4>
+<div class="doc">
+<div class="inherited">
+<p>Returns a string representation of this object.</p>
+<div class="docs-inherited-from">docs inherited from <a href="http://api.dartlang.org/dart_core/Object.html" ref="external">Object</a> </div></div>
+<pre class="source">
+String toString() =&gt; 'Db($databaseName,$_debugInfo)';
+</pre>
+</div>
+</div>
+<div class="method"><h4 id="wait">
+<button class="show-code">Code</button>
+<a href="http://api.dartlang.org/dart_async/Future.html" ref="external">Future</a>&lt;<a href="http://api.dartlang.org/dart_core/Map.html" ref="external">Map</a>&gt; <strong>wait</strong>() <a class="anchor-link" href="#wait"
+              title="Permalink to Db.wait">#</a></h4>
+<div class="doc">
+<pre class="source">
+Future&lt;Map&gt; wait(){
+ return getLastError();
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        <script async src="../client-live-nav.js"></script>
+        </body></html>
+        

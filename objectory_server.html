@@ -1,0 +1,66 @@
+        <!DOCTYPE html>
+        <html>
+        <head>
+                <meta charset="utf-8">
+        <title>objectory_server Library / Dart Documentation</title>
+        <link rel="stylesheet" type="text/css"
+            href="styles.css">
+        <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href="favicon.ico">
+        
+        </head>
+        <body data-library="objectory_server">
+        <div class="page">
+        <div class="header">
+          <a href="index.html"><div class="logo"></div></a>
+          <a href="index.html">Dart Documentation</a>
+         &rsaquo; <a href="objectory_server.html">objectory_server</a>        <div id="search-box">
+          <input type="search" name="q" id="q" autocomplete="off"
+              class="search-input" placeholder="Search API">
+        </div>
+        
+      </div>
+      <div class="drop-down" id="drop-down"></div>
+      
+        <div class="nav">
+        
+</div>
+<div class="content">
+<h2><strong>objectory_server</strong> library</h2>
+<div>
+<h3>Functions</h3>
+<div class="method"><h4 id="main">
+<button class="show-code">Code</button>
+void <strong>main</strong>(args) <a class="anchor-link" href="#main"
+              title="Permalink to main">#</a></h4>
+<div class="doc">
+<pre class="source">
+void main(args) {
+ var parser = new ArgParser();
+ parser.addOption('uri', abbr: 'u', defaultsTo: 'mongodb://127.0.0.1/objectory_server_test', help: "Uri for MongoDb database to connect");
+ parser.addOption('port', abbr: 'p', defaultsTo: '8080', help: "Port for objectory_server");
+ parser.addOption('ip', abbr: 'i', defaultsTo: '127.0.0.1', help: "Ip for objectory_server");
+ parser.addFlag('verbose', abbr: 'v', defaultsTo: false, negatable: false);
+ parser.addFlag('help',abbr: 'h', negatable: false);
+ parser.addFlag('oauth', abbr: 'a', help: 'OAuth Client ID for web applications');
+ var argMap = parser.parse(args);
+ if (argMap["help"] == true) {
+   print(parser.getUsage());
+   return;
+ }
+ var server = new ObjectoryServerImpl(argMap['ip'],int.parse(argMap['port']),argMap['uri'],argMap['verbose']);
+ //server.oauthClientId = argMap['oauth'];
+}
+</pre>
+</div>
+</div>
+</div>
+        </div>
+        <div class="clear"></div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        <script async src="client-live-nav.js"></script>
+        </body></html>
+        
