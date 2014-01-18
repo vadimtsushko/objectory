@@ -94,7 +94,7 @@ class ObjectoryQueryBuilder extends SelectorBuilder{
 </div>
 <h3>Extends</h3>
 <p>
-<span class="type-box"><span class="icon-class"></span><a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a></span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>ObjectoryQueryBuilder</strong></span></p>
+<span class="type-box"><span class="icon-class"></span>SelectorBuilder</span>&nbsp;&gt;&nbsp;<span class="type-box"><span class="icon-class"></span><strong>ObjectoryQueryBuilder</strong></span></p>
 <div>
 <h3>Properties</h3>
 <div class="field"><h4 id="extParamsMap">
@@ -115,7 +115,7 @@ Map get extParamsMap =&gt; {'skip': paramSkip, 'limit': paramLimit, 'fetchLinksM
             href="#map"
             title="Permalink to ObjectoryQueryBuilder.map">#</a>
         </h4>
-        <div class="inherited-from">inherited from <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> </div><div class="doc">
+        <div class="inherited-from">inherited from SelectorBuilder </div><div class="doc">
 <pre class="source">
 Map map = {}
 </pre>
@@ -139,7 +139,7 @@ bool paramFetchLinks = false
             href="#paramFields"
             title="Permalink to ObjectoryQueryBuilder.paramFields">#</a>
         </h4>
-        <div class="inherited-from">inherited from <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> </div><div class="doc">
+        <div class="inherited-from">inherited from SelectorBuilder </div><div class="doc">
 <pre class="source">
 Map paramFields
 </pre>
@@ -151,7 +151,7 @@ Map paramFields
             href="#paramLimit"
             title="Permalink to ObjectoryQueryBuilder.paramLimit">#</a>
         </h4>
-        <div class="inherited-from">inherited from <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> </div><div class="doc">
+        <div class="inherited-from">inherited from SelectorBuilder </div><div class="doc">
 <pre class="source">
 int paramLimit = 0
 </pre>
@@ -163,7 +163,7 @@ int paramLimit = 0
             href="#paramSkip"
             title="Permalink to ObjectoryQueryBuilder.paramSkip">#</a>
         </h4>
-        <div class="inherited-from">inherited from <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> </div><div class="doc">
+        <div class="inherited-from">inherited from SelectorBuilder </div><div class="doc">
 <pre class="source">
 int paramSkip = 0
 </pre>
@@ -190,7 +190,7 @@ ObjectoryQueryBuilder all(String fieldName, List values) =&gt; super.all(fieldNa
 <div class="inherited">
 <p>Combine current expression with expression in parameter. 
 <a href="http://docs.mongodb.org/manual/reference/operator/and/#op._S_and">See MongoDB doc</a>
-<a class="crossref" href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> provides implicit <code>and</code> operator for chained queries so these two expression will produce
+<code>SelectorBuilder</code> provides implicit <code>and</code> operator for chained queries so these two expression will produce
 identical MongoDB queries</p>
 <pre><code>where.eq('price', 1.99).lt('qty', 20).eq('sale', true);
 where.eq('price', 1.99).and(where.lt('qty',20)).and(where.eq('sale', true))
@@ -198,7 +198,7 @@ where.eq('price', 1.99).and(where.lt('qty',20)).and(where.eq('sale', true))
 <p>Both these queries would produce json map:</p>
 <pre><code>{'\$query': {'\$and': [{'price':1.99},{'qty': {'\$lt': 20 }}, {'sale': true }]}}
 </code></pre>
-<div class="docs-inherited-from">docs inherited from <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> </div></div>
+<div class="docs-inherited-from">docs inherited from SelectorBuilder </div></div>
 <pre class="source">
 ObjectoryQueryBuilder and(ObjectoryQueryBuilder other) =&gt; super.and(other);
 </pre>
@@ -305,7 +305,7 @@ ObjectoryQueryBuilder fields(List&lt;String&gt; fields) =&gt; throw new Exceptio
 <button class="show-code">Code</button>
 <a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> <strong>getQueryString</strong>() <a class="anchor-link" href="#getQueryString"
               title="Permalink to ObjectoryQueryBuilder.getQueryString">#</a></h4>
-<div class="inherited-from">inherited from <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> </div><div class="doc">
+<div class="inherited-from">inherited from SelectorBuilder </div><div class="doc">
 <pre class="source">
 String getQueryString(){
  var result = JSON.encode(map);
@@ -327,9 +327,9 @@ ObjectoryQueryBuilder gt(String fieldName,value)=&gt;super.gt(fieldName, value);
 </div>
 <div class="method inherited"><h4 id="gte">
 <button class="show-code">Code</button>
-<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>gte</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> fieldName, value) <a class="anchor-link" href="#gte"
+SelectorBuilder <strong>gte</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> fieldName, value) <a class="anchor-link" href="#gte"
               title="Permalink to ObjectoryQueryBuilder.gte">#</a></h4>
-<div class="inherited-from">inherited from <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> </div><div class="doc">
+<div class="inherited-from">inherited from SelectorBuilder </div><div class="doc">
 <pre class="source">
 SelectorBuilder gte(String fieldName,value){
  _addExpression(fieldName,{"\$gte":value});
@@ -340,9 +340,9 @@ SelectorBuilder gte(String fieldName,value){
 </div>
 <div class="method inherited"><h4 id="hint">
 <button class="show-code">Code</button>
-<a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> <strong>hint</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> fieldName, {<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> descending: false}) <a class="anchor-link" href="#hint"
+SelectorBuilder <strong>hint</strong>(<a href="http://api.dartlang.org/dart_core/String.html" ref="external">String</a> fieldName, {<a href="http://api.dartlang.org/dart_core/bool.html" ref="external">bool</a> descending: false}) <a class="anchor-link" href="#hint"
               title="Permalink to ObjectoryQueryBuilder.hint">#</a></h4>
-<div class="inherited-from">inherited from <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> </div><div class="doc">
+<div class="inherited-from">inherited from SelectorBuilder </div><div class="doc">
 <pre class="source">
 SelectorBuilder hint(String fieldName, {bool descending: false}){
  _query;
@@ -507,7 +507,7 @@ For example
 MongoDB json query from this expression would be</p>
 <pre><code> {'\$query': {'\$and': [{'price':1.99}, {'\$or': [{'qty': {'\$lt': 20 }}, {'sale': true }]}]}}
 </code></pre>
-<div class="docs-inherited-from">docs inherited from <a href="../mongo_dart/SelectorBuilder.html">SelectorBuilder</a> </div></div>
+<div class="docs-inherited-from">docs inherited from SelectorBuilder </div></div>
 <pre class="source">
 ObjectoryQueryBuilder or(ObjectoryQueryBuilder other) =&gt; super.or(other);
 </pre>

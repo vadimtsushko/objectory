@@ -130,7 +130,7 @@ class Objectory{
  Future dropCollections() { throw new Exception('Must be implemented'); }
 
  Future open() { throw new Exception('Must be implemented'); }
- ObjectoryCollection constructCollection(){ throw new Exception('Must be implemented'); }
+ ObjectoryCollection constructCollection() =&gt; new ObjectoryCollection();
  ObjectoryCollection _createObjectoryCollection(Type classType, String collectionName){
    return constructCollection()
      ..classType = classType
@@ -363,7 +363,7 @@ completeFindOne(Map map,Completer completer,ObjectoryQueryBuilder selector,Type 
               title="Permalink to Objectory.constructCollection">#</a></h4>
 <div class="doc">
 <pre class="source">
-ObjectoryCollection constructCollection(){ throw new Exception('Must be implemented'); }
+ObjectoryCollection constructCollection() =&gt; new ObjectoryCollection();
 </pre>
 </div>
 </div>
