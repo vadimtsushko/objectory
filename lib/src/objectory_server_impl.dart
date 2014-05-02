@@ -2,7 +2,6 @@ library objectory_server_impl;
 import 'dart:io';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:logging/logging.dart';
-import 'dart:async';
 import 'dart:convert';
 
 final Logger _log = new Logger('Objectory server');
@@ -251,14 +250,14 @@ class ObjectoryServerImpl {
     db = new Db(mongoUri);
     db.open().then((_) {
       HttpServer.bind(hostName, port).then((server) {
+        print('Objectory server started. Listening on http://$hostName:$port');
         server.transform(new WebSocketTransformer()).listen((WebSocket webSocket) {
           _token+=1;
           var c = new ObjectoryClient(_token, webSocket, db);
           _log.fine('adding connection token = ${_token}');
-       }, onError: (e) => _log.severe(e.toString()));
+
+        }, onError: (e) => _log.severe(e.toString()));
       }).catchError((e) => _log.severe(e.toString()));
     });
-    print('Listening on http://$hostName:$port');
-    print('MongoDB connection: ${db.serverConfig.host}:${db.serverConfig.port}');         
   }
 }

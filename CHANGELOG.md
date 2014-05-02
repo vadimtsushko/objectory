@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.3.16
+
+- bugfix in ObjectoryServerImpl. Addressed [issue 64](https://github.com/vadimtsushko/objectory/issues/64)
+
 ###0.3.15
 
 - `get` method added to objectory collection
