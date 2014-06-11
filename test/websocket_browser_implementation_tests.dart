@@ -6,7 +6,7 @@ import 'package:unittest/unittest.dart';
 import 'package:unittest/html_enhanced_config.dart';
 import 'implementation_test_lib.dart';
 
-const DefaultUri = '127.0.0.1:8080';
+const DefaultUri = '127.0.0.1:8181';
 
 main() {
   useHtmlEnhancedConfiguration();

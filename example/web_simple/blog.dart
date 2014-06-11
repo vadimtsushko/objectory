@@ -2,7 +2,7 @@ library blog_example;
 import 'package:objectory/objectory_browser.dart';
 import '../domain_model/domain_model.dart';
 import 'dart:html' as html;
-const DefaultUri = '127.0.0.1:8080';
+const DefaultUri = '127.0.0.1:8181';
 main(){
   objectory = new ObjectoryWebsocketBrowserImpl(DefaultUri,registerClasses,true);
   var authors = new Map<String,Author>();

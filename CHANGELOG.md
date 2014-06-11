@@ -1,5 +1,13 @@
 #Recent change notes
 
+###0.3.19
+
+- BugFix in ObjectoryServerImpl, objectory server port changed in samples and tests to avoid conflict with pub serve
+
+###0.3.18
+
+- Update core dependencies to 0.10.0 and up
+
 ###0.3.16
 
 - bugfix in ObjectoryServerImpl. Addressed [issue 64](https://github.com/vadimtsushko/objectory/issues/64)

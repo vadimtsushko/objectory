@@ -16,7 +16,7 @@ class ObjectoryCollectionDirectConnectionImpl extends ObjectoryCollection{
     var result = objectory.createTypedList(classType);
     objectoryImpl.db.collection(collectionName)
       .find(selector)
-      .each((map){
+      .forEach((map){
         PersistentObject obj = objectory.map2Object(classType,map);
         result.add(obj);
       }).then((_) {

@@ -202,7 +202,7 @@ class ObjectoryClient {
     });
   }
   queryDb(RequestHeader header,Map query) {
-    db.executeDbCommand(DbCommand.createQueryDBCommand(db,query))
+    db.executeDbCommand(DbCommand.createQueryDbCommand(db,query))
     .then((responseData) {
       sendResult(header,responseData);
     });
