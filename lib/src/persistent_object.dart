@@ -4,37 +4,30 @@ import 'package:bson/bson.dart';
 import 'objectory_base.dart';
 import 'dart:async';
 import 'dart:collection';
+import 'package:quiver/core.dart';
 part 'persistent_list.dart';
 
+
 class BasePersistentObject {
-  final Map _map = objectory.dataMapDecorator(new LinkedHashMap());
+  Map _map = objectory.dataMapDecorator(new LinkedHashMap()); 
+
+  Set<String> _dirtyFields = new Set<String>();
+  Map<String,dynamic> _compoundProperties = new Map<String,dynamic>();
+  bool saveOnUpdate = false;
   Map get map => _map;
   set map(Map newValue) {
-    _setMap(newValue);
+    if (newValue != null) {
+      _map = newValue;
+    }      
   }
-  Set<String> _dirtyFields;
-  Map<String,dynamic> _compoundProperties;
-  bool saveOnUpdate = false;
   BasePersistentObject() {
-    _setMap(map);
-  }
-  void _setMap(Map newValue) {
-    if (newValue == null || newValue.isEmpty) {
-      _initMap();
-    } else {
-      _map.clear();
-      newValue.forEach((k, v) => _map[k] = v);
-    }
-    _compoundProperties = new Map<String,dynamic>();
-    init();
-    _dirtyFields = new Set<String>();
   }
   Set<String> get dirtyFields => _dirtyFields;
   EmbeddedPersistentObject getEmbeddedObject(Type classType, String property) {
     EmbeddedPersistentObject result = _compoundProperties[property];
     if (result == null) {
       result = objectory.newInstance(classType);
-      result._setMap(map[property]);
+      result.map = map[property];
       map[property] = result.map;
       result._parent = this;
       result._pathToMe = property;
@@ -149,6 +142,28 @@ class PersistentObject extends BasePersistentObject{
   ObjectId get id => map['_id'];
   DbRef get dbRef => new DbRef(this.collectionName,this.id);
   set id (ObjectId value) => map['_id'] = value;
+  PersistentObject():super() {
+    _setMap(map);
+  }
+
+  set map(Map newValue) {
+    _setMap(newValue);
+  }
+  void _setMap(Map newValue) {
+    if (newValue == null || newValue.isEmpty) {
+      _initMap();
+    } else {
+      _map.clear();
+      newValue.forEach((k, v) => _map[k] = v);
+    }
+    _compoundProperties = new Map<String,dynamic>();
+    init();
+    _dirtyFields = new Set<String>();
+  }
+
+  
+  
+  
   void _initMap() {
     map["_id"] = null;
     super._initMap();
@@ -206,4 +221,9 @@ class EmbeddedPersistentObject extends BasePersistentObject{
   save() {
     throw new Exception('Must not be invoked');
   }
+  
+  bool operator ==(o) => o is EmbeddedPersistentObject && o._parent == _parent && o._pathToMe == _pathToMe && o.map == map;
+  int get hashCode => hash3(_parent, _pathToMe, map);
+  
+  
 }

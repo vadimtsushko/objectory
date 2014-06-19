@@ -31,7 +31,6 @@ class Customer extends PersistentObject {
   String get name => getProperty('name');
   set name(String value) => setProperty('name',value);
 
-//  List<Address> get addresses => new PersistentList<Address>(this,'Address','addresses');
   List<Address> get addresses => getPersistentList(Address,'addresses');
 }
 

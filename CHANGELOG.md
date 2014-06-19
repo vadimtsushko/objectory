@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.3.20
+
+- Fix for [issue 65](https://github.com/vadimtsushko/objectory/issues/65). Added test testPersistentListWithEmbeddedObjects
+
 ###0.3.19
 
 - BugFix in ObjectoryServerImpl, objectory server port changed in samples and tests to avoid conflict with pub serve

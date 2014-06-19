@@ -35,6 +35,29 @@ testSetDirty(){
   expect(customer.dirtyFields.contains('addresses'),isTrue);
 }
 
+testPersistentListWithEmbeddedObjects(){
+  var author = new Author();
+  author.name = "Vadim";
+  author.address.cityName = 'Tyumen';
+  expect(author.address.hashCode == author.address.hashCode, isTrue, reason: 'Access to Embedded persistent object\'s hashCode should return same int');
+  expect(author.address == author.address, isTrue, reason: 'Access to Embedded persistent object should return same object');  
+  var customer = new Customer();
+  customer.name = 'Freddy';
+  var address = new Address();
+  address.cityName = 'Tyumen';
+  customer.addresses.add(address);
+  expect(customer.addresses[0].cityName,'Tyumen');  
+  expect(customer.addresses[0].cityName,customer.addresses[0].cityName);
+  expect(customer.addresses[0].map,customer.addresses[0].map);
+  expect(customer.addresses[0].map,customer.map['addresses'][0]);
+  customer.addresses[0].cityName = 'Kaluga';
+  expect(customer.addresses[0].cityName,'Kaluga');
+  expect(customer.addresses.internalList==customer.map['addresses'],isTrue, reason: 'Internal list of persistent list should be same as list in parent map');
+  expect(customer.addresses[0] == customer.addresses[0], isTrue, reason: 'Access to persistent list by same index should return same object');
+}
+
+
+
 testCompoundObject(){
   var person = new Person();
   person.address.cityName = 'Tyumen';
@@ -153,6 +176,7 @@ main(){
   group("PersistenObjectTests", ()  {
     test("testAuthorCreation",testAuthorCreation);
     test("testSetDirty",testSetDirty);
+    test("testPersistentListWithEmbeddedObjects",testPersistentListWithEmbeddedObjects);
     test("testCompoundObject",testCompoundObject);
     test("testFailOnAbsentProperty",testFailOnAbsentProperty);
     test("testFailOnSettingUnsavedLinkObject",testFailOnSettingUnsavedLinkObject);

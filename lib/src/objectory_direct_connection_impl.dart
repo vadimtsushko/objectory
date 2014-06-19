@@ -75,6 +75,7 @@ class ObjectoryDirectConnectionImpl extends Objectory{
 
   void close(){
     db.close();
+    db = null;
   }
   Future dropCollections() {
     return Future.wait(getCollections().map(
