@@ -98,7 +98,7 @@ Future testMatch(){
     person.firstName = 'Nickolay';
     return person.save();
   }).then((_) {  
-    return objectory[Person].find(where.match('firstName','^niCk.*y\$', caseInsensitive: true));
+    return objectory[Person].find(where.match($Person.firstName,'^niCk.*y\$', caseInsensitive: true));
   }).then((coll){
       expect(coll.length,1);
       Person personFromMongo = coll[0];
@@ -288,7 +288,7 @@ Future testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   Author author;
   return objectory.initDomainModel().then((_) {
     _setupArticle(objectory);
-    return objectory[Article].find(where.sortBy('title'));
+    return objectory[Article].find(where.sortBy($Article.title));
   }).then((articles) {
     Article artcl = articles[0];
     expect(artcl.comments[0] is EmbeddedPersistentObject, isTrue);
@@ -344,7 +344,7 @@ Future testCount(){
 Future testFindWithFetchLinksMode() {
   return objectory.initDomainModel().then((_) {
     _setupArticle(objectory);
-    return objectory[Article].find(where.sortBy('title').fetchLinks());
+    return objectory[Article].find(where.sortBy($Article.title).fetchLinks());
   }).then((artciles) {
     Article artcl = artciles[0];
     expect(artcl.comments[0].user.name,'Joe Great');
@@ -357,7 +357,7 @@ Future testFindWithFetchLinksMode() {
 Future testFindOneWithFetchLinksMode() {
   return objectory.initDomainModel().then((_) {
     _setupArticle(objectory);
-    return objectory[Article].findOne(where.sortBy('title').fetchLinks());
+    return objectory[Article].findOne(where.sortBy($Article.title).fetchLinks());
   }).then((Article artcl) {
     expect(artcl.comments[0].user.name,'Joe Great');
     expect(artcl.comments[1].user.name,'Lisa Fine');
@@ -384,12 +384,12 @@ Future testCollectionGet() {
     person.lastName = 'initial setup';
     return person.save();
   }).then((_) {
-    return objectory[Person].findOne(where.eq('firstName','111'));
+    return objectory[Person].findOne(where.eq($Person.firstName,'111'));
   }).then((Person person) {
     expect(person, isNotNull);
     expect(person.lastName, 'initial setup');
     person.lastName = 'unsaved changes';
-    return objectory[Person].findOne(where.eq('firstName','111'));
+    return objectory[Person].findOne(where.eq($Person.firstName,'111'));
   }).then((Person person) {
     expect(person.lastName, 'initial setup',reason: 'Find operations should get objects from Db');
     person.lastName = 'unsaved changes';

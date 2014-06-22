@@ -37,8 +37,8 @@ class ObjectoryQueryBuilder extends SelectorBuilder{
   ObjectoryQueryBuilder showDiskLoc() => super.showDiskLoc();
   ObjectoryQueryBuilder returnKey() => super.returnKey();
   ObjectoryQueryBuilder jsQuery(String javaScriptCode) => super.jsQuery(javaScriptCode);
-  ObjectoryQueryBuilder fields(List<String> fields) => throw new Exception('Not impemented in Objectory');
-  ObjectoryQueryBuilder excludeFields(List<String> fields) =>  throw new Exception('Not impemented in Objectory');
+  ObjectoryQueryBuilder fields(List<String> fields) => throw new UnsupportedError('Not impemented in Objectory');
+  ObjectoryQueryBuilder excludeFields(List<String> fields) =>  throw new UnsupportedError('Not impemented in Objectory');
   ObjectoryQueryBuilder limit(int limit) => super.limit(limit);
   ObjectoryQueryBuilder skip(int skip) => super.skip(skip);
   ObjectoryQueryBuilder raw(Map rawSelector) => super.raw(rawSelector);

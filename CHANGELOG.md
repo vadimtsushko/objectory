@@ -1,5 +1,11 @@
 #Recent change notes
 
+###0.3.21
+
+- Domain model autogeneration from simple proto-model (models are backward compatible)
+- Autogeneration of helper schema classes, for safe fields choosing for `find` and `findOne` queries
+- Examples and test adopted for new features
+
 ###0.3.20
 
 - Fix for [issue 65](https://github.com/vadimtsushko/objectory/issues/65). Added test testPersistentListWithEmbeddedObjects
