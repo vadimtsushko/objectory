@@ -2,11 +2,13 @@
 part of domain_model;
 
 class $Article {
-  static  final String title = 'title';
-  static  final String body = 'body';
-  static  final String author = 'author';
-  static  final String comments = 'comments';
+  static String get title => 'title';
+  static String get body => 'body';
+  static String get author => 'author';
+  static String get comments => 'comments';
+  static final List<String> allFields = [title, body, author, comments];
 }
+
 class Article extends PersistentObject {
   String get title => getProperty('title');
   set title (String value) => setProperty('title',value);
@@ -18,10 +20,14 @@ class Article extends PersistentObject {
 }
 
 class $Address {
-   final String cityName = 'cityName';
-   final String zipCode = 'zipCode';
-   final String streetName = 'streetName';
+  String _pathToMe;
+  $Address(this._pathToMe);
+  String get cityName => _pathToMe + '.cityName';
+  String get zipCode => _pathToMe + '.zipCode';
+  String get streetName => _pathToMe + '.streetName';
+  List<String> get allFields => [cityName, zipCode, streetName];
 }
+
 class Address extends EmbeddedPersistentObject {
   String get cityName => getProperty('cityName');
   set cityName (String value) => setProperty('cityName',value);
@@ -32,10 +38,12 @@ class Address extends EmbeddedPersistentObject {
 }
 
 class $User {
-  static  final String name = 'name';
-  static  final String email = 'email';
-  static  final String login = 'login';
+  static String get name => 'name';
+  static String get email => 'email';
+  static String get login => 'login';
+  static final List<String> allFields = [name, email, login];
 }
+
 class User extends PersistentObject {
   String get name => getProperty('name');
   set name (String value) => setProperty('name',value);
@@ -46,10 +54,14 @@ class User extends PersistentObject {
 }
 
 class $Comment {
-   final String user = 'user';
-   final String body = 'body';
-   final String date = 'date';
+  String _pathToMe;
+  $Comment(this._pathToMe);
+  String get user => _pathToMe + '.user';
+  String get body => _pathToMe + '.body';
+  String get date => _pathToMe + '.date';
+  List<String> get allFields => [user, body, date];
 }
+
 class Comment extends EmbeddedPersistentObject {
   User get user => getLinkedObject('user');
   set user (User value) => setLinkedObject('user',value);
@@ -60,9 +72,11 @@ class Comment extends EmbeddedPersistentObject {
 }
 
 class $Customer {
-  static  final String name = 'name';
-  static  final String addresses = 'addresses';
+  static String get name => 'name';
+  static String get addresses => 'addresses';
+  static final List<String> allFields = [name, addresses];
 }
+
 class Customer extends PersistentObject {
   String get name => getProperty('name');
   set name (String value) => setProperty('name',value);
@@ -70,13 +84,15 @@ class Customer extends PersistentObject {
 }
 
 class $Person {
-  static  final String firstName = 'firstName';
-  static  final String lastName = 'lastName';
-  static  final $Address address = new $Address();
-  static  final String father = 'father';
-  static  final String mother = 'mother';
-  static  final String children = 'children';
+  static String get firstName => 'firstName';
+  static String get lastName => 'lastName';
+  static final $Address address = new $Address('address');
+  static String get father => 'father';
+  static String get mother => 'mother';
+  static String get children => 'children';
+  static final List<String> allFields = [firstName, lastName, father, mother, children]..addAll([address].expand((e)=>e.allFields));
 }
+
 class Person extends PersistentObject {
   String get firstName => getProperty('firstName');
   set firstName (String value) => setProperty('firstName',value);
@@ -91,11 +107,13 @@ class Person extends PersistentObject {
 }
 
 class $Author {
-  static  final String name = 'name';
-  static  final String email = 'email';
-  static  final String age = 'age';
-  static  final $Address address = new $Address();
+  static String get name => 'name';
+  static String get email => 'email';
+  static String get age => 'age';
+  static final $Address address = new $Address('address');
+  static final List<String> allFields = [name, email, age]..addAll([address].expand((e)=>e.allFields));
 }
+
 class AuthorBase extends PersistentObject {
   String get name => getProperty('name');
   set name (String value) => setProperty('name',value);

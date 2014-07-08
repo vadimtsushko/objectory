@@ -166,6 +166,12 @@ Future testCompoundObject(){
     expect(savedPerson.firstName,'Fred');
     expect(savedPerson.address.streetName,'Elm');
     expect(savedPerson.address.cityName,'Moscow');
+    return objectory[Person].findOne(where.eq($Person.address.cityName, 'Moscow'));
+  }).then((Person savedPerson){
+    expect(savedPerson,isNotNull);
+    expect(savedPerson.firstName,'Fred');
+    expect(savedPerson.address.streetName,'Elm');
+    expect(savedPerson.address.cityName,'Moscow');
     objectory.close();
   });
 }

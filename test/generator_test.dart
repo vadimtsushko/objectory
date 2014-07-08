@@ -8,12 +8,20 @@ class Foo {
 @embedded
 class FooEmbedded {
   String bar;
-  int baz;
+  String bar1;
+  BazEmbedded baz1;
+  BazEmbedded baz2;
 }
 class BarWithEmbeddedAndLinkedObjects {
   FooEmbedded fooEmbedded;
   Foo fooLinked;
 }
+@embedded
+class BazEmbedded {
+   String deepXyz;
+   String deepZyx;
+}
+
 class Xyz {
   List<Foo> foos;
 }
@@ -21,6 +29,8 @@ class Xyz {
 class TestClass {
   String foo;
 }
+
+
 
 main() {
   ModelGenerator generator;
@@ -57,11 +67,11 @@ main() {
       var cls = generator.classGenerators.first;
       expect(cls.type,FooEmbedded);
       expect(cls.isEmbedded,isTrue);      
-      expect(cls.properties.length,2);
+      expect(cls.properties.length,4);
       expect(cls.properties.first.name,'bar');
       expect(cls.properties.first.type,String);
-      expect(cls.properties.last.name,'baz');
-      expect(cls.properties.last.type,int);
+      expect(cls.properties.last.name,'baz2');
+      expect(cls.properties.last.type,BazEmbedded);
     });  
     test('Persistent List',() {
       generator.processClass(Xyz);
@@ -93,13 +103,23 @@ class Foo extends PersistentObject {
     });  
     test('Embedded',() {
       generator.processClass(FooEmbedded);
+      generator.processClass(BazEmbedded);      
       generator.generateOutput(header: false, schemaClasses: false,register: false);
       var res = '''
 class FooEmbedded extends EmbeddedPersistentObject {
   String get bar => getProperty('bar');
   set bar (String value) => setProperty('bar',value);
-  int get baz => getProperty('baz');
-  set baz (int value) => setProperty('baz',value);
+  String get bar1 => getProperty('bar1');
+  set bar1 (String value) => setProperty('bar1',value);
+  BazEmbedded get baz1 => getEmbeddedObject(BazEmbedded,'baz1');
+  BazEmbedded get baz2 => getEmbeddedObject(BazEmbedded,'baz2');
+}
+
+class BazEmbedded extends EmbeddedPersistentObject {
+  String get deepXyz => getProperty('deepXyz');
+  set deepXyz (String value) => setProperty('deepXyz',value);
+  String get deepZyx => getProperty('deepZyx');
+  set deepZyx (String value) => setProperty('deepZyx',value);
 }
 
 ''';
@@ -110,6 +130,7 @@ class FooEmbedded extends EmbeddedPersistentObject {
       generator.processClass(Foo);
       generator.processClass(FooEmbedded);
       generator.processClass(BarWithEmbeddedAndLinkedObjects);
+      generator.processClass(BazEmbedded);
       generator.generateOutput(header: false, schemaClasses: false,register: false);
       var res = '''
 class Foo extends PersistentObject {
@@ -122,8 +143,10 @@ class Foo extends PersistentObject {
 class FooEmbedded extends EmbeddedPersistentObject {
   String get bar => getProperty('bar');
   set bar (String value) => setProperty('bar',value);
-  int get baz => getProperty('baz');
-  set baz (int value) => setProperty('baz',value);
+  String get bar1 => getProperty('bar1');
+  set bar1 (String value) => setProperty('bar1',value);
+  BazEmbedded get baz1 => getEmbeddedObject(BazEmbedded,'baz1');
+  BazEmbedded get baz2 => getEmbeddedObject(BazEmbedded,'baz2');
 }
 
 class BarWithEmbeddedAndLinkedObjects extends PersistentObject {
@@ -132,8 +155,14 @@ class BarWithEmbeddedAndLinkedObjects extends PersistentObject {
   set fooLinked (Foo value) => setLinkedObject('fooLinked',value);
 }
 
+class BazEmbedded extends EmbeddedPersistentObject {
+  String get deepXyz => getProperty('deepXyz');
+  set deepXyz (String value) => setProperty('deepXyz',value);
+  String get deepZyx => getProperty('deepZyx');
+  set deepZyx (String value) => setProperty('deepZyx',value);
+}
+
 ''';
-//      print(generator.output);
       expect(generator.output.toString(),res);
     });  
     test('With persistent list',() {
@@ -145,10 +174,83 @@ class Xyz extends PersistentObject {
 }
 
 ''';
-//      print(generator.output.toString());
       expect(generator.output.toString(),res);
     });  
 
   });
 
+  test('Schema generation. Simplest',() {
+    generator.processClass(Foo);
+    generator.generateOutput(header: false, persistentClasses: false,register: false);
+    var res = '''
+class \$Foo {
+  static String get bar => 'bar';
+  static String get baz => 'baz';
+  static final List<String> allFields = [bar, baz];
+}
+
+''';
+    expect(generator.output.toString(),res);
+  });  
+
+  test('Schema generation. Embedded object',() {
+    generator.processClass(BazEmbedded);
+    generator.generateOutput(header: false, persistentClasses: false,register: false);
+    var res = '''
+class \$BazEmbedded {
+  String _pathToMe;
+  \$BazEmbedded(this._pathToMe);
+  String get deepXyz => _pathToMe + '.deepXyz';
+  String get deepZyx => _pathToMe + '.deepZyx';
+  List<String> get allFields => [deepXyz, deepZyx];
+}
+
+''';
+    expect(generator.output.toString(),res);
+  });  
+  
+  
+  
+  test('Schema generation',() {
+    generator.processClass(BarWithEmbeddedAndLinkedObjects);
+    generator.processClass(Foo);
+    generator.processClass(FooEmbedded);
+    generator.processClass(BazEmbedded);
+    generator.generateOutput(header: false, persistentClasses: false,register: false);
+    var res = '''
+class \$BarWithEmbeddedAndLinkedObjects {
+  static final \$FooEmbedded fooEmbedded = new \$FooEmbedded('fooEmbedded');
+  static String get fooLinked => 'fooLinked';
+  static final List<String> allFields = [fooLinked]..addAll([fooEmbedded].expand((e)=>e.allFields));
+}
+
+class \$Foo {
+  static String get bar => 'bar';
+  static String get baz => 'baz';
+  static final List<String> allFields = [bar, baz];
+}
+
+class \$FooEmbedded {
+  String _pathToMe;
+  \$FooEmbedded(this._pathToMe);
+  String get bar => _pathToMe + '.bar';
+  String get bar1 => _pathToMe + '.bar1';
+  final \$BazEmbedded baz1 = new \$BazEmbedded(_pathToMe + '.baz1');
+  final \$BazEmbedded baz2 = new \$BazEmbedded(_pathToMe + '.baz2');
+  List<String> get allFields => [bar, bar1]..addAll([baz1, baz2].expand((e)=>e.allFields));
+}
+
+class \$BazEmbedded {
+  String _pathToMe;
+  \$BazEmbedded(this._pathToMe);
+  String get deepXyz => _pathToMe + '.deepXyz';
+  String get deepZyx => _pathToMe + '.deepZyx';
+  List<String> get allFields => [deepXyz, deepZyx];
+}
+
+''';
+    expect(generator.output.toString(),res);
+  });  
+
+  
 }

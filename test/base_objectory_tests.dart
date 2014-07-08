@@ -17,7 +17,6 @@ testAuthorCreation(){
   expect(author.map['address']['cityName'],'Tyumen');
   expect(author.map['address']['streetName'],'Elm tree street');
 }
-
 testSetDirty(){
   var author = new Author();
   author.name = "Vadim";

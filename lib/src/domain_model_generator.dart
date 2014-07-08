@@ -113,17 +113,37 @@ part of domain_model;
   }
   
   void generateOuputForSchemaClass(ClassGenerator classGenerator) {
-    var staticModifier = classGenerator.isEmbedded ? '' : 'static ';
     output.write('class \$${classGenerator.type} {\n');
+    var staticModifier = 'static ';
+    var propertyNamePrefix = "'";
+    if (classGenerator.isEmbedded) {
+      staticModifier = '';
+      propertyNamePrefix = "_pathToMe + '.";
+      output.write("  String _pathToMe;\n");
+      output.write("  \$${classGenerator.type}(this._pathToMe);\n");
+    }
     classGenerator.properties.forEach((propertyGenerator) {
       if (isEmbeddedPersistent(propertyGenerator)) {
-        output.write("  $staticModifier final \$${propertyGenerator.type} ${propertyGenerator.name} = new \$${propertyGenerator.type}();\n");
+        var propName = classGenerator.isEmbedded ? "_pathToMe + '.${propertyGenerator.name}'" : "'${propertyGenerator.name}'";
+        output.write("  ${staticModifier}final \$${propertyGenerator.type} ${propertyGenerator.name} = new \$${propertyGenerator.type}($propName);\n");
       }
       else {
-        output.write("  $staticModifier final String ${propertyGenerator.name} = '${propertyGenerator.name}';\n"); 
+        output.write("  ${staticModifier}String get ${propertyGenerator.name} => ${propertyNamePrefix}${propertyGenerator.name}';\n"); 
       }
     });
-    output.write('}\n');
+    var simpleProperties = classGenerator.properties.where((e)=>!isEmbeddedPersistent(e)).map((PropertyGenerator e)=>e.name).toList().toString();
+    var embeddedProperties = classGenerator.properties.where((e)=>isEmbeddedPersistent(e)).map((PropertyGenerator e)=>e.name).toList();
+    var chunkForEmbeddedProperies = '';
+    if (embeddedProperties.isNotEmpty) {
+      chunkForEmbeddedProperies = "..addAll($embeddedProperties.expand((e)=>e.allFields))";
+    }
+    if (classGenerator.isEmbedded) {
+      output.write("  List<String> get allFields => ${simpleProperties}${chunkForEmbeddedProperies};\n");
+    }
+    else {
+      output.write("  static final List<String> allFields = $simpleProperties${chunkForEmbeddedProperies};\n");
+    }
+    output.write('}\n\n');
   }
 
   bool isEmbeddedPersistent(PropertyGenerator propertyGenerator) {
