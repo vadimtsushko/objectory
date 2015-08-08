@@ -77,8 +77,11 @@ class ObjectoryDirectConnectionImpl extends Objectory{
     db.close();
     db = null;
   }
-  Future dropCollections() {
-    return Future.wait(getCollections().map(
-        (collection) => db.collection(collection).drop()));
+  Future dropCollections() async {
+    for (var collection in getCollections()) {
+
+      await db.collection(collection).drop();
+    }
   }
+
 }

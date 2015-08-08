@@ -137,13 +137,12 @@ class Objectory{
   Future<Map> dropDb() { throw new Exception('Must be implemented'); }
   Future<Map> wait() { throw new Exception('Must be implemented'); }
   void close() { throw new Exception('Must be implemented'); }
-  Future<bool> initDomainModel() {
+  Future initDomainModel() async {
     registerClassesCallback();
-    return open().then((_){
-      if (dropCollectionsOnStartup) {
-        return objectory.dropCollections();
-      }
-    });
+    await open();
+    if (dropCollectionsOnStartup) {
+      await objectory.dropCollections();
+    }
   }
   Future update(PersistentObject persistentObject) {
     var id = persistentObject.id;
