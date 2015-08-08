@@ -1,6 +1,8 @@
 import 'package:objectory/objectory_console.dart';
 import 'domain_model.dart';
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
+import 'package:bson/bson.dart';
+
 _addToObjectoryCache(PersistentObject obj) {
   objectory.cache[obj.id.toString()] = obj;
   obj.markAsFetched();

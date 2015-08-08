@@ -1,5 +1,9 @@
 #Recent change notes
 
+###0.3.22
+
+- Remove export directive for external dependenvies (bson and dart:async)
+
 ###0.3.21
 
 - Domain model autogeneration from simple proto-model (models are backward compatible)

@@ -1,5 +1,5 @@
 library schema_test;
-import 'package:unittest/unittest.dart';
+import 'package:test/test.dart';
 
 class $BarWithEmbeddedAndLinkedObjects {
   static  final $FooEmbedded fooEmbedded = new $FooEmbedded('fooEmbedded');

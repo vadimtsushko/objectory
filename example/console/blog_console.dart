@@ -1,7 +1,7 @@
 library blog_example;
 import 'package:objectory/objectory_console.dart';
 import '../domain_model/domain_model.dart';
-
+import 'dart:async';
 
 const Uri = 'mongodb://127.0.0.1/objectory_blog';
 main(){

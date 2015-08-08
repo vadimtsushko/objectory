@@ -6,3 +6,4 @@ packages
 *.dart.js.deps
 /.idea
 /*.iml
+/.pub/
