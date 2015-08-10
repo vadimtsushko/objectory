@@ -7,8 +7,6 @@ import 'package:bson/bson.dart';
 import 'dart:async';
 import 'dart:convert';
 
-const IP = '127.0.0.1';
-const PORT = 8080;
 class ObjectoryMessage {
   Map command;
   var content;

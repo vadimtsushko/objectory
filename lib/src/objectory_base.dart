@@ -40,6 +40,7 @@ class Objectory{
   final Map<Type,ObjectoryCollection> _collections = new Map<Type,ObjectoryCollection>();
   final Map<String,Type> _collectionNameToTypeMap = new Map<String,Type>();
   bool useFieldLevelUpdate = true;
+  bool _isOpen = false;
   Objectory(this.uri,this.registerClassesCallback,this.dropCollectionsOnStartup);
 
   void _addToCache(PersistentObject obj) {
@@ -143,7 +144,15 @@ class Objectory{
     if (dropCollectionsOnStartup) {
       await objectory.dropCollections();
     }
+    _isOpen = true;
   }
+  ensureInitialized() async {
+    if (!_isOpen) {
+      await initDomainModel();
+    }
+  }
+
+
   Future update(PersistentObject persistentObject) {
     var id = persistentObject.id;
     if (id == null) {

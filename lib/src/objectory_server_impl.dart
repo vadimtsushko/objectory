@@ -243,6 +243,7 @@ class ObjectoryServerImpl {
     hierarchicalLoggingEnabled = true;
     if (verbose) {
       _log.level = Level.ALL;
+      _log.info('Verbose mode on. Set log level ALL');
     }
     else {
       _log.level = Level.WARNING;

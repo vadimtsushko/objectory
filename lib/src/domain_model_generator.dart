@@ -82,6 +82,7 @@ part of domain_model;
   void generateOuputForClass(ClassGenerator classGenerator) {
     var embeddedModifier = classGenerator.isEmbedded ? 'Embedded' : '';
     output.write('class ${classGenerator.persistentClassName} extends ${embeddedModifier}PersistentObject {\n');
+    output.writeln("  String get collectionName => '${classGenerator.persistentClassName}';");
     classGenerator.properties.forEach(generateOuputForProperty);
     output.write('}\n\n');
   }
