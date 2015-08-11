@@ -1,4 +1,5 @@
 library persistent_object;
+
 import 'objectory_query_builder.dart';
 import 'package:bson/bson.dart';
 import 'objectory_base.dart';
@@ -7,30 +8,31 @@ import 'dart:collection';
 import 'package:quiver/core.dart';
 part 'persistent_list.dart';
 
+enum PropertyType { String, int, double, bool, DateTime, ObjectId }
 
-enum PropertyType {String, int, double, bool, DateTime, ObjectId}
 class PropertyDescriptor {
   final PropertyType type;
   final String name;
   final String label;
+  bool get isNumeric =>
+      (type == PropertyType.int) || (type == PropertyType.double);
   const PropertyDescriptor(this.name, this.type, this.label);
 }
 
-
 class BasePersistentObject {
-  Map _map = objectory.dataMapDecorator(new LinkedHashMap()); 
+  Map _map = objectory.dataMapDecorator(new LinkedHashMap());
 
   Set<String> _dirtyFields = new Set<String>();
-  Map<String,dynamic> _compoundProperties = new Map<String,dynamic>();
+  Map<String, dynamic> _compoundProperties = new Map<String, dynamic>();
   bool saveOnUpdate = false;
   Map get map => _map;
   set map(Map newValue) {
     if (newValue != null) {
       _map = newValue;
-    }      
+    }
   }
-  BasePersistentObject() {
-  }
+
+  BasePersistentObject() {}
   Set<String> get dirtyFields => _dirtyFields;
   EmbeddedPersistentObject getEmbeddedObject(Type classType, String property) {
     EmbeddedPersistentObject result = _compoundProperties[property];
@@ -43,22 +45,23 @@ class BasePersistentObject {
     }
     return result;
   }
+
   PersistentList getPersistentList(Type classType, String property) {
     PersistentList result = _compoundProperties[property];
     if (result == null) {
-      result = new PersistentList(this,classType,property);
+      result = new PersistentList(this, classType, property);
       _compoundProperties[property] = result;
     }
     return result;
   }
-  
+
   PersistentObject getLinkedObject(String property) {
     DbRef dbRef = map[property];
     if (dbRef == null) {
       return null;
     }
     Type classType = objectory.getClassTypeByCollection(dbRef.collection);
-    return objectory.findInCacheOrGetProxy(dbRef.id,classType);
+    return objectory.findInCacheOrGetProxy(dbRef.id, classType);
   }
 
   setLinkedObject(String property, PersistentObject value) {
@@ -72,11 +75,11 @@ class BasePersistentObject {
       map[property] = value.dbRef;
     }
   }
-  void _initMap() {
-  }
+
+  void _initMap() {}
 
   void setDirty(String fieldName) {
-    if (_dirtyFields == null){
+    if (_dirtyFields == null) {
       return;
     }
     _dirtyFields.add(fieldName);
@@ -94,33 +97,34 @@ class BasePersistentObject {
     return !_dirtyFields.isEmpty;
   }
 
-
-  void setProperty(String property, value){
+  void setProperty(String property, value) {
     onValueChanging(property, value);
     this.map[property] = value;
   }
 
-  dynamic getProperty(String property){
+  dynamic getProperty(String property) {
     return this.map[property];
   }
 
-  String toString()=>"$collectionName($map)";
+  String toString() => "$collectionName($map)";
 
-  void init(){}
-  
+  void init() {}
+
   /// Name of MongoDB collection where instance of this class would  be persistet in DB.
   /// By default equals to class name, but may be overwritten
   String get collectionName => runtimeType.toString();
 
-  Future<PersistentObject> fetchLinks(){
+  Future<PersistentObject> fetchLinks() {
     var dbRefs = new List<DbRef>();
     getDbRefsFromMap(map, dbRefs);
     var objects = dbRefs.map((each) => objectory.dbRef2Object(each));
-    return Future.forEach(objects,(each) => each.fetch()).then((_)=>new Future.value(this));
+    return Future
+        .forEach(objects, (each) => each.fetch())
+        .then((_) => new Future.value(this));
   }
 
-  getDbRefsFromMap(Map map, List result){
-    for(var each in map.values){
+  getDbRefsFromMap(Map map, List result) {
+    for (var each in map.values) {
       if (each is DbRef) {
         result.add(each);
       }
@@ -132,7 +136,8 @@ class BasePersistentObject {
       }
     }
   }
-  getDbRefsFromList(List list, List result){
+
+  getDbRefsFromList(List list, List result) {
     for (var each in list) {
       if (each is DbRef) {
         result.add(each);
@@ -145,19 +150,20 @@ class BasePersistentObject {
       }
     }
   }
-
 }
-class PersistentObject extends BasePersistentObject{
+
+class PersistentObject extends BasePersistentObject {
   ObjectId get id => map['_id'];
-  DbRef get dbRef => new DbRef(this.collectionName,this.id);
-  set id (ObjectId value) => map['_id'] = value;
-  PersistentObject():super() {
+  DbRef get dbRef => new DbRef(this.collectionName, this.id);
+  set id(ObjectId value) => map['_id'] = value;
+  PersistentObject() : super() {
     _setMap(map);
   }
 
   set map(Map newValue) {
     _setMap(newValue);
   }
+
   void _setMap(Map newValue) {
     if (newValue == null || newValue.isEmpty) {
       _initMap();
@@ -165,42 +171,45 @@ class PersistentObject extends BasePersistentObject{
       _map.clear();
       newValue.forEach((k, v) => _map[k] = v);
     }
-    _compoundProperties = new Map<String,dynamic>();
+    _compoundProperties = new Map<String, dynamic>();
     init();
     _dirtyFields = new Set<String>();
   }
 
-  
-  
-  
   void _initMap() {
     map["_id"] = null;
     super._initMap();
   }
+
   bool _fetchedFromDb = false;
   bool get isFetched => _fetchedFromDb;
-  void markAsFetched() { 
+  void markAsFetched() {
     _fetchedFromDb = true;
   }
+
   Future remove() {
     return objectory.remove(this);
   }
+
   Future save() {
     return objectory.save(this);
   }
+
   Future getMeFromDb() {
-    return objectory[objectory.getClassTypeByCollection(this.collectionName)].findOne(where.id(this.id));
+    return objectory[objectory.getClassTypeByCollection(this.collectionName)]
+        .findOne(where.id(this.id));
   }
+
   Future reRead() {
-    return getMeFromDb()
-      .then((PersistentObject fromDb) {
-        if (fromDb != null) {
-          this.map = fromDb.map;
-        }  
-      });
+    return getMeFromDb().then((PersistentObject fromDb) {
+      if (fromDb != null) {
+        this.map = fromDb.map;
+      }
+    });
   }
-  void setProperty(String property, value){
-    super.setProperty(property,value);
+
+  void setProperty(String property, value) {
+    super.setProperty(property, value);
     if (saveOnUpdate) {
       save();
     }
@@ -214,25 +223,31 @@ class PersistentObject extends BasePersistentObject{
     }
   }
 }
-class EmbeddedPersistentObject extends BasePersistentObject{
+
+class EmbeddedPersistentObject extends BasePersistentObject {
   BasePersistentObject _parent;
   String _pathToMe;
   bool _elementListMode = false;
-  void setDirty(String fieldName){
+  void setDirty(String fieldName) {
     super.setDirty(fieldName);
     if (_parent != null) {
-      _elementListMode? _parent.setDirty('${_pathToMe}'): _parent.setDirty('${_pathToMe}.${fieldName}');
+      _elementListMode
+          ? _parent.setDirty('${_pathToMe}')
+          : _parent.setDirty('${_pathToMe}.${fieldName}');
     }
   }
+
   remove() {
     throw new Exception('Must not be invoked');
   }
+
   save() {
     throw new Exception('Must not be invoked');
   }
-  
-  bool operator ==(o) => o is EmbeddedPersistentObject && o._parent == _parent && o._pathToMe == _pathToMe && o.map == map;
+
+  bool operator ==(o) => o is EmbeddedPersistentObject &&
+      o._parent == _parent &&
+      o._pathToMe == _pathToMe &&
+      o.map == map;
   int get hashCode => hash3(_parent, _pathToMe, map);
-  
-  
 }

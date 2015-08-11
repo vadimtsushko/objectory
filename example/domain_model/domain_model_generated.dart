@@ -7,9 +7,9 @@ class $Article {
   static String get author => 'author';
   static String get comments => 'comments';
   static final List<String> allFields = [title, body, author, comments];
-  static final List<FieldDescriptor> simpleFields = [
-    const FieldDescriptor('title', FieldType.String, 'Заголовок')
-    ,const FieldDescriptor('body', FieldType.String, 'body')
+  static final List<PropertyDescriptor> simpleFields = [
+    const PropertyDescriptor('title', PropertyType.String, 'title')
+    ,const PropertyDescriptor('body', PropertyType.String, 'body')
   ];
 }
 
@@ -29,10 +29,10 @@ class $User {
   static String get email => 'email';
   static String get login => 'login';
   static final List<String> allFields = [name, email, login];
-  static final List<FieldDescriptor> simpleFields = [
-    const FieldDescriptor('name', FieldType.String, 'name')
-    ,const FieldDescriptor('email', FieldType.String, 'email')
-    ,const FieldDescriptor('login', FieldType.String, 'login')
+  static final List<PropertyDescriptor> simpleFields = [
+    const PropertyDescriptor('name', PropertyType.String, 'name')
+    ,const PropertyDescriptor('email', PropertyType.String, 'email')
+    ,const PropertyDescriptor('login', PropertyType.String, 'login')
   ];
 }
 
@@ -53,9 +53,9 @@ class $BlogComment {
   String get body => _pathToMe + '.body';
   String get date => _pathToMe + '.date';
   List<String> get allFields => [user, body, date];
-  static final List<FieldDescriptor> simpleFields = [
-    const FieldDescriptor('body', FieldType.String, 'body')
-    ,const FieldDescriptor('date', FieldType.DateTime, 'date')
+  static final List<PropertyDescriptor> simpleFields = [
+    const PropertyDescriptor('body', PropertyType.String, 'body')
+    ,const PropertyDescriptor('date', PropertyType.DateTime, 'date')
   ];
 }
 
@@ -74,10 +74,10 @@ class $Author {
   static String get email => 'email';
   static String get age => 'age';
   static final List<String> allFields = [name, email, age];
-  static final List<FieldDescriptor> simpleFields = [
-    const FieldDescriptor('name', FieldType.String, 'Автор')
-    ,const FieldDescriptor('email', FieldType.String, 'email')
-    ,const FieldDescriptor('age', FieldType.int, 'age')
+  static final List<PropertyDescriptor> simpleFields = [
+    const PropertyDescriptor('name', PropertyType.String, 'name')
+    ,const PropertyDescriptor('email', PropertyType.String, 'email')
+    ,const PropertyDescriptor('age', PropertyType.int, 'age')
   ];
 }
 

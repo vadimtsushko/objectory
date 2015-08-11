@@ -196,11 +196,11 @@ part of domain_model;
   }
 
   generateFieldDescriptors(List<PropertyGenerator> simpleProperties) {
-    output.writeln("  static final List<FieldDescriptor> simpleFields = [");
+    output.writeln("  static final List<PropertyDescriptor> simpleFields = [");
     var comma = '';
     for (var property in simpleProperties) {
       var label = property.label == null? property.name: property.label;
-      output.writeln("    ${comma}const FieldDescriptor('${property.name}', FieldType.${property.type}, '$label')");
+      output.writeln("    ${comma}const PropertyDescriptor('${property.name}', PropertyType.${property.type}, '$label')");
       comma = ',';
     }
     output.writeln("  ];");
