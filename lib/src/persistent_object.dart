@@ -8,6 +8,15 @@ import 'package:quiver/core.dart';
 part 'persistent_list.dart';
 
 
+enum PropertyType {String, int, double, bool, DateTime, ObjectId}
+class PropertyDescriptor {
+  final PropertyType type;
+  final String name;
+  final String label;
+  const PropertyDescriptor(this.name, this.type, this.label);
+}
+
+
 class BasePersistentObject {
   Map _map = objectory.dataMapDecorator(new LinkedHashMap()); 
 

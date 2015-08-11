@@ -2,12 +2,19 @@
 part of domain_model;
 
 class $Article {
-  static  final String title = 'title';
-  static  final String body = 'body';
-  static  final String author = 'author';
-  static  final String comments = 'comments';
+  static String get title => 'title';
+  static String get body => 'body';
+  static String get author => 'author';
+  static String get comments => 'comments';
+  static final List<String> allFields = [title, body, author, comments];
+  static final List<FieldDescriptor> simpleFields = [
+    const FieldDescriptor('title', FieldType.String, 'Заголовок')
+    ,const FieldDescriptor('body', FieldType.String, 'body')
+  ];
 }
+
 class Article extends PersistentObject {
+  String get collectionName => 'Article';
   String get title => getProperty('title');
   set title (String value) => setProperty('title',value);
   String get body => getProperty('body');
@@ -18,11 +25,19 @@ class Article extends PersistentObject {
 }
 
 class $User {
-  static  final String name = 'name';
-  static  final String email = 'email';
-  static  final String login = 'login';
+  static String get name => 'name';
+  static String get email => 'email';
+  static String get login => 'login';
+  static final List<String> allFields = [name, email, login];
+  static final List<FieldDescriptor> simpleFields = [
+    const FieldDescriptor('name', FieldType.String, 'name')
+    ,const FieldDescriptor('email', FieldType.String, 'email')
+    ,const FieldDescriptor('login', FieldType.String, 'login')
+  ];
 }
+
 class User extends PersistentObject {
+  String get collectionName => 'User';
   String get name => getProperty('name');
   set name (String value) => setProperty('name',value);
   String get email => getProperty('email');
@@ -32,11 +47,20 @@ class User extends PersistentObject {
 }
 
 class $BlogComment {
-   final String user = 'user';
-   final String body = 'body';
-   final String date = 'date';
+  String _pathToMe;
+  $BlogComment(this._pathToMe);
+  String get user => _pathToMe + '.user';
+  String get body => _pathToMe + '.body';
+  String get date => _pathToMe + '.date';
+  List<String> get allFields => [user, body, date];
+  static final List<FieldDescriptor> simpleFields = [
+    const FieldDescriptor('body', FieldType.String, 'body')
+    ,const FieldDescriptor('date', FieldType.DateTime, 'date')
+  ];
 }
+
 class BlogComment extends EmbeddedPersistentObject {
+  String get collectionName => 'BlogComment';
   User get user => getLinkedObject('user');
   set user (User value) => setLinkedObject('user',value);
   String get body => getProperty('body');
@@ -46,11 +70,19 @@ class BlogComment extends EmbeddedPersistentObject {
 }
 
 class $Author {
-  static  final String name = 'name';
-  static  final String email = 'email';
-  static  final String age = 'age';
+  static String get name => 'name';
+  static String get email => 'email';
+  static String get age => 'age';
+  static final List<String> allFields = [name, email, age];
+  static final List<FieldDescriptor> simpleFields = [
+    const FieldDescriptor('name', FieldType.String, 'Автор')
+    ,const FieldDescriptor('email', FieldType.String, 'email')
+    ,const FieldDescriptor('age', FieldType.int, 'age')
+  ];
 }
+
 class Author extends PersistentObject {
+  String get collectionName => 'Author';
   String get name => getProperty('name');
   set name (String value) => setProperty('name',value);
   String get email => getProperty('email');

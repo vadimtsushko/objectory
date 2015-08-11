@@ -1,5 +1,6 @@
 library domain_model_proto;
 import 'package:objectory/src/domain_model_generator.dart';
+import 'dart:mirrors';
 
 class Author {
   String name;
