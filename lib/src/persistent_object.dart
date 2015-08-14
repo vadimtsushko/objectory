@@ -55,13 +55,12 @@ class BasePersistentObject {
     return result;
   }
 
-  PersistentObject getLinkedObject(String property) {
-    DbRef dbRef = map[property];
-    if (dbRef == null) {
+  PersistentObject getLinkedObject(Type type, String property) {
+    ObjectId objId = map[property];
+    if (objId == null) {
       return null;
     }
-    Type classType = objectory.getClassTypeByCollection(dbRef.collection);
-    return objectory.findInCacheOrGetProxy(dbRef.id, classType);
+    return objectory.findInCacheOrGetProxy(objId, type);
   }
 
   setLinkedObject(String property, PersistentObject value) {
@@ -71,8 +70,8 @@ class BasePersistentObject {
       if (value.id == null) {
         throw new Exception('Attemt to set link to unsaved object: $value');
       }
-      onValueChanging(property, value.dbRef);
-      map[property] = value.dbRef;
+      onValueChanging(property, value.id);
+      map[property] = value.id;
     }
   }
 
