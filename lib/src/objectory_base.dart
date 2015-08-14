@@ -182,6 +182,9 @@ class Objectory{
   }
 
   Map _getMapForUpdateCommand(PersistentObject object) {
+    if (object.dirtyFields.isEmpty) {
+      return const {};
+    }
     if (!useFieldLevelUpdate) {
       return object.map;
     }

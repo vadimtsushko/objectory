@@ -98,6 +98,9 @@ class BasePersistentObject {
   }
 
   void setProperty(String property, value) {
+    if (this.map[property] == value) {
+      return;
+    }
     onValueChanging(property, value);
     this.map[property] = value;
   }
