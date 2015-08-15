@@ -19,7 +19,7 @@ class Article extends PersistentObject {
   set title (String value) => setProperty('title',value);
   String get body => getProperty('body');
   set body (String value) => setProperty('body',value);
-  Author get author => getLinkedObject('author');
+  Author get author => getLinkedObject('author', Author);
   set author (Author value) => setLinkedObject('author',value);
   List<BlogComment> get comments => getPersistentList(BlogComment,'comments');
 }
@@ -61,7 +61,7 @@ class $BlogComment {
 
 class BlogComment extends EmbeddedPersistentObject {
   String get collectionName => 'BlogComment';
-  User get user => getLinkedObject('user');
+  User get user => getLinkedObject('user', User);
   set user (User value) => setLinkedObject('user',value);
   String get body => getProperty('body');
   set body (String value) => setProperty('body',value);
@@ -92,8 +92,8 @@ class Author extends PersistentObject {
 }
 
 registerClasses() {
-  objectory.registerClass(Article,()=>new Article(),()=>new List<Article>());
-  objectory.registerClass(User,()=>new User(),()=>new List<User>());
-  objectory.registerClass(BlogComment,()=>new BlogComment(),()=>new List<BlogComment>());
-  objectory.registerClass(Author,()=>new Author(),()=>new List<Author>());
+  objectory.registerClass(Article,()=>new Article(),()=>new List<Article>(), {'author': Author});
+  objectory.registerClass(User,()=>new User(),()=>new List<User>(), {});
+  objectory.registerClass(BlogComment,()=>new BlogComment(),()=>new List<BlogComment>(), {'user': User});
+  objectory.registerClass(Author,()=>new Author(),()=>new List<Author>(), {});
 }

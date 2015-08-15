@@ -36,6 +36,7 @@ class Objectory{
   DataListDecorator dataListDecorator = (List list) => list;
   final Map<String,BasePersistentObject> cache = new  Map<String,BasePersistentObject>();
   final Map<Type,FactoryMethod> _factories = new Map<Type,FactoryMethod>();
+  final Map<Type,Map<String,Type>> _linkedTypes = new Map<Type,Map<String,Type>>();
   final Map<Type,FactoryMethod> _listFactories = new Map<Type,FactoryMethod>();
   final Map<Type,ObjectoryCollection> _collections = new Map<Type,ObjectoryCollection>();
   final Map<String,Type> _collectionNameToTypeMap = new Map<String,Type>();
@@ -80,10 +81,8 @@ class Objectory{
     }
     var result = newInstance(classType);
     result.map = map;
-    if (result is PersistentObject){
-      result.id = map["_id"];
-    }
     if (result is PersistentObject) {
+      result.id = map["_id"];
       if (result.id != null) {
         objectory._addToCache(result);
       }
@@ -113,9 +112,10 @@ class Objectory{
 
   ObjectId generateId() => new ObjectId();
 
-  void registerClass(Type classType,FactoryMethod factory,[FactoryMethod listFactory]){
+  void registerClass(Type classType,FactoryMethod factory,FactoryMethod listFactory, Map<String,Type> linkedTypes){
     _factories[classType] = factory;
     _listFactories[classType] = (listFactory==null ? ()=>new List<PersistentObject>() : listFactory);
+    _linkedTypes[classType] = linkedTypes;
     BasePersistentObject obj = factory();
     if (obj is PersistentObject) {
       var collectionName = obj.collectionName;
@@ -199,7 +199,30 @@ class Objectory{
     }
     return builder.map;
   }
-  
+  Future<PersistentObject> fetchLinks(PersistentObject obj) async {
+    var lt = _linkedTypes[obj.runtimeType];
+    for (var propertyName in lt.keys) {
+      ObjectId id = obj.map[propertyName];
+      if (id != null) {
+        await findInCacheOrGetProxy(id, lt[propertyName]).fetch();
+      }
+    }
+//    await _linkedTypes[obj.runtimeType].forEach((propertyName,propertyType) async {
+//      ObjectId id = obj.map[propertyName];
+//      if (id != null) {
+//        var fetched = await findInCacheOrGetProxy(id, propertyType).fetch();
+//        obj.map[propertyName] = fetched;
+//      }
+//    });
+    return obj;
+//    var dbRefs = new List<DbRef>();
+//    getDbRefsFromMap(map, dbRefs);
+//    var objects = dbRefs.map((each) => objectory.dbRef2Object(each));
+//    return Future
+//    .forEach(objects, (each) => each.fetch())
+//    .then((_) => new Future.value(this));
+  }
+
   ObjectoryCollection operator[](Type classType) => _collections[classType];
 }
 

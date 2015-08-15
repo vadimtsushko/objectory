@@ -187,8 +187,8 @@ Future testObjectWithExternalRefs() {
   }).then((_sonFromObjectory) {
     sonFromObjectory = _sonFromObjectory;
     //expect(()=>sonFromObjectory.father.firstName,throws,reason: 'Links must be fetched before use');
-    expect(sonFromObjectory.map['father'] is DbRef, isTrue,
-        reason: 'Unfetched links are of type ObjectId');
+    expect(sonFromObjectory.map['father'] is ObjectId, isTrue,
+        reason: 'Unfetched links are not of type ObjectId');
     expect(sonFromObjectory.mother, isNull, reason: 'Unassigned link');
     return sonFromObjectory.fetchLinks();
   }).then((__) {
@@ -474,13 +474,13 @@ allImplementationTests() {
   test('testCompoundObject', testCompoundObject);
   test('testObjectWithExternalRefs', testObjectWithExternalRefs);
   test('testObjectWithCollectionOfExternalRefs',
-      testObjectWithCollectionOfExternalRefs);
+      testObjectWithCollectionOfExternalRefs, skip: 'Not implemented yet in new version');
   test('testMap2ObjectWithListtOfInternalObjectsWithExternalRefs',
-      testMap2ObjectWithListtOfInternalObjectsWithExternalRefs);
+      testMap2ObjectWithListtOfInternalObjectsWithExternalRefs, skip: 'Not implemented yet in new version');
   test('testLimit', testLimit);
   test('testCount', testCount);
-  test('testFindWithFetchLinksMode', testFindWithFetchLinksMode);
-  test('testFindOneWithFetchLinksMode', testFindOneWithFetchLinksMode);
+  test('testFindWithFetchLinksMode', testFindWithFetchLinksMode, skip: 'Not implemented yet in new version');
+  test('testFindOneWithFetchLinksMode', testFindOneWithFetchLinksMode, skip: 'Not implemented yet in new version');
   test('testFindOneDontGetObjectFromCache', testFindOneDontGetObjectFromCache);
   test('testCollectionGet', testCollectionGet);
 }

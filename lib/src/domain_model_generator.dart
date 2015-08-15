@@ -3,6 +3,7 @@ library schema_generator;
 import 'dart:mirrors';
 import 'dart:io';
 import 'package:path/path.dart' as path;
+import 'package:objectory/src/persistent_object.dart';
 
 ///<-- Metadata
 class Embedded {
@@ -50,6 +51,7 @@ part of domain_model;
   List<ClassGenerator> classGenerators = new List<ClassGenerator>();
   Map<Type, ClassMirror> classMirrors = new Map<Type, ClassMirror>();
   List<Type> _classesOrdered = [];
+  final Map<Type, List> _linkedTypes = new Map<Type, List>();
   ModelGenerator(this.libraryName);
   StringBuffer output = new StringBuffer();
   init() {
@@ -69,11 +71,8 @@ part of domain_model;
     saveOuput(outFileName);
   }
 
-  void generateOutput(
-      {bool header: true,
-      bool persistentClasses: true,
-      bool schemaClasses: true,
-      bool register: true}) {
+  void generateOutput({bool header: true, bool persistentClasses: true,
+      bool schemaClasses: true, bool register: true}) {
     if (header) {
       output.write(HEADER);
     }
@@ -88,8 +87,13 @@ part of domain_model;
     if (register) {
       output.write('registerClasses() {\n');
       for (Type cls in _classesOrdered) {
+        var linkedTypeMap = {};
+        for (List each in _linkedTypes[cls]) {
+          linkedTypeMap["'${each.first}'"] =  each.last;
+        }
+
         output.write(
-            '  objectory.registerClass($cls,()=>new $cls(),()=>new List<$cls>());\n');
+            '  objectory.registerClass($cls,()=>new $cls(),()=>new List<$cls>(), $linkedTypeMap);\n');
       }
       output.write('}\n');
     }
@@ -98,7 +102,7 @@ part of domain_model;
   void saveOuput(String fileName) {
     if (path.isRelative(fileName)) {
       var targetDir = path.dirname(path.fromUri(Platform.script));
-      fileName = path.join(targetDir,path.basename(fileName));
+      fileName = path.join(targetDir, path.basename(fileName));
     }
     new File(fileName).writeAsStringSync(output.toString());
     print('Created file: $fileName');
@@ -111,15 +115,20 @@ part of domain_model;
     output.writeln(
         "  String get collectionName => '${classGenerator.persistentClassName}';");
     classGenerator.properties.forEach(generateOuputForProperty);
+    _linkedTypes[classGenerator.type] = classGenerator.properties
+        .where((PropertyGenerator p) =>
+            p.propertyType == PropertyType.PERSISTENT_OBJECT)
+        .map((PropertyGenerator p) => [p.name, p.type])
+        .toList();
     output.write('}\n\n');
   }
 
   void generateOuputForProperty(PropertyGenerator propertyGenerator) {
     //output.write(propertyGenerator.commentLine);
     if (propertyGenerator.propertyType == PropertyType.SIMPLE) {
-      output
-          .write('  ${propertyGenerator.type} get ${propertyGenerator.name} => '
-              "getProperty('${propertyGenerator.name}');\n");
+      output.write(
+          '  ${propertyGenerator.type} get ${propertyGenerator.name} => '
+          "getProperty('${propertyGenerator.name}');\n");
       output.write(
           '  set ${propertyGenerator.name} (${propertyGenerator.type} value) => '
           "setProperty('${propertyGenerator.name}',value);\n");
@@ -132,7 +141,7 @@ part of domain_model;
       } else {
         output.write(
             '  ${propertyGenerator.type} get ${propertyGenerator.name} => '
-            "getLinkedObject('${propertyGenerator.name}');\n");
+            "getLinkedObject('${propertyGenerator.name}', ${propertyGenerator.type});\n");
         output.write(
             '  set ${propertyGenerator.name} (${propertyGenerator.type} value) => '
             "setLinkedObject('${propertyGenerator.name}',value);\n");
@@ -190,7 +199,8 @@ part of domain_model;
     }
 
     var fields = classGenerator.properties
-    .where((e) => e.propertyType == PropertyType.SIMPLE).toList();
+        .where((e) => e.propertyType == PropertyType.SIMPLE)
+        .toList();
     generateFieldDescriptors(fields);
     output.write('}\n\n');
   }
@@ -199,8 +209,9 @@ part of domain_model;
     output.writeln("  static final List<PropertyDescriptor> simpleFields = [");
     var comma = '';
     for (var property in simpleProperties) {
-      var label = property.label == null? property.name: property.label;
-      output.writeln("    ${comma}const PropertyDescriptor('${property.name}', PropertyType.${property.type}, '$label')");
+      var label = property.label == null ? property.name : property.label;
+      output.writeln(
+          "    ${comma}const PropertyDescriptor('${property.name}', PropertyType.${property.type}, '$label')");
       comma = ',';
     }
     output.writeln("  ];");
@@ -211,8 +222,7 @@ part of domain_model;
       return false;
     }
     ClassGenerator targetClass = classGenerators.firstWhere(
-        (cg) => cg.type == propertyGenerator.type,
-        orElse: () => null);
+        (cg) => cg.type == propertyGenerator.type, orElse: () => null);
     if (targetClass == null) {
       throw new StateError(
           'Not found class ${propertyGenerator.type} in prototype schema');
@@ -233,8 +243,7 @@ part of domain_model;
       generatorClass.isEmbedded =
           classMirror.metadata.any((m) => m.type.reflectedType == Embedded);
       var asClassMirror = classMirror.metadata.firstWhere(
-          (m) => m.type.reflectedType == AsClass,
-          orElse: () => null);
+          (m) => m.type.reflectedType == AsClass, orElse: () => null);
       if (asClassMirror != null) {
         generatorClass.asClass = asClassMirror.getField(#value).reflectee;
       }
@@ -255,6 +264,7 @@ part of domain_model;
 }
 
 class PropertyGenerator {
+  PropertyDescriptor descriptor;
   String name;
   String label;
   Type type;
@@ -263,7 +273,6 @@ class PropertyGenerator {
   String toString() => 'PropertyGenerator($name,$type,$propertyType)';
   String get commentLine => '  // $type $name\n';
   processVariableMirror(VariableMirror vm) {
-
     vm.metadata.where((m) => m.reflectee is Label).forEach((m) {
       var memberLabel = m.reflectee as Label;
       label = memberLabel.value;

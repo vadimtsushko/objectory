@@ -8,15 +8,16 @@ import 'dart:collection';
 import 'package:quiver/core.dart';
 part 'persistent_list.dart';
 
-enum PropertyType { String, int, double, bool, DateTime, ObjectId }
+enum PropertyType { String, int, double, bool, DateTime, ObjectId, LinkedObject, EmbeddedPersistentObject, List, ListOfLinks, ListOfEmbeddedObjects}
 
 class PropertyDescriptor {
   final PropertyType type;
   final String name;
   final String label;
+  final Type persistentType;
   bool get isNumeric =>
       (type == PropertyType.int) || (type == PropertyType.double);
-  const PropertyDescriptor(this.name, this.type, this.label);
+  const PropertyDescriptor(this.name, this.type, this.persistentType, this.label);
 }
 
 class BasePersistentObject {
@@ -55,7 +56,7 @@ class BasePersistentObject {
     return result;
   }
 
-  PersistentObject getLinkedObject(Type type, String property) {
+  PersistentObject getLinkedObject(String property, Type type) {
     ObjectId objId = map[property];
     if (objId == null) {
       return null;
@@ -114,15 +115,12 @@ class BasePersistentObject {
 
   /// Name of MongoDB collection where instance of this class would  be persistet in DB.
   /// By default equals to class name, but may be overwritten
-  String get collectionName => runtimeType.toString();
+  String get collectionName {
+    throw new Exception('Must be implemented');
+  }
 
   Future<PersistentObject> fetchLinks() {
-    var dbRefs = new List<DbRef>();
-    getDbRefsFromMap(map, dbRefs);
-    var objects = dbRefs.map((each) => objectory.dbRef2Object(each));
-    return Future
-        .forEach(objects, (each) => each.fetch())
-        .then((_) => new Future.value(this));
+    return objectory.fetchLinks(this);
   }
 
   getDbRefsFromMap(Map map, List result) {
