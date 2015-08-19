@@ -14,10 +14,10 @@ class PropertyDescriptor {
   final PropertyType type;
   final String name;
   final String label;
-  final Type persistentType;
+  //final Type persistentType;
   bool get isNumeric =>
       (type == PropertyType.int) || (type == PropertyType.double);
-  const PropertyDescriptor(this.name, this.type, this.persistentType, this.label);
+  const PropertyDescriptor(this.name, this.type, this.label);
 }
 
 class BasePersistentObject {
