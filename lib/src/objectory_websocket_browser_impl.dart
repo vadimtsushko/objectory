@@ -141,11 +141,12 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Map _createCommand(String command, String collection){
     return {'command': command, 'collection': collection};
   }
-  ObjectId generateId() => new ObjectId(clientMode: true);
+  generateId() => new ObjectId(clientMode: true);
 
-  Future doUpdate(String collection,ObjectId id, Map toUpdate) =>
-      _postMessage(_createCommand('update',collection),toUpdate,{"_id": id});
-
+  Future doUpdate(String collection,var id, Map toUpdate) {
+    assert(id.runtimeType == idType);
+    return _postMessage(_createCommand('update', collection), toUpdate, {"_id": id});
+  }
 
   Future insert(PersistentObject persistentObject) =>
       _postMessage(_createCommand('insert',persistentObject.collectionName),persistentObject.map);

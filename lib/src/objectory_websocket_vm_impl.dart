@@ -63,7 +63,6 @@ class ObjectoryCollectionWebsocketConnectionImpl extends ObjectoryCollection{
     if (selector == null) {
       selector = new ObjectoryQueryBuilder();
     }
-    var obj;
     objectoryImpl._postMessage(objectoryImpl._createCommand('findOne',collectionName), selector.map, selector.extParamsMap)
     .then((map){
       objectoryImpl.completeFindOne(map,completer,selector, classType); 
@@ -127,11 +126,12 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     return {'command': command, 'collection': collection};
   }
 
-  ObjectId generateId() => new ObjectId(clientMode: true);
+  generateId() => new ObjectId(clientMode: true);
 
-  Future doUpdate(String collection,ObjectId id, Map toUpdate) =>
-      _postMessage(_createCommand('update',collection),toUpdate,{"_id": id});
-
+  Future doUpdate(String collection,var id, Map toUpdate) {
+    assert(id.runtimeType == idType);
+    return _postMessage(_createCommand('update', collection), toUpdate, {"_id": id});
+  }
   Future insert(PersistentObject persistentObject) =>
       _postMessage(_createCommand('insert',persistentObject.collectionName),persistentObject.map);
 

@@ -116,7 +116,7 @@ class ObjectoryClient {
     }
     else
     {
-      ObjectId id = mapToSave['_id'];
+      var id = mapToSave['_id'];
       if (id != null) {
         db.collection(header.collection).update({'_id': id},mapToSave).then((responseData) {
           sendResult(header, responseData);
@@ -128,7 +128,7 @@ class ObjectoryClient {
             sendResult(header, responseData);
           });
         } else {
-          _log.shout('ERROR: Trying to update object without ObjectId set. $header, $mapToSave');
+          _log.shout('ERROR: Trying to update object without _id set. $header, $mapToSave');
           }  
       }
     }

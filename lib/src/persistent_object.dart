@@ -57,10 +57,11 @@ class BasePersistentObject {
   }
 
   PersistentObject getLinkedObject(String property, Type type) {
-    ObjectId objId = map[property];
+    var objId = map[property];
     if (objId == null) {
       return null;
     }
+    assert(objId.runtimeType == objectory.idType);
     return objectory.findInCacheOrGetProxy(objId, type);
   }
 
@@ -153,9 +154,13 @@ class BasePersistentObject {
 }
 
 class PersistentObject extends BasePersistentObject {
-  ObjectId get id => map['_id'];
+  dynamic get id => map['_id'];
+
   DbRef get dbRef => new DbRef(this.collectionName, this.id);
-  set id(ObjectId value) => map['_id'] = value;
+  set id(var value) {
+    assert(value == null || value.runtimeType == objectory.idType);
+    map['_id'] = value;
+  }
   PersistentObject() : super() {
     _setMap(map);
   }

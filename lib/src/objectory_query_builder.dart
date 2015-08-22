@@ -1,5 +1,4 @@
 library objectory_query;
-import 'package:bson/bson.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart' hide where;
 import 'persistent_object.dart';
 
@@ -16,7 +15,9 @@ class ObjectoryQueryBuilder extends SelectorBuilder{
 
 
   ObjectoryQueryBuilder eq(String fieldName,value) => super.eq(fieldName, value);
-  ObjectoryQueryBuilder id(ObjectId value) => super.id(value);
+  ObjectoryQueryBuilder id(value) {
+    return super.eq('_id',value);
+  }
   ObjectoryQueryBuilder ne(String fieldName, value) => super.ne(fieldName, value);
   ObjectoryQueryBuilder gt(String fieldName,value)=>super.gt(fieldName, value);
   ObjectoryQueryBuilder lt(String fieldName,value) => super.lt(fieldName, value);
@@ -53,8 +54,8 @@ class ObjectoryQueryBuilder extends SelectorBuilder{
     return this;
   }
   
-  ObjectoryQueryBuilder references(String propertyName, PersistentObject model) => eq(propertyName, new DbRef(model.collectionName, model.id));
-  ObjectoryQueryBuilder containsReference(String propertyName, PersistentObject model) => oneFrom(propertyName, [new DbRef(model.collectionName, model.id)]);
+//  ObjectoryQueryBuilder references(String propertyName, PersistentObject model) => eq(propertyName, new DbRef(model.collectionName, model.id));
+//  ObjectoryQueryBuilder containsReference(String propertyName, PersistentObject model) => oneFrom(propertyName, [new DbRef(model.collectionName, model.id)]);
   
   ObjectoryQueryBuilder clone() {
     var copy = where;

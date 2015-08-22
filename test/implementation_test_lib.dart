@@ -187,6 +187,7 @@ Future testObjectWithExternalRefs() {
   }).then((_sonFromObjectory) {
     sonFromObjectory = _sonFromObjectory;
     //expect(()=>sonFromObjectory.father.firstName,throws,reason: 'Links must be fetched before use');
+    print(sonFromObjectory);
     expect(sonFromObjectory.map['father'] is ObjectId, isTrue,
         reason: 'Unfetched links are not of type ObjectId');
     expect(sonFromObjectory.mother, isNull, reason: 'Unassigned link');
