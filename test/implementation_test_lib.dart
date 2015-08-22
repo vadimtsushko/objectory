@@ -182,7 +182,7 @@ Future testObjectWithExternalRefs() {
     son.father = father;
     expect(son.dirtyFields.length, 1);
     son.save();
-    objectory.cache.clear();
+    objectory.clearCache(Person);
     return objectory[Person].findOne(where.id(son.id));
   }).then((_sonFromObjectory) {
     sonFromObjectory = _sonFromObjectory;
@@ -221,7 +221,7 @@ Future testObjectWithCollectionOfExternalRefs() {
     fatherId = father.id;
     sonId = son.id;
     daughterId = daughter.id;
-    objectory.cache.clear();
+    objectory.clearCache(Person);
     father = null;
     return objectory[Person].findOne(where.id(fatherId));
   }).then((fatherFromObjectory) {
@@ -236,7 +236,7 @@ Future testObjectWithCollectionOfExternalRefs() {
     father.children.add(daughter);
     father.save();
     fatherId = father.id;
-    objectory.cache.clear();
+    objectory.clearCache(Person);
     father = null;
     return objectory[Person].findOne(where.id(fatherId));
   }).then((fatherFromObjectory) {
@@ -271,7 +271,7 @@ Future testObjectWithCollectionOfExternalRefs() {
     expect(father.children.indexOf(son), 0);
     father.children.remove(son);
     father.save();
-    objectory.cache.clear();
+    objectory.clearCache(Person);
     father = null;
     son = null;
     daughter = null;
@@ -372,7 +372,7 @@ Future testFindOneDontGetObjectFromCache() {
   return objectory.initDomainModel().then((_) {
     var article = new Article();
     article.id = new ObjectId();
-    objectory.cache[article.id.toString()] = article;
+    objectory.addToCache(article);
     return objectory[Article].findOne(where.id(article.id));
   }).then((artcl) {
     expect(artcl, isNull);

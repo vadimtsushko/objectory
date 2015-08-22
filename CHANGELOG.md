@@ -4,7 +4,8 @@
 
 - Loosing type annotation - `_id` field can be something another then ObjectId.
   Use assertions for consistent usage of one type for `_id` fields across objectory application.
-
+- Objectory cache separated by collections
+- Objectory cache made private, added public methods `clearCache(Type classType)` and `addToCache(PersistentObject obj)`
 
 ###0.4.2
 

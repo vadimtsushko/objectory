@@ -55,8 +55,8 @@ class Objectory {
   Type idType = ObjectId;
   DataMapDecorator dataMapDecorator = (Map map) => map;
   DataListDecorator dataListDecorator = (List list) => list;
-  final Map<String, BasePersistentObject> cache =
-      new Map<String, BasePersistentObject>();
+  final Map<String,Map<String, BasePersistentObject>> _cache =
+      new Map<String,Map<String, BasePersistentObject>>();
   final Map<Type, FactoryMethod> _factories = new Map<Type, FactoryMethod>();
   final Map<Type, Map<String, Type>> _linkedTypes =
       new Map<Type, Map<String, Type>>();
@@ -69,24 +69,26 @@ class Objectory {
   bool _isOpen = false;
   Objectory(
       this.uri, this.registerClassesCallback, this.dropCollectionsOnStartup);
-
-  void _addToCache(PersistentObject obj) {
-    cache[obj.id.toString()] = obj;
+  void clearCache(Type classType) {
+    _cache[classType.toString()].clear();
+  }
+  void addToCache(PersistentObject obj) {
+    _cache[obj.runtimeType.toString()][obj.id.toString()] = obj;
     obj.markAsFetched();
   }
   Type getClassTypeByCollection(String collectionName) =>
       _collectionNameToTypeMap[collectionName];
-  PersistentObject _findInCache(var id) {
+  PersistentObject findInCache(Type classType,var id) {
     if (id == null) {
       return null;
     }
-    return cache[id.toString()];
+    return _cache[classType.toString()][id.toString()];
   }
   PersistentObject findInCacheOrGetProxy(var id, Type classType) {
     if (id == null) {
       return null;
     }
-    PersistentObject result = _findInCache(id);
+    PersistentObject result = findInCache(classType,id);
     if (result == null) {
       result = objectory.newInstance(classType);
       result.id = id;
@@ -113,7 +115,7 @@ class Objectory {
     if (result is PersistentObject) {
       result.id = map["_id"];
       if (result.id != null) {
-        objectory._addToCache(result);
+        objectory.addToCache(result);
       }
     }
     return result;
@@ -133,7 +135,7 @@ class Objectory {
     } else {
       persistentObject.id = generateId();
       persistentObject.map["_id"] = persistentObject.id;
-      objectory._addToCache(persistentObject);
+      objectory.addToCache(persistentObject);
       res = insert(persistentObject);
     }
     persistentObject.dirtyFields.clear();
@@ -145,6 +147,7 @@ class Objectory {
   void registerClass(Type classType, FactoryMethod factory,
       FactoryMethod listFactory, Map<String, Type> linkedTypes) {
     _factories[classType] = factory;
+    _cache[classType.toString()] = new Map<String, BasePersistentObject>();
     _listFactories[classType] = (listFactory == null
         ? () => new List<PersistentObject>()
         : listFactory);
