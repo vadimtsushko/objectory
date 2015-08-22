@@ -1,5 +1,11 @@
 #Recent change notes
 
+###0.4.3
+
+- Loosing type annotation - `_id` field can be something another then ObjectId.
+  Use assertions for consistent usage of one type for `_id` fields across objectory application.
+
+
 ###0.4.2
 
 - DbRefs removed. Pointers to linked objects use Manual pointers (plain ObjecId).
