@@ -133,7 +133,7 @@ class Objectory {
     if (persistentObject.id != null) {
       res = update(persistentObject);
     } else {
-      persistentObject.id = generateId();
+      persistentObject.id = idGenerator();
       persistentObject.map["_id"] = persistentObject.id;
       objectory.addToCache(persistentObject);
       res = insert(persistentObject);
@@ -142,7 +142,6 @@ class Objectory {
     return res;
   }
 
-  generateId() => new ObjectId();
 
   void registerClass(Type classType, FactoryMethod factory,
       FactoryMethod listFactory, Map<String, Type> linkedTypes) {
