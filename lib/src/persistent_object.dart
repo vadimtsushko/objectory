@@ -67,10 +67,17 @@ class BasePersistentObject {
 
   setLinkedObject(String property, PersistentObject value) {
     if (value == null) {
+      if (map[property] == null) {
+        return;
+      }
+      onValueChanging(property, null);
       map[property] = null;
     } else {
       if (value.id == null) {
         throw new Exception('Attemt to set link to unsaved object: $value');
+      }
+      if (this.map[property] == value.id) {
+        return;
       }
       onValueChanging(property, value.id);
       map[property] = value.id;
