@@ -133,7 +133,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future _postMessage(Map command, Map content, [Map extParams]) {
     requestId++;
     command['requestId'] = requestId;
-    webSocket.send(JSON.encode(new BSON().serialize({'header':command, 'content':content, 'extParams': extParams}).byteList));
+    webSocket.send(new BSON().serialize({'header':command, 'content':content, 'extParams': extParams}).byteList);
     var completer = new Completer();
     awaitedRequests[requestId] = completer;
     return completer.future;

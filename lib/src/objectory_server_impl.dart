@@ -2,7 +2,8 @@ library objectory_server_impl;
 import 'dart:io';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:logging/logging.dart';
-import 'dart:convert';
+
+//import 'dart:convert';
 
 final Logger _log = new Logger('Objectory server');
 
@@ -30,7 +31,7 @@ class ObjectoryClient {
     socket.done.catchError((e) {closed = true;});
     socket.listen((message) {
       try {
-        var binary = new BsonBinary.from(JSON.decode(message));
+        var binary = new BsonBinary.from(message);
         var jdata = new BSON().deserialize(binary);
         var header = new RequestHeader.fromMap(jdata['header']);
         Map content = jdata['content'];
