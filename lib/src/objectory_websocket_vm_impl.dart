@@ -132,7 +132,7 @@ class ObjectoryWebsocketConnectionImpl extends Objectory{
     assert(id.runtimeType == idType);
     return _postMessage(_createCommand('update', collection), toUpdate, {"_id": id});
   }
-  Future insert(PersistentObject persistentObject) =>
+  Future doInsert(PersistentObject persistentObject) =>
       _postMessage(_createCommand('insert',persistentObject.collectionName),persistentObject.map);
 
   Future remove(PersistentObject persistentObject) =>

@@ -15,15 +15,18 @@ class ObjectoryCollection {
   Future<PersistentObject> findOne([ObjectoryQueryBuilder selector]) {
     throw new Exception('method findOne must be implemented');
   }
+
   Future<int> count([ObjectoryQueryBuilder selector]) {
     throw new Exception('method count must be implemented');
   }
+
   Future<List<PersistentObject>> find([ObjectoryQueryBuilder selector]) {
     throw new Exception('method find must be implemented');
   }
+
   Future<PersistentObject> get(var id) {
-   assert(id.runtimeType == objectory.idType);
-   return objectory.findInCacheOrGetProxy(id, this.classType).fetch();
+    assert(id.runtimeType == objectory.idType);
+    return objectory.findInCacheOrGetProxy(id, this.classType).fetch();
   }
 }
 
@@ -32,12 +35,15 @@ class RawDbCollection {
   Future<Map> findOne([selector]) {
     throw new Exception('method findOne must be implemented');
   }
+
   Future<int> count([selector]) {
     throw new Exception('method count must be implemented');
   }
+
   Future<List<Map>> find([selector]) {
     throw new Exception('method find must be implemented');
   }
+
   Future remove([selector]) {
     throw new Exception('method find must be implemented');
   }
@@ -47,16 +53,18 @@ typedef Object FactoryMethod();
 typedef Map DataMapDecorator(Map map);
 typedef List DataListDecorator(List list);
 typedef dynamic IdGenerator();
+
 class Objectory {
   String uri;
+  String userName;
   Function registerClassesCallback;
   bool dropCollectionsOnStartup;
   IdGenerator idGenerator = () => new ObjectId();
   Type idType = ObjectId;
   DataMapDecorator dataMapDecorator = (Map map) => map;
   DataListDecorator dataListDecorator = (List list) => list;
-  final Map<String,Map<String, BasePersistentObject>> _cache =
-      new Map<String,Map<String, BasePersistentObject>>();
+  final Map<String, Map<String, BasePersistentObject>> _cache =
+      new Map<String, Map<String, BasePersistentObject>>();
   final Map<Type, FactoryMethod> _factories = new Map<Type, FactoryMethod>();
   final Map<Type, Map<String, Type>> _linkedTypes =
       new Map<Type, Map<String, Type>>();
@@ -67,34 +75,39 @@ class Objectory {
   final Map<String, Type> _collectionNameToTypeMap = new Map<String, Type>();
   bool useFieldLevelUpdate = true;
   bool _isOpen = false;
+  bool saveAuditData = true;
   Objectory(
       this.uri, this.registerClassesCallback, this.dropCollectionsOnStartup);
   void clearCache(Type classType) {
     _cache[classType.toString()].clear();
   }
+
   void addToCache(PersistentObject obj) {
     _cache[obj.runtimeType.toString()][obj.id.toString()] = obj;
     obj.markAsFetched();
   }
+
   Type getClassTypeByCollection(String collectionName) =>
       _collectionNameToTypeMap[collectionName];
-  PersistentObject findInCache(Type classType,var id) {
+  PersistentObject findInCache(Type classType, var id) {
     if (id == null) {
       return null;
     }
     return _cache[classType.toString()][id.toString()];
   }
+
   PersistentObject findInCacheOrGetProxy(var id, Type classType) {
     if (id == null) {
       return null;
     }
-    PersistentObject result = findInCache(classType,id);
+    PersistentObject result = findInCache(classType, id);
     if (result == null) {
       result = objectory.newInstance(classType);
       result.id = id;
     }
     return result;
   }
+
   BasePersistentObject newInstance(Type classType) {
     if (_factories.containsKey(classType)) {
       return _factories[classType]();
@@ -102,10 +115,12 @@ class Objectory {
     throw new Exception(
         'Class $classType have not been registered in Objectory');
   }
+
   PersistentObject dbRef2Object(DbRef dbRef) {
     return findInCacheOrGetProxy(
         dbRef.id, objectory.getClassTypeByCollection(dbRef.collection));
   }
+
   BasePersistentObject map2Object(Type classType, Map map) {
     if (map == null) {
       map = new LinkedHashMap();
@@ -120,6 +135,7 @@ class Objectory {
     }
     return result;
   }
+
   List createTypedList(Type classType) {
     return _listFactories[classType]();
   }
@@ -142,7 +158,6 @@ class Objectory {
     return res;
   }
 
-
   void registerClass(Type classType, FactoryMethod factory,
       FactoryMethod listFactory, Map<String, Type> linkedTypes) {
     _factories[classType] = factory;
@@ -159,6 +174,7 @@ class Objectory {
           _createObjectoryCollection(classType, collectionName);
     }
   }
+
   Future dropCollections() {
     throw new Exception('Must be implemented');
   }
@@ -166,6 +182,7 @@ class Objectory {
   Future open() {
     throw new Exception('Must be implemented');
   }
+
   ObjectoryCollection constructCollection() => new ObjectoryCollection();
   ObjectoryCollection _createObjectoryCollection(
       Type classType, String collectionName) {
@@ -173,24 +190,38 @@ class Objectory {
       ..classType = classType
       ..collectionName = collectionName;
   }
+
   Future insert(PersistentObject persistentObject) {
+    if (saveAuditData) {
+      persistentObject.map['createdBy'] = userName;
+      persistentObject.map['createdAt'] = new DateTime.now();
+    }
+    return doInsert(persistentObject);
+  }
+  Future doInsert(PersistentObject persistentObject) {
     throw new Exception('Must be implemented');
   }
+
   Future doUpdate(String collection, var id, Map toUpdate) {
     throw new Exception('Must be implemented');
   }
+
   Future remove(BasePersistentObject persistentObject) {
     throw new Exception('Must be implemented');
   }
+
   Future<Map> dropDb() {
     throw new Exception('Must be implemented');
   }
+
   Future<Map> wait() {
     throw new Exception('Must be implemented');
   }
+
   void close() {
     throw new Exception('Must be implemented');
   }
+
   Future initDomainModel() async {
     registerClassesCallback();
     await open();
@@ -199,6 +230,7 @@ class Objectory {
     }
     _isOpen = true;
   }
+
   ensureInitialized() async {
     if (!_isOpen) {
       await initDomainModel();
@@ -220,6 +252,7 @@ class Objectory {
     }
     return doUpdate(persistentObject.collectionName, id, toUpdate);
   }
+
   completeFindOne(Map map, Completer completer, ObjectoryQueryBuilder selector,
       Type classType) {
     var obj;
@@ -241,6 +274,10 @@ class Objectory {
     if (object.dirtyFields.isEmpty) {
       return const {};
     }
+    if (saveAuditData) {
+      object.map['modifiedBy'] = userName;
+      object.map['modifiedAt'] = new DateTime.now();
+    }
     if (!useFieldLevelUpdate) {
       return object.map;
     }
@@ -253,8 +290,13 @@ class Objectory {
       }
       builder.set(attr, root);
     }
+    if (saveAuditData) {
+      builder.set('modifiedBy', object.map['modifiedBy']);
+      builder.set('modifiedAt', object.map['modifiedAt']);
+    }
     return builder.map;
   }
+
   Future<PersistentObject> fetchLinks(PersistentObject obj) async {
     var lt = _linkedTypes[obj.runtimeType];
     for (var propertyName in lt.keys) {

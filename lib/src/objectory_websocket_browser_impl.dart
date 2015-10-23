@@ -133,7 +133,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
   Future _postMessage(Map command, Map content, [Map extParams]) {
     requestId++;
     command['requestId'] = requestId;
-    webSocket.send(new BSON().serialize({'header':command, 'content':content, 'extParams': extParams}).byteList);
+    webSocket.send(JSON.encode(new BSON().serialize({'header':command, 'content':content, 'extParams': extParams}).byteList));
     var completer = new Completer();
     awaitedRequests[requestId] = completer;
     return completer.future;
@@ -148,7 +148,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
     return _postMessage(_createCommand('update', collection), toUpdate, {"_id": id});
   }
 
-  Future insert(PersistentObject persistentObject) =>
+  Future doInsert(PersistentObject persistentObject) =>
       _postMessage(_createCommand('insert',persistentObject.collectionName),persistentObject.map);
 
   Future remove(PersistentObject persistentObject) =>
@@ -164,6 +164,10 @@ class ObjectoryWebsocketBrowserImpl extends Objectory{
 
   Future<Map> wait(){
     return queryDb({"getlasterror":1});
+  }
+
+  Future<Map> authenticate(String authToken, String userName) async {
+      return _postMessage(_createCommand('authenticate',null),{'authToken': authToken, 'userName': userName});
   }
 
   void close(){

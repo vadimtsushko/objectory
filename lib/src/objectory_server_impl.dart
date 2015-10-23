@@ -31,7 +31,7 @@ class ObjectoryClient {
     socket.done.catchError((e) {closed = true;});
     socket.listen((message) {
       try {
-        var binary = new BsonBinary.from(message);
+        var binary = new BsonBinary.from(JSON.decode(message));
         var jdata = new BSON().deserialize(binary);
         var header = new RequestHeader.fromMap(jdata['header']);
         Map content = jdata['content'];
