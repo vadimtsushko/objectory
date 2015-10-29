@@ -144,15 +144,15 @@ class Objectory {
       .map((ObjectoryCollection oc) => oc.collectionName)
       .toList();
 
-  Future save(PersistentObject persistentObject) {
-    Future res;
+  Future save(PersistentObject persistentObject) async {
+    var res;
     if (persistentObject.id != null) {
-      res = update(persistentObject);
+      res = await update(persistentObject);
     } else {
       persistentObject.id = idGenerator();
       persistentObject.map["_id"] = persistentObject.id;
       objectory.addToCache(persistentObject);
-      res = insert(persistentObject);
+      res = await insert(persistentObject);
     }
     persistentObject.dirtyFields.clear();
     return res;
@@ -191,14 +191,15 @@ class Objectory {
       ..collectionName = collectionName;
   }
 
-  Future insert(PersistentObject persistentObject) {
+  Future insert(PersistentObject persistentObject) async {
     if (saveAuditData) {
       persistentObject.map['createdBy'] = userName;
       persistentObject.map['createdAt'] = new DateTime.now();
     }
-    return doInsert(persistentObject);
+    await saveObjectToHistory(persistentObject,'i');
+    return doInsert(persistentObject.collectionName, persistentObject.map);
   }
-  Future doInsert(PersistentObject persistentObject) {
+  Future doInsert(String collection, Map toUpdate) {
     throw new Exception('Must be implemented');
   }
 
@@ -237,7 +238,7 @@ class Objectory {
     }
   }
 
-  Future update(PersistentObject persistentObject) {
+  Future update(PersistentObject persistentObject) async {
     var id = persistentObject.id;
     if (id == null) {
       return new Future.error(
@@ -250,6 +251,7 @@ class Objectory {
         'warn': 'Update operation called without actual changes'
       });
     }
+    await saveObjectToHistory(persistentObject,'u');
     return doUpdate(persistentObject.collectionName, id, toUpdate);
   }
 
@@ -308,6 +310,14 @@ class Objectory {
     }
     return obj;
   }
-
+  Future saveObjectToHistory(PersistentObject obj, String operationType) async {
+    String historyCollectionName = obj.collectionName + 'History';
+    Map toInsert = new Map.from(obj.map);
+    var objectId = toInsert.remove('_id');
+    toInsert['_id'] = idGenerator();
+    toInsert['_originalObjectId'] = objectId;
+    toInsert['_logOperationType'] = operationType;
+    await doInsert(historyCollectionName, toInsert);
+  }
   ObjectoryCollection operator [](Type classType) => _collections[classType];
 }

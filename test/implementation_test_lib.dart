@@ -20,64 +20,61 @@ Future simpleTestInsertionAndUpdate() async {
   expect(authFromDb.age, 4);
   objectory.close();
 }
+
 Future simpleTestInsertAndRemove() async {
   Author author;
   await objectory.initDomainModel();
-    author = new Author();
-    author.name = 'Dan';
-    author.age = 3;
-    author.email = 'who@cares.net';
-   await author.save();
+  author = new Author();
+  author.name = 'Dan';
+  author.age = 3;
+  author.email = 'who@cares.net';
+  await author.save();
   Author authFromDb = await objectory[Author].findOne(where.id(author.id));
-    expect(authFromDb, isNotNull);
-    expect(authFromDb.age, 3);
-    await authFromDb.remove();
-  authFromDb = await  objectory[Author].findOne(where.id(author.id));
-    expect(authFromDb, isNull);
-    objectory.close();
+  expect(authFromDb, isNotNull);
+  expect(authFromDb.age, 3);
+  await authFromDb.remove();
+  authFromDb = await objectory[Author].findOne(where.id(author.id));
+  expect(authFromDb, isNull);
+  objectory.close();
 }
 
-Future testInsertionAndUpdate() {
-  return objectory.initDomainModel().then((_) {
-    Author author = new Author();
-    author.name = 'Dan';
-    author.age = 3;
-    author.email = 'who@cares.net';
-    author.save();
-    author.age = 4;
-    author.save();
-    return objectory[Author].find();
-  }).then((coll) {
-    expect(coll.length, 1);
-    Author authFromMongo = coll[0];
-    expect(authFromMongo.age, 4);
-    objectory.close();
-  });
+Future testInsertionAndUpdate() async {
+  await objectory.initDomainModel();
+  Author author = new Author();
+  author.name = 'Dan';
+  author.age = 3;
+  author.email = 'who@cares.net';
+  await author.save();
+  author.age = 4;
+  await author.save();
+  var coll = await objectory[Author].find();
+  expect(coll.length, 1);
+  Author authFromMongo = coll[0];
+  expect(authFromMongo.age, 4);
+  await objectory.close();
 }
 
-Future testSaveWithoutChanges() {
-  return objectory.initDomainModel().then((_) {
-    Author author = new Author();
-    author.name = 'Dan';
-    author.age = 3;
-    author.email = 'who@cares.net';
-    author.save();
-    author.age = 4;
-    author.save();
-    return objectory[Author].find();
-  }).then((coll) {
-    expect(coll.length, 1);
-    Author authFromMongo = coll[0];
-    expect(authFromMongo.age, 4);
-    authFromMongo.save();
-    return objectory[Author].findOne(where.id(authFromMongo.id));
-  }).then((Author author1) {
-    expect(author1.age, 4);
-    expect(author1.name, 'DAN'); // Converted to uppecase in setter
-    expect(author1.email, 'who@cares.net');
-    objectory.close();
-  });
+Future testSaveWithoutChanges() async {
+  await objectory.initDomainModel();
+  Author author = new Author();
+  author.name = 'Dan';
+  author.age = 3;
+  author.email = 'who@cares.net';
+  author.save();
+  author.age = 4;
+  await author.save();
+  var coll = await objectory[Author].find();
+  expect(coll.length, 1);
+  Author authFromMongo = coll[0];
+  expect(authFromMongo.age, 4);
+  authFromMongo.save();
+  var author1 = await objectory[Author].findOne(where.id(authFromMongo.id));
+  expect(author1.age, 4);
+  expect(author1.name, 'DAN'); // Converted to uppecase in setter
+  expect(author1.email, 'who@cares.net');
+  await objectory.close();
 }
+
 Future testMatch() {
   return objectory.initDomainModel().then((_) {
     var person = new Person();
@@ -99,6 +96,7 @@ Future testMatch() {
     objectory.close();
   });
 }
+
 Future testJsQuery() {
   return objectory.initDomainModel().then((_) {
     var person = new Person();
@@ -139,65 +137,62 @@ Future tesFindWithoutParams() {
     objectory.close();
   });
 }
-Future testCompoundObject() {
-  return objectory.initDomainModel().then((_) {
-    var person = new Person();
-    person.address.cityName = 'Tyumen';
-    person.address.streetName = 'Elm';
-    person.firstName = 'Dick';
-    person.save();
-    return objectory[Person].findOne(where.id(person.id));
-  }).then((Person savedPerson) {
-    expect(savedPerson.firstName, 'Dick');
-    expect(savedPerson.address.streetName, 'Elm');
-    expect(savedPerson.address.cityName, 'Tyumen');
-    savedPerson.firstName = 'Fred';
-    savedPerson.address.cityName = 'Moscow';
-    savedPerson.save();
-    return objectory[Person].findOne(where.id(savedPerson.id));
-  }).then((Person savedPerson) {
-    expect(savedPerson.firstName, 'Fred');
-    expect(savedPerson.address.streetName, 'Elm');
-    expect(savedPerson.address.cityName, 'Moscow');
-    return objectory[Person]
-        .findOne(where.eq($Person.address.cityName, 'Moscow'));
-  }).then((Person savedPerson) {
-    expect(savedPerson, isNotNull);
-    expect(savedPerson.firstName, 'Fred');
-    expect(savedPerson.address.streetName, 'Elm');
-    expect(savedPerson.address.cityName, 'Moscow');
-    objectory.close();
-  });
+
+Future testCompoundObject() async {
+  await objectory.initDomainModel();
+  var person = new Person();
+  person.address.cityName = 'Tyumen';
+  person.address.streetName = 'Elm';
+  person.firstName = 'Dick';
+  await person.save();
+  Person savedPerson = await objectory[Person].findOne(where.id(person.id));
+  expect(savedPerson.firstName, 'Dick');
+  expect(savedPerson.address.streetName, 'Elm');
+  expect(savedPerson.address.cityName, 'Tyumen');
+  savedPerson.firstName = 'Fred';
+  savedPerson.address.cityName = 'Moscow';
+  await savedPerson.save();
+  savedPerson = await objectory[Person].findOne(where.id(savedPerson.id));
+  expect(savedPerson.firstName, 'Fred');
+  expect(savedPerson.address.streetName, 'Elm');
+  expect(savedPerson.address.cityName, 'Moscow');
+  savedPerson = await objectory[Person]
+      .findOne(where.eq($Person.address.cityName, 'Moscow'));
+
+  expect(savedPerson, isNotNull);
+  expect(savedPerson.firstName, 'Fred');
+  expect(savedPerson.address.streetName, 'Elm');
+  expect(savedPerson.address.cityName, 'Moscow');
+  await objectory.close();
 }
-Future testObjectWithExternalRefs() {
+
+Future testObjectWithExternalRefs() async {
   Person sonFromObjectory;
-  return objectory.initDomainModel().then((_) {
-    Person father = new Person();
-    father.firstName = 'Father';
-    father.save();
-    Person son = new Person();
-    son.firstName = 'Son';
-    son.save();
-    expect(son.dirtyFields.isEmpty, isTrue);
-    son.father = father;
-    expect(son.dirtyFields.length, 1);
-    son.save();
-    objectory.clearCache(Person);
-    return objectory[Person].findOne(where.id(son.id));
-  }).then((_sonFromObjectory) {
-    sonFromObjectory = _sonFromObjectory;
-    //expect(()=>sonFromObjectory.father.firstName,throws,reason: 'Links must be fetched before use');
-    print(sonFromObjectory);
-    expect(sonFromObjectory.map['father'] is ObjectId, isTrue,
-        reason: 'Unfetched links are not of type ObjectId');
-    expect(sonFromObjectory.mother, isNull, reason: 'Unassigned link');
-    return sonFromObjectory.fetchLinks();
-  }).then((__) {
-    expect(sonFromObjectory.father.firstName, 'Father');
-    expect(sonFromObjectory.mother, isNull);
-    objectory.close();
-  });
+  await objectory.initDomainModel();
+  Person father = new Person();
+  father.firstName = 'Father';
+  await father.save();
+  Person son = new Person();
+  son.firstName = 'Son';
+  await son.save();
+  expect(son.dirtyFields.isEmpty, isTrue);
+  son.father = father;
+  expect(son.dirtyFields.length, 1);
+  await son.save();
+  objectory.clearCache(Person);
+  var _sonFromObjectory = await objectory[Person].findOne(where.id(son.id));
+  sonFromObjectory = _sonFromObjectory;
+  //expect(()=>sonFromObjectory.father.firstName,throws,reason: 'Links must be fetched before use');
+  print(sonFromObjectory);
+  expect(sonFromObjectory.map['father'] is ObjectId, isTrue,
+      reason: 'Unfetched links are not of type ObjectId');
+  expect(sonFromObjectory.mother, isNull, reason: 'Unassigned link');
+  await sonFromObjectory.fetchLinks();
+  expect(sonFromObjectory.father.firstName, 'Father');
+  expect(sonFromObjectory.mother, isNull);
+  await objectory.close();
 }
+
 Future testObjectWithCollectionOfExternalRefs() {
   Person father;
   Person son;
@@ -308,38 +303,32 @@ Future testMap2ObjectWithListtOfInternalObjectsWithExternalRefs() {
   });
 }
 
-Future testLimit() {
-  return objectory.initDomainModel().then((_) {
-    for (int n = 0; n < 30; n++) {
-      Author author = new Author();
-      author.age = n;
-      author.save();
-    }
-    return objectory.wait();
-  }).then((coll) {
-    return objectory[Author].find(where.skip(20).limit(10));
-  }).then((coll) {
-    expect(coll.length, 10);
-    Author authFromMongo = coll[0];
-    expect(authFromMongo.age, 20);
-    objectory.close();
-  });
+Future testLimit() async {
+  await objectory.initDomainModel();
+  for (int n = 0; n < 30; n++) {
+    Author author = new Author();
+    author.age = n;
+    await author.save();
+  }
+  await objectory.wait();
+  var coll = await objectory[Author].find(where.skip(20).limit(10));
+  expect(coll.length, 10);
+  Author authFromMongo = coll[0];
+  expect(authFromMongo.age, 20);
+  await objectory.close();
 }
 
-Future testCount() {
-  return objectory.initDomainModel().then((_) {
-    for (int n = 0; n < 27; n++) {
-      Author author = new Author();
-      author.age = n;
-      author.save();
-    }
-    return objectory.wait();
-  }).then((coll) {
-    return objectory[Author].count();
-  }).then((_count) {
-    expect(_count, 27);
-    objectory.close();
-  });
+Future testCount() async {
+  await objectory.initDomainModel();
+  for (int n = 0; n < 27; n++) {
+    Author author = new Author();
+    author.age = n;
+    await author.save();
+  }
+  await objectory.wait();
+  var _count = await objectory[Author].count();
+  expect(_count, 27);
+  await objectory.close();
 }
 
 Future testFindWithFetchLinksMode() {
@@ -379,6 +368,7 @@ Future testFindOneDontGetObjectFromCache() {
     objectory.close();
   });
 }
+
 Future testCollectionGet() {
   return objectory.initDomainModel().then((_) {
     var person = new Person();
@@ -399,7 +389,8 @@ Future testCollectionGet() {
     return objectory[Person].get(person.id);
   }).then((Person person) {
     expect(person.lastName, 'unsaved changes',
-        reason: 'Collection get method should get objects from objectory cache');
+        reason:
+            'Collection get method should get objects from objectory cache');
     objectory.close();
   });
 }
@@ -436,6 +427,7 @@ _setupArticle(objectory) {
   objectory.save(article);
   objectory.cache.clear();
 }
+
 allImplementationTests() {
   test('simpleTestInsertionAndUpdate', () async {
     await objectory.initDomainModel();
@@ -463,7 +455,7 @@ allImplementationTests() {
     expect(authFromDb, isNotNull);
     expect(authFromDb.age, 3);
     await authFromDb.remove();
-    authFromDb = await  objectory[Author].findOne(where.id(author.id));
+    authFromDb = await objectory[Author].findOne(where.id(author.id));
     expect(authFromDb, isNull);
     objectory.close();
   });
@@ -475,13 +467,17 @@ allImplementationTests() {
   test('testCompoundObject', testCompoundObject);
   test('testObjectWithExternalRefs', testObjectWithExternalRefs);
   test('testObjectWithCollectionOfExternalRefs',
-      testObjectWithCollectionOfExternalRefs, skip: 'Not implemented yet in new version');
+      testObjectWithCollectionOfExternalRefs,
+      skip: 'Not implemented yet in new version');
   test('testMap2ObjectWithListtOfInternalObjectsWithExternalRefs',
-      testMap2ObjectWithListtOfInternalObjectsWithExternalRefs, skip: 'Not implemented yet in new version');
+      testMap2ObjectWithListtOfInternalObjectsWithExternalRefs,
+      skip: 'Not implemented yet in new version');
   test('testLimit', testLimit);
   test('testCount', testCount);
-  test('testFindWithFetchLinksMode', testFindWithFetchLinksMode, skip: 'Not implemented yet in new version');
-  test('testFindOneWithFetchLinksMode', testFindOneWithFetchLinksMode, skip: 'Not implemented yet in new version');
+  test('testFindWithFetchLinksMode', testFindWithFetchLinksMode,
+      skip: 'Not implemented yet in new version');
+  test('testFindOneWithFetchLinksMode', testFindOneWithFetchLinksMode,
+      skip: 'Not implemented yet in new version');
   test('testFindOneDontGetObjectFromCache', testFindOneDontGetObjectFromCache);
   test('testCollectionGet', testCollectionGet);
 }

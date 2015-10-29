@@ -53,8 +53,8 @@ class ObjectoryDirectConnectionImpl extends Objectory{
     db = new Db(uri);
     return db.open();
   }
-  Future doInsert(PersistentObject persistentObject) =>
-      db.collection(persistentObject.collectionName).insert(persistentObject.map);
+  Future doInsert(String collectionName, Map toInsert) =>
+      db.collection(collectionName).insert(toInsert);
 
   Future doUpdate(String collection,var id, Map toUpdate) {
         assert(id.runtimeType == idType);
