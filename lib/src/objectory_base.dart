@@ -9,6 +9,15 @@ import 'package:mongo_dart_query/mongo_dart_query.dart' hide where;
 
 Objectory objectory;
 
+class HistoryRecord {
+  DateTime timestamp;
+  String author;
+  String operation;
+  String content;
+  String toString() =>
+      'LogItem(author: $author, timestamp: $timestamp, content: $content)';
+}
+
 class ObjectoryCollection {
   String collectionName;
   Type classType;
@@ -196,15 +205,21 @@ class Objectory {
       persistentObject.map['createdBy'] = userName;
       persistentObject.map['createdAt'] = new DateTime.now();
     }
-    await saveObjectToHistory(persistentObject,'i');
+    await saveObjectToHistory(persistentObject, 'i');
     return doInsert(persistentObject.collectionName, persistentObject.map);
   }
+
   Future doInsert(String collection, Map toUpdate) {
     throw new Exception('Must be implemented');
   }
 
   Future doUpdate(String collection, var id, Map toUpdate) {
     throw new Exception('Must be implemented');
+  }
+
+  Stream<Map> findRawObjects(String collectionName,
+      [ObjectoryQueryBuilder selector]) {
+    throw new Exception('method findRawObjects must be implemented');
   }
 
   Future remove(BasePersistentObject persistentObject) {
@@ -251,7 +266,7 @@ class Objectory {
         'warn': 'Update operation called without actual changes'
       });
     }
-    await saveObjectToHistory(persistentObject,'u');
+    await saveObjectToHistory(persistentObject, 'u');
     return doUpdate(persistentObject.collectionName, id, toUpdate);
   }
 
@@ -310,6 +325,7 @@ class Objectory {
     }
     return obj;
   }
+
   Future saveObjectToHistory(PersistentObject obj, String operationType) async {
     String historyCollectionName = obj.collectionName + 'History';
     Map toInsert = new Map.from(obj.map);
@@ -319,5 +335,49 @@ class Objectory {
     toInsert['_logOperationType'] = operationType;
     await doInsert(historyCollectionName, toInsert);
   }
+
+  getHistoryStreamForObject(PersistentObject object) async {
+    return await findRawObjects(object.collectionName + 'History',
+        where.eq('_originalObjectId', object.id).sortBy('modifiedAt')).toList();
+  }
+
+  HistoryRecord getHistoryRecord(List<String> fields, Map item, Map prevItem) {
+    HistoryRecord result = new HistoryRecord();
+    result.operation = item['_logOperationType'];
+    if (result.operation == 'i') {
+      result.timestamp = item['createdAt'];
+      result.author = item['createdBy'];
+    } else {
+      result.timestamp = item['modifiedAt'];
+      result.author = item['modifiedBy'];
+    }
+    var contentList = new List<String>();
+    for (var field in fields) {
+      if (prevItem.isEmpty || item[field] != prevItem[field]) {
+        contentList.add('$field: ${item[field]}');
+      }
+    }
+    result.content = contentList.join(', ');
+    return result;
+  }
+
+  Future<List<HistoryRecord>> getHistoryFor(PersistentObject object) async {
+    var result = new List<HistoryRecord>();
+    var items =  await findRawObjects(object.collectionName + 'History',
+        where.eq('_originalObjectId', object.id).sortBy('modifiedAt')).toList();
+    var fields = object.$allFields;
+    Map prevItem = {};
+    for (Map item in items) {
+      var historyRecord =
+          getHistoryRecord(fields, item, prevItem);
+      if (historyRecord.content != '') {
+        result.add(historyRecord);
+      }
+      prevItem = item;
+    }
+
+    return result;
+  }
+
   ObjectoryCollection operator [](Type classType) => _collections[classType];
 }

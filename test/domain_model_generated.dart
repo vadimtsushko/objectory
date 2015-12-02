@@ -15,6 +15,7 @@ class $Article {
 
 class Article extends PersistentObject {
   String get collectionName => 'Article';
+  List<String> get $allFields => $Article.allFields;
   String get title => getProperty('title');
   set title (String value) => setProperty('title',value);
   String get body => getProperty('body');
@@ -40,6 +41,7 @@ class $Address {
 
 class Address extends EmbeddedPersistentObject {
   String get collectionName => 'Address';
+  List<String> get $allFields => $Address.allFields;
   String get cityName => getProperty('cityName');
   set cityName (String value) => setProperty('cityName',value);
   String get zipCode => getProperty('zipCode');
@@ -62,6 +64,7 @@ class $User {
 
 class User extends PersistentObject {
   String get collectionName => 'User';
+  List<String> get $allFields => $User.allFields;
   String get name => getProperty('name');
   set name (String value) => setProperty('name',value);
   String get email => getProperty('email');
@@ -85,6 +88,7 @@ class $Comment {
 
 class Comment extends EmbeddedPersistentObject {
   String get collectionName => 'Comment';
+  List<String> get $allFields => $Comment.allFields;
   User get user => getLinkedObject('user', User);
   set user (User value) => setLinkedObject('user',value);
   String get body => getProperty('body');
@@ -104,6 +108,7 @@ class $Customer {
 
 class Customer extends PersistentObject {
   String get collectionName => 'Customer';
+  List<String> get $allFields => $Customer.allFields;
   String get name => getProperty('name');
   set name (String value) => setProperty('name',value);
   List<Address> get addresses => getPersistentList(Address,'addresses');
@@ -125,6 +130,7 @@ class $Person {
 
 class Person extends PersistentObject {
   String get collectionName => 'Person';
+  List<String> get $allFields => $Person.allFields;
   String get firstName => getProperty('firstName');
   set firstName (String value) => setProperty('firstName',value);
   String get lastName => getProperty('lastName');
@@ -152,6 +158,7 @@ class $Author {
 
 class AuthorBase extends PersistentObject {
   String get collectionName => 'AuthorBase';
+  List<String> get $allFields => $AuthorBase.allFields;
   String get name => getProperty('name');
   set name (String value) => setProperty('name',value);
   String get email => getProperty('email');

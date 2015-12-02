@@ -114,6 +114,9 @@ part of domain_model;
         'class ${classGenerator.persistentClassName} extends ${embeddedModifier}PersistentObject {\n');
     output.writeln(
         "  String get collectionName => '${classGenerator.persistentClassName}';");
+    output.writeln(
+        "  List<String> get \$allFields => \$${classGenerator.persistentClassName}.allFields;");
+
     classGenerator.properties.forEach(generateOuputForProperty);
     _linkedTypes[classGenerator.type] = classGenerator.properties
         .where((PropertyGenerator p) =>

@@ -8,7 +8,19 @@ import 'dart:collection';
 import 'package:quiver/core.dart';
 part 'persistent_list.dart';
 
-enum PropertyType { String, int, double, bool, DateTime, ObjectId, LinkedObject, EmbeddedPersistentObject, List, ListOfLinks, ListOfEmbeddedObjects}
+enum PropertyType {
+  String,
+  int,
+  double,
+  bool,
+  DateTime,
+  ObjectId,
+  LinkedObject,
+  EmbeddedPersistentObject,
+  List,
+  ListOfLinks,
+  ListOfEmbeddedObjects
+}
 
 class PropertyDescriptor {
   final PropertyType type;
@@ -168,8 +180,12 @@ class PersistentObject extends BasePersistentObject {
     assert(value == null || value.runtimeType == objectory.idType);
     map['_id'] = value;
   }
+
   PersistentObject() : super() {
     _setMap(map);
+  }
+  List<String> get $allFields {
+    throw new Exception('Must be implemented');
   }
 
   set map(Map newValue) {

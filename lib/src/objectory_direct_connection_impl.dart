@@ -29,8 +29,11 @@ class ObjectoryCollectionDirectConnectionImpl extends ObjectoryCollection{
         }
       });
     return completer.future;
-  }  
-  
+  }
+
+
+
+
   Future<PersistentObject> findOne([ObjectoryQueryBuilder selector]){
     Completer completer = new Completer();
     objectoryImpl.db.collection(collectionName)
@@ -60,6 +63,10 @@ class ObjectoryDirectConnectionImpl extends Objectory{
         assert(id.runtimeType == idType);
         return db.collection(collection).update({"_id": id},toUpdate);
   }
+
+
+  Stream<Map> findRawObjects(String collectionName, [ObjectoryQueryBuilder selector])
+    => db.collection(collectionName).find(selector);
 
   Future remove(PersistentObject persistentObject) =>
       db.collection(persistentObject.collectionName).remove({"_id":persistentObject.id});

@@ -15,6 +15,7 @@ class $Article {
 
 class Article extends PersistentObject {
   String get collectionName => 'Article';
+  List<String> get $allFields => $Article.allFields;
   String get title => getProperty('title');
   set title (String value) => setProperty('title',value);
   String get body => getProperty('body');
@@ -38,6 +39,7 @@ class $User {
 
 class User extends PersistentObject {
   String get collectionName => 'User';
+  List<String> get $allFields => $User.allFields;
   String get name => getProperty('name');
   set name (String value) => setProperty('name',value);
   String get email => getProperty('email');
@@ -61,6 +63,7 @@ class $BlogComment {
 
 class BlogComment extends EmbeddedPersistentObject {
   String get collectionName => 'BlogComment';
+  List<String> get $allFields => $BlogComment.allFields;
   User get user => getLinkedObject('user', User);
   set user (User value) => setLinkedObject('user',value);
   String get body => getProperty('body');
@@ -83,6 +86,7 @@ class $Author {
 
 class Author extends PersistentObject {
   String get collectionName => 'Author';
+  List<String> get $allFields => $Author.allFields;
   String get name => getProperty('name');
   set name (String value) => setProperty('name',value);
   String get email => getProperty('email');
