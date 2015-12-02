@@ -217,7 +217,7 @@ class Objectory {
     throw new Exception('Must be implemented');
   }
 
-  Stream<Map> findRawObjects(String collectionName,
+  Future<List<Map>> findRawObjects(String collectionName,
       [ObjectoryQueryBuilder selector]) {
     throw new Exception('method findRawObjects must be implemented');
   }
@@ -336,11 +336,6 @@ class Objectory {
     await doInsert(historyCollectionName, toInsert);
   }
 
-  getHistoryStreamForObject(PersistentObject object) async {
-    return await findRawObjects(object.collectionName + 'History',
-        where.eq('_originalObjectId', object.id).sortBy('modifiedAt')).toList();
-  }
-
   HistoryRecord getHistoryRecord(List<String> fields, Map item, Map prevItem) {
     HistoryRecord result = new HistoryRecord();
     result.operation = item['_logOperationType'];
@@ -364,7 +359,7 @@ class Objectory {
   Future<List<HistoryRecord>> getHistoryFor(PersistentObject object) async {
     var result = new List<HistoryRecord>();
     var items =  await findRawObjects(object.collectionName + 'History',
-        where.eq('_originalObjectId', object.id).sortBy('modifiedAt')).toList();
+        where.eq('_originalObjectId', object.id).sortBy('modifiedAt'));
     var fields = object.$allFields;
     Map prevItem = {};
     for (Map item in items) {

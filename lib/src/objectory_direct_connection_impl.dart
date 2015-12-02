@@ -65,8 +65,8 @@ class ObjectoryDirectConnectionImpl extends Objectory{
   }
 
 
-  Stream<Map> findRawObjects(String collectionName, [ObjectoryQueryBuilder selector])
-    => db.collection(collectionName).find(selector);
+  Future<List<Map>> findRawObjects(String collectionName, [ObjectoryQueryBuilder selector]) async
+    => await db.collection(collectionName).find(selector).toList();
 
   Future remove(PersistentObject persistentObject) =>
       db.collection(persistentObject.collectionName).remove({"_id":persistentObject.id});
