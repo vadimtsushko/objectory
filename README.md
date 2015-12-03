@@ -1,4 +1,7 @@
 ##Objectory - object document mapper for server-side and client side Dart applications
+Update: Please consider that library as unsuppoprted and not in active developement. Current updates 
+(>0.3.22 published to pub) are mostly suited for usage in concrete scenario of internal project.
+
 
 Objectory provides typed, checked environment to model, save and query data persisted on MongoDb.
 
