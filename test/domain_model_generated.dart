@@ -31,7 +31,6 @@ class $Address {
   String get cityName => _pathToMe + '.cityName';
   String get zipCode => _pathToMe + '.zipCode';
   String get streetName => _pathToMe + '.streetName';
-  List<String> get allFields => [cityName, zipCode, streetName];
   static final List<PropertyDescriptor> simpleFields = [
     const PropertyDescriptor('cityName', PropertyType.String, 'cityName')
     ,const PropertyDescriptor('zipCode', PropertyType.String, 'zipCode')
@@ -41,7 +40,6 @@ class $Address {
 
 class Address extends EmbeddedPersistentObject {
   String get collectionName => 'Address';
-  List<String> get $allFields => $Address.allFields;
   String get cityName => getProperty('cityName');
   set cityName (String value) => setProperty('cityName',value);
   String get zipCode => getProperty('zipCode');
@@ -79,7 +77,6 @@ class $Comment {
   String get user => _pathToMe + '.user';
   String get body => _pathToMe + '.body';
   String get date => _pathToMe + '.date';
-  List<String> get allFields => [user, body, date];
   static final List<PropertyDescriptor> simpleFields = [
     const PropertyDescriptor('body', PropertyType.String, 'body')
     ,const PropertyDescriptor('date', PropertyType.DateTime, 'date')
@@ -88,7 +85,6 @@ class $Comment {
 
 class Comment extends EmbeddedPersistentObject {
   String get collectionName => 'Comment';
-  List<String> get $allFields => $Comment.allFields;
   User get user => getLinkedObject('user', User);
   set user (User value) => setLinkedObject('user',value);
   String get body => getProperty('body');
@@ -156,9 +152,9 @@ class $Author {
   ];
 }
 
-class AuthorBase extends PersistentObject {
-  String get collectionName => 'AuthorBase';
-  List<String> get $allFields => $AuthorBase.allFields;
+class Author extends PersistentObject {
+  String get collectionName => 'Author';
+  List<String> get $allFields => $Author.allFields;
   String get name => getProperty('name');
   set name (String value) => setProperty('name',value);
   String get email => getProperty('email');
