@@ -8,6 +8,7 @@ class Author {
   int age;
 }
 
+
 class User{
   String name;
   String email;
@@ -23,6 +24,7 @@ class Article{
 @embedded
 class BlogComment{
   User user;
+
   String body;
   DateTime date;
 }

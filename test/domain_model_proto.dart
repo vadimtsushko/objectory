@@ -1,7 +1,7 @@
 library domain_model_proto;
 import 'package:objectory/src/domain_model_generator.dart';
 
-@AsClass('AuthorBase')
+//@AsClass('AuthorBase')
 class Author {
   String name;
   String email;

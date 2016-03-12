@@ -54,7 +54,6 @@ class $BlogComment {
   String get user => _pathToMe + '.user';
   String get body => _pathToMe + '.body';
   String get date => _pathToMe + '.date';
-  List<String> get allFields => [user, body, date];
   static final List<PropertyDescriptor> simpleFields = [
     const PropertyDescriptor('body', PropertyType.String, 'body')
     ,const PropertyDescriptor('date', PropertyType.DateTime, 'date')
@@ -63,7 +62,6 @@ class $BlogComment {
 
 class BlogComment extends EmbeddedPersistentObject {
   String get collectionName => 'BlogComment';
-  List<String> get $allFields => $BlogComment.allFields;
   User get user => getLinkedObject('user', User);
   set user (User value) => setLinkedObject('user',value);
   String get body => getProperty('body');

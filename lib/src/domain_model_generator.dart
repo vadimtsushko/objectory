@@ -27,7 +27,9 @@ class Label {
   final String value;
   const Label(this.value);
 }
+
 const label = const Label('TEST');
+
 /// --> Metadata
 
 class PropertyType {
@@ -71,8 +73,11 @@ part of domain_model;
     saveOuput(outFileName);
   }
 
-  void generateOutput({bool header: true, bool persistentClasses: true,
-      bool schemaClasses: true, bool register: true}) {
+  void generateOutput(
+      {bool header: true,
+      bool persistentClasses: true,
+      bool schemaClasses: true,
+      bool register: true}) {
     if (header) {
       output.write(HEADER);
     }
@@ -89,7 +94,7 @@ part of domain_model;
       for (Type cls in _classesOrdered) {
         var linkedTypeMap = {};
         for (List each in _linkedTypes[cls]) {
-          linkedTypeMap["'${each.first}'"] =  each.last;
+          linkedTypeMap["'${each.first}'"] = each.last;
         }
 
         output.write(
@@ -114,9 +119,10 @@ part of domain_model;
         'class ${classGenerator.persistentClassName} extends ${embeddedModifier}PersistentObject {\n');
     output.writeln(
         "  String get collectionName => '${classGenerator.persistentClassName}';");
-    output.writeln(
-        "  List<String> get \$allFields => \$${classGenerator.persistentClassName}.allFields;");
-
+    if (!classGenerator.isEmbedded) {
+      output.writeln("  List<String> get \$allFields => \$${classGenerator
+              .persistentClassName}.allFields;");
+    }
     classGenerator.properties.forEach(generateOuputForProperty);
     _linkedTypes[classGenerator.type] = classGenerator.properties
         .where((PropertyGenerator p) =>
@@ -129,9 +135,9 @@ part of domain_model;
   void generateOuputForProperty(PropertyGenerator propertyGenerator) {
     //output.write(propertyGenerator.commentLine);
     if (propertyGenerator.propertyType == PropertyType.SIMPLE) {
-      output.write(
-          '  ${propertyGenerator.type} get ${propertyGenerator.name} => '
-          "getProperty('${propertyGenerator.name}');\n");
+      output
+          .write('  ${propertyGenerator.type} get ${propertyGenerator.name} => '
+              "getProperty('${propertyGenerator.name}');\n");
       output.write(
           '  set ${propertyGenerator.name} (${propertyGenerator.type} value) => '
           "setProperty('${propertyGenerator.name}',value);\n");
@@ -193,10 +199,10 @@ part of domain_model;
       chunkForEmbeddedProperies =
           "..addAll($embeddedProperties.expand((e)=>e.allFields))";
     }
-    if (classGenerator.isEmbedded) {
-      output.write(
-          "  List<String> get allFields => ${simpleProperties}${chunkForEmbeddedProperies};\n");
-    } else {
+    if (!classGenerator.isEmbedded) {
+//      output.write(
+//          "  List<String> get allFields => ${simpleProperties}${chunkForEmbeddedProperies};\n");
+//    } else {
       output.write(
           "  static final List<String> allFields = $simpleProperties${chunkForEmbeddedProperies};\n");
     }
@@ -225,7 +231,8 @@ part of domain_model;
       return false;
     }
     ClassGenerator targetClass = classGenerators.firstWhere(
-        (cg) => cg.type == propertyGenerator.type, orElse: () => null);
+        (cg) => cg.type == propertyGenerator.type,
+        orElse: () => null);
     if (targetClass == null) {
       throw new StateError(
           'Not found class ${propertyGenerator.type} in prototype schema');
@@ -246,7 +253,8 @@ part of domain_model;
       generatorClass.isEmbedded =
           classMirror.metadata.any((m) => m.type.reflectedType == Embedded);
       var asClassMirror = classMirror.metadata.firstWhere(
-          (m) => m.type.reflectedType == AsClass, orElse: () => null);
+          (m) => m.type.reflectedType == AsClass,
+          orElse: () => null);
       if (asClassMirror != null) {
         generatorClass.asClass = asClassMirror.getField(#value).reflectee;
       }
