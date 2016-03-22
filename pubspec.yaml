@@ -10,10 +10,12 @@ dependencies:
   logging: "^0.11.0"
   logging_handlers: any
   console_log_handler: any
+  shelf: any
   mongo_dart:
     git: 'https://github.com/vadimtsushko/mongo_dart.git'
   mongo_dart_query: "^0.2.0"
   quiver: ">=0.19.0+1 <0.20.0"
+  http: any
 dev_dependencies:
   args: 'any'
   hop: any

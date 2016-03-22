@@ -7,7 +7,6 @@ import 'package:test/test.dart';
 import 'domain_model.dart';
 
 Future simpleTestInsertionAndUpdate() async {
-  await objectory.initDomainModel();
   Author author = new Author();
   author.name = 'Dan';
   author.age = 3;
@@ -23,7 +22,6 @@ Future simpleTestInsertionAndUpdate() async {
 
 Future simpleTestInsertAndRemove() async {
   Author author;
-  await objectory.initDomainModel();
   author = new Author();
   author.name = 'Dan';
   author.age = 3;
@@ -39,7 +37,6 @@ Future simpleTestInsertAndRemove() async {
 }
 
 Future testInsertionAndUpdate() async {
-  await objectory.initDomainModel();
   Author author = new Author();
   author.name = 'Dan';
   author.age = 3;
@@ -55,7 +52,6 @@ Future testInsertionAndUpdate() async {
 }
 
 Future testSaveWithoutChanges() async {
-  await objectory.initDomainModel();
   Author author = new Author();
   author.name = 'Dan';
   author.age = 3;
@@ -70,7 +66,7 @@ Future testSaveWithoutChanges() async {
   authFromMongo.save();
   var author1 = await objectory[Author].findOne(where.id(authFromMongo.id));
   expect(author1.age, 4);
-  expect(author1.name, 'DAN'); // Converted to uppecase in setter
+  expect(author1.name, 'Dan'); // Converted to uppecase in setter
   expect(author1.email, 'who@cares.net');
   await objectory.close();
 }
@@ -139,7 +135,6 @@ Future tesFindWithoutParams() {
 }
 
 Future testCompoundObject() async {
-  await objectory.initDomainModel();
   var person = new Person();
   person.address.cityName = 'Tyumen';
   person.address.streetName = 'Elm';
@@ -168,7 +163,6 @@ Future testCompoundObject() async {
 
 Future testObjectWithExternalRefs() async {
   Person sonFromObjectory;
-  await objectory.initDomainModel();
   Person father = new Person();
   father.firstName = 'Father';
   await father.save();
@@ -183,7 +177,6 @@ Future testObjectWithExternalRefs() async {
   var _sonFromObjectory = await objectory[Person].findOne(where.id(son.id));
   sonFromObjectory = _sonFromObjectory;
   //expect(()=>sonFromObjectory.father.firstName,throws,reason: 'Links must be fetched before use');
-  print(sonFromObjectory);
   expect(sonFromObjectory.map['father'] is ObjectId, isTrue,
       reason: 'Unfetched links are not of type ObjectId');
   expect(sonFromObjectory.mother, isNull, reason: 'Unassigned link');
@@ -319,7 +312,6 @@ Future testLimit() async {
 }
 
 Future testCount() async {
-  await objectory.initDomainModel();
   for (int n = 0; n < 27; n++) {
     Author author = new Author();
     author.age = n;
@@ -429,8 +421,10 @@ _setupArticle(objectory) {
 }
 
 allImplementationTests() {
-  test('simpleTestInsertionAndUpdate', () async {
+  setUp(()async{
     await objectory.initDomainModel();
+  });
+  test('simpleTestInsertionAndUpdate', () async {
     Author author = new Author();
     author.name = 'Dan';
     author.age = 3;
@@ -445,7 +439,6 @@ allImplementationTests() {
   });
   test('simpleTestInsertAndRemove', () async {
     Author author;
-    await objectory.initDomainModel();
     author = new Author();
     author.name = 'Dan';
     author.age = 3;
