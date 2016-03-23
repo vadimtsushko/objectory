@@ -7,7 +7,7 @@ import '../domain_model/domain_model.dart';
 const DefaultUri = 'mongodb://127.0.0.1/objectory_vm1_tests';
 
 main() async {
-  objectory = new ObjectoryHttpImpl(DefaultUri, registerClasses, 'http://localhost:7777' );
+  objectory = new ObjectoryHttpImpl('http://localhost:7777', registerClasses );
   Author author;
   await objectory.initDomainModel();
   author = new Author();

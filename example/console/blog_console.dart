@@ -90,18 +90,16 @@ main() async {
   print(
       "===================================================================================");
   print(">> Printing articles");
-  await Future.wait(articles.map((article) => printArticle(article)));
+  for (var article in articles) {
+    await printArticle(article);
+  }
   await objectory.close();
 }
 
-Future printArticle(article) {
-  var completer = new Completer();
-  article.fetchLinks().then((__) {
-    print("${article.author.name}:${article.title}:${article.body}");
-    for (var comment in article.comments) {
-      print("     ${comment.date}:${comment.user.name}: ${comment.body}");
-    }
-    completer.complete(true);
-  });
-  return completer.future;
+printArticle(article) async {
+  await article.fetchLinks();
+  print("${article.author.name}:${article.title}:${article.body}");
+  for (var comment in article.comments) {
+    print("     ${comment.date}:${comment.user.name}: ${comment.body}");
+  }
 }

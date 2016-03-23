@@ -7,7 +7,6 @@ import 'package:bson/bson.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart';
-import 'package:http/browser_client.dart';
 
 class ObjectoryMessage {
   Map command;
@@ -104,10 +103,7 @@ class ObjectoryHttpImpl extends Objectory {
       'content': content,
       'extParams': extParams
     }).byteList);
-    var client = new BrowserClient();
-    Response response = await client.post(objectoryServerUrl, body: postBuffer);
-    client.close();
-
+    Response response = await post(objectoryServerUrl, body: postBuffer);
     var jdata = new BSON().deserialize(new BsonBinary.from(response.bodyBytes));
     var message = new ObjectoryMessage.fromMessage(jdata);
     return message.content;

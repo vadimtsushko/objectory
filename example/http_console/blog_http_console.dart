@@ -1,11 +1,8 @@
 library blog_example;
-
-import 'package:objectory/objectory_http.dart';
+import 'package:objectory/objectory.dart';
+import 'package:objectory/src/http_client_io.dart';
 import '../domain_model/domain_model.dart';
-import 'dart:html' as html;
-import 'dart:async';
 
-const DefaultUri = '127.0.0.1:8181';
 main() async {
   objectory = new ObjectoryHttpImpl('http://localhost:7777', registerClasses, dropCollectionsOnStartup: true );
   var authors = new Map<String, Author>();
@@ -103,11 +100,4 @@ printArticle(article) async {
   for (var comment in article.comments) {
     print("     ${comment.date}:${comment.user.name}: ${comment.body}");
   }
-}
-
-
-
-print(message) {
-  var textElement = html.querySelector('#text');
-  textElement.innerHtml = '${textElement.innerHtml}<br>\n${message.toString()}';
 }

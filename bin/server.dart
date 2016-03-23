@@ -1,5 +1,6 @@
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf/shelf_io.dart' as io;
+import 'package:shelf_cors/shelf_cors.dart' as shelf_cors;
 import 'package:args/args.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:objectory/src/objectory_shelf_handler.dart';
@@ -19,10 +20,16 @@ main(args) async {
   Db db = new Db(argMap['uri']);
   await db.open();
   var objectoryHandler = new ObjectoryHandler(db, true);
-  var handler = const shelf.Pipeline()  // .addMiddleware(shelf.logRequests())
+  var handler = const shelf.Pipeline()
+      .addMiddleware(shelf.logRequests())
+      .addMiddleware(shelf_cors.createCorsHeadersMiddleware())
       .addHandler(objectoryHandler.handle);
 
   io.serve(handler, 'localhost', 7777).then((server) {
     print('Serving at http://${server.address.host}:${server.port}');
   });
+}
+
+shelf.Response _echoRequest(shelf.Request request) {
+  return new shelf.Response.ok('Request for "${request.url}"');
 }
