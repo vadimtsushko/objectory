@@ -7,7 +7,6 @@ import 'package:bson/bson.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart';
-//import 'package:http';
 
 class ObjectoryMessage {
   Map command;
@@ -79,7 +78,7 @@ class ObjectoryCollectionHttpImpl extends ObjectoryCollection {
 }
 
 class ObjectoryHttpImpl extends Objectory {
-  Client browserClient;
+
   bool isConnected = false;
   String userName = '';
   String authToken = '';
@@ -90,34 +89,11 @@ class ObjectoryHttpImpl extends Objectory {
       : super(uri, registerClassesCallback, dropCollectionsOnStartup);
 
   Future open() async{
-    browserClient = new Client();
+
   }
 
   ObjectoryCollection constructCollection() =>
       new ObjectoryCollectionHttpImpl(this);
-
-
-  _onMessageRead(/*ProgressEvent event*/ data) {
-    /*FileReader reader = event.target;
-    var data = reader.result;
-    if (data is! List) {
-      data = new Uint8List.view(data);
-    }*/
-    var jdata = new BSON().deserialize(new BsonBinary.from(JSON.decode(data)));
-    //log.info('onmessage: $jdata');
-    var message = new ObjectoryMessage.fromMessage(jdata);
-    int receivedRequestId = message.command['requestId'];
-    if (receivedRequestId == null) {
-      return;
-    }
-    var completer = awaitedRequests[receivedRequestId];
-    if (completer != null) {
-      //log.fine("Complete request: $receivedRequestId message: $message");
-      completer.complete(message.content);
-    } else {
-      //log.shout('Not found completer for request: $receivedRequestId');
-    }
-  }
 
   Future _postMessage(Map command, Map content, [Map extParams]) async {
     requestId++;
@@ -127,10 +103,9 @@ class ObjectoryHttpImpl extends Objectory {
       'content': content,
       'extParams': extParams
     }).byteList);
-    Response response = await browserClient.post(objectoryServerUrl, body: postBuffer);
+    Response response = await post(objectoryServerUrl, body: postBuffer);
 
     var jdata = new BSON().deserialize(new BsonBinary.from(response.bodyBytes));
-    //log.info('onmessage: $jdata');
     var message = new ObjectoryMessage.fromMessage(jdata);
     return message.content;
   }
@@ -188,7 +163,7 @@ class ObjectoryHttpImpl extends Objectory {
   }
 
   void close() {
-    browserClient.close();
+
   }
 
   Future dropCollections() {

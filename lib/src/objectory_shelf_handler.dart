@@ -1,4 +1,4 @@
-library instock.shelf.objectory.server;
+library instock.shelf.objectory.handler;
 
 import 'dart:io';
 import 'package:mongo_dart/mongo_dart.dart';
@@ -35,65 +35,63 @@ class ObjectoryHandler {
 
   handle(shelf.Request request) async {
 //    try {
-      var message = await request.readAsString();
-      message = JSON.decode(message);
-      var binary = new BsonBinary.from(message);
-      var jdata = new BSON().deserialize(binary);
-      var header = new ObjectoryRequestHeader.fromMap(jdata['header']);
-      Map content = jdata['content'];
-      Map extParams = jdata['extParams'];
-//        if (header.command == 'authenticate') {
-//          authenticate(header, content);
-//          return;
-//        }
-      if (header.command == "insert") {
-        var result = await save(header, content);
-        return result;
-      }
-      if (header.command == "update") {
-        save(header, content, extParams);
-      }
-      if (header.command == "remove") {
-        return await remove(header, content);
-      }
-      if (header.command == "findOne") {
-        return await findOne(header, content, extParams);
-      }
-      if (header.command == "count") {
-        return await count(header, content, extParams);
-      }
-      if (header.command == "find") {
-        return await find(header, content, extParams);
-      }
-      if (header.command == "queryDb") {
-        return await queryDb(header, content);
-      }
+    var message = await request.readAsString();
+    message = JSON.decode(message);
+    var binary = new BsonBinary.from(message);
+    var jdata = new BSON().deserialize(binary);
+    var header = new ObjectoryRequestHeader.fromMap(jdata['header']);
+    print(header);
+    Map content = jdata['content'];
+    Map extParams = jdata['extParams'];
+    if (header.command == 'authenticate') {
+      return await authenticate(header, content);
+    }
+    if (header.command == "insert") {
+      var result = await save(header, content);
+      return result;
+    }
+    if (header.command == "update") {
+      save(header, content, extParams);
+    }
+    if (header.command == "remove") {
+      return await remove(header, content);
+    }
+    if (header.command == "findOne") {
+      return await findOne(header, content, extParams);
+    }
+    if (header.command == "count") {
+      return await count(header, content, extParams);
+    }
+    if (header.command == "find") {
+      return await find(header, content, extParams);
+    }
+    if (header.command == "queryDb") {
+      return await queryDb(header, content);
+    }
 //      if (header.command == "dropDb") {
 //        await dropDb(header);
 //        return;
 //      }
-      if (header.command == "dropCollection") {
-        return await dropCollection(header);
-      }
-      log.shout('Unexpected message: $message');
-      return sendError(header, content);
-//    } catch (e) {
-//      log.severe(e);
-//      return sendError(null, null);
-//    }
+    if (header.command == "dropCollection") {
+      return await dropCollection(header);
+    }
+    log.shout('Unexpected message: $message');
+    return sendError(header, content);
   }
 
   _encode(ObjectoryRequestHeader header, content) {
-    var buffer = new BSON().serialize({'header': header.toMap(), 'content': content}).byteList;
+    var buffer = new BSON()
+        .serialize({'header': header.toMap(), 'content': content}).byteList;
     return new Stream.fromIterable([buffer]);
   }
 
   sendResult(ObjectoryRequestHeader header, content) {
-    return new shelf.Response.ok(_encode(header,content));
+    return new shelf.Response.ok(_encode(header, content));
   }
 
   sendError(ObjectoryRequestHeader header, content) {
-    return new shelf.Response.internalServerError(body: _encode(header,content));
+    return new shelf.Response.internalServerError(
+        body: _encode(header, content));
   }
 
   save(ObjectoryRequestHeader header, Map mapToSave, [Map idMap]) async {
@@ -151,18 +149,15 @@ class ObjectoryHandler {
     return sendResult(header, responseData);
   }
 
-//  authenticate(RequestHeader header, Map selector) async {
-//    userName = selector['userName'];
-//    authToken = selector['authToken'];
-//    print('Objectory authenticate. userName: $userName');
-//    var result = <String, String>{};
-//    if (new StaticUserLookup().users.map((e) => e.first).contains(userName)) {
-//      authenticated = true;
-//      result['userName'] = userName;
-//      result['authToken'] = authToken;
-//    }
-//    sendResult(header, result);
-//  }
+  authenticate(ObjectoryRequestHeader header, Map selector) async {
+    userName = selector['userName'];
+    authToken = selector['authToken'];
+    print('Objectory authenticate. userName: $userName');
+    var result = <String, String>{};
+    result['userName'] = userName;
+    result['authToken'] = authToken;
+    return sendResult(header, result);
+  }
 
   count(ObjectoryRequestHeader header, Map selector, Map extParams) async {
     var responseData = await db
