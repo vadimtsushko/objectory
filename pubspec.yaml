@@ -1,5 +1,5 @@
 name: objectory
-version: 0.4.4-dev
+version: 0.5.0-dev
 author: Vadim Tsushko <vadimtsushko@gmail.com>
 description: Object document mapper/persistency layer for server-side and browser apps
 homepage: https://github.com/vadimtsushko/objectory
