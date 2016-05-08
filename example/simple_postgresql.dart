@@ -4,7 +4,7 @@ main() async{
   var driver = new PostgresqlDriver(username: 'testdb', database: 'testdb');
   var gateway = new Gateway(driver);
   await gateway.connect();
-  var query = gateway.table('User');
-  var res = await query.add({'name': 'Vadim'});
+  var res = await gateway.table('User').add({'name': 'Daniil'});
+  print(res);
   await gateway.disconnect();
 }
