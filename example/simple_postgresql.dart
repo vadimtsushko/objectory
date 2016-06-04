@@ -5,7 +5,8 @@ main() async{
   var gateway = new Gateway(driver);
   await gateway.connect();
   //var res = await gateway.table('User').add({'name': 'Daniil'});
-  var res = await gateway.table('User').add({'name': 'Вадим'});
-  print(res);
+  //var res = await gateway.table('User').add({'name': 'Вадим'});
+  //print(res);
+  await gateway.table('User').update({'name': 'Вадим'});
   await gateway.disconnect();
 }
