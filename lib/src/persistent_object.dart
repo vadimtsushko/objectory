@@ -14,6 +14,7 @@ enum PropertyType {
   double,
   bool,
   DateTime,
+  num,
   ObjectId,
   LinkedObject,
   EmbeddedPersistentObject,
