@@ -42,6 +42,7 @@ class Person {
   Address address;
   Person father;
   Person mother;
+  num age;
   List<Person> children;
 }
 

@@ -291,7 +291,7 @@ class PropertyGenerator {
 
     Type t = vm.type.reflectedType;
     type = t;
-    if (t == int || t == double || t == String || t == DateTime || t == bool) {
+    if (t == int || t == double || t == String || t == DateTime || t == bool || t == num) {
       return;
     }
 

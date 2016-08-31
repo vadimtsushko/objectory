@@ -116,11 +116,13 @@ class $Person {
   static final $Address address = new $Address('address');
   static String get father => 'father';
   static String get mother => 'mother';
+  static String get age => 'age';
   static String get children => 'children';
-  static final List<String> allFields = [firstName, lastName, father, mother, children]..addAll([address].expand((e)=>e.allFields));
+  static final List<String> allFields = [firstName, lastName, father, mother, age, children]..addAll([address].expand((e)=>e.allFields));
   static final List<PropertyDescriptor> simpleFields = [
     const PropertyDescriptor('firstName', PropertyType.String, 'firstName')
     ,const PropertyDescriptor('lastName', PropertyType.String, 'lastName')
+    ,const PropertyDescriptor('age', PropertyType.num, 'age')
   ];
 }
 
@@ -136,6 +138,8 @@ class Person extends PersistentObject {
   set father (Person value) => setLinkedObject('father',value);
   Person get mother => getLinkedObject('mother', Person);
   set mother (Person value) => setLinkedObject('mother',value);
+  num get age => getProperty('age');
+  set age (num value) => setProperty('age',value);
   List<Person> get children => getPersistentList(Person,'children');
 }
 
