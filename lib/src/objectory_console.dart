@@ -107,6 +107,10 @@ class ObjectoryConsole extends Objectory {
 
   Future truncate(Type persistentType) async {
     String tableName = this.tableName(persistentType);
+    return truncateTable(tableName);
+  }
+
+  Future truncateTable(String tableName) async {
     await connection.execute('TRUNCATE TABLE "$tableName"');
   }
 
@@ -132,7 +136,11 @@ class ObjectoryConsole extends Objectory {
   }
 
   Future<int> doCount(String tableName, selector) async {
-    List<Row> rows = await queryPostres(tableName, selector).toList();
+    SqlQueryBuilder sqlBuilder = new SqlQueryBuilder(tableName, selector);
+    String command = sqlBuilder.getQueryCountSql();
+    List<Row> rows = await connection
+        .query(command, sqlBuilder.params)
+        .toList();
     return rows.first.toList().first;
   }
 

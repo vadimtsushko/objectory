@@ -100,10 +100,10 @@ class ObjectoryClient {
 //          dropDb(header);
 //          return;
 //        }
-//        if (header.command == "dropCollection") {
-//          dropCollection(header);
-//          return;
-//        }
+        if (header.command == "truncate") {
+          truncate(header);
+          return;
+        }
         log.shout('Unexpected message: $message');
         sendResult(header, content);
       } catch (e) {
@@ -137,15 +137,15 @@ class ObjectoryClient {
   save(RequestHeader header, Map mapToSave, [Map idMap]) async {
     if (header.command == 'insert') {
       int newId = await objectory.doInsert(header.collection, mapToSave);
-      sendResult(header, {'id': newId});
+      sendResult(header, newId);
     } else {
-      var id = mapToSave['id'];
+      var id = idMap['id'];
       Map result = {};
       if (id == null) {
         log.shout(
-            'ERROR: Trying to update object without _id set. $header, $mapToSave');
+            'ERROR: Trying to update object without id set. $header, $mapToSave');
       } else {
-        var res = objectory.doUpdate(header.collection, id, mapToSave);
+        var res = await objectory.doUpdate(header.collection, id, mapToSave);
         result['result'] = res;
       }
       sendResult(header, result);
@@ -212,8 +212,16 @@ class ObjectoryClient {
   count(RequestHeader header, Map selector, Map extParams) async {
     int res = await objectory.doCount(
         header.collection, _queryBuilder(selector, extParams));
+    print('COUNT RESULT IS $res');
     sendResult(header, res);
   }
+
+  truncate(RequestHeader header) async {
+    int res = await objectory.truncateTable(
+        header.collection);
+    sendResult(header, res);
+  }
+
 
 //  queryDb(RequestHeader header, Map query) {
 //    db
@@ -253,10 +261,10 @@ class ObjectoryServerImpl {
   bool testMode = false;
   String hostName;
   int port;
-  String mongoUri;
+  String postgresUri;
   int _token = 0;
   String oauthClientId;
-  ObjectoryServerImpl(this.hostName, this.port, this.mongoUri, this.testMode,
+  ObjectoryServerImpl(this.hostName, this.port, this.postgresUri, this.testMode,
       bool verbose, this.authenticator) {
     hierarchicalLoggingEnabled = true;
     if (verbose) {
@@ -268,7 +276,7 @@ class ObjectoryServerImpl {
   }
   start() async {
     try {
-      objectoryConsole = new ObjectoryConsole(mongoUri, () => null);
+      objectoryConsole = new ObjectoryConsole(postgresUri, () => null);
       await objectoryConsole.initDomainModel();
       HttpServer server = await HttpServer.bind(hostName, port);
       print('Objectory server started. Listening on http://$hostName:$port');

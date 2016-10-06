@@ -13,6 +13,7 @@ class Author {
 //  Address address;
 }
 
+@Table(logChanges: false)
 class User {
   @Field()
   String name;
@@ -34,6 +35,7 @@ class Person {
   Person mother;
 //  List<Person> children;
 }
+
 
 main() {
   new ModelGenerator(#domain_model_proto)

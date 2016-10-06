@@ -6,6 +6,8 @@ import 'dart:collection';
 import 'dart:async';
 import 'package:bson/bson.dart';
 import 'package:mongo_dart_query/mongo_dart_query.dart' hide where;
+import 'dart:developer';
+
 
 Objectory objectory;
 
@@ -237,12 +239,31 @@ class Objectory {
 
   Future<List<PersistentObject>> select(Type classType,
       [QueryBuilder selector]) async {
-    throw new UnimplementedError();
+    var result = objectory.createTypedList(classType);
+    bool fetchLinks = selector != null && selector.paramFetchLinks;
+    for (Map each in await findRawObjects(tableName(classType), selector)) {
+      PersistentObject obj = objectory.map2Object(classType, each);
+      if (fetchLinks) {
+        await obj.fetchLinks();
+      }
+      result.add(obj);
+    }
+    return result;
   }
 
   Future<PersistentObject> selectOne(Type classType,
       [QueryBuilder selector]) async {
-    throw new UnimplementedError();
+    var localSelector = selector;
+    if (localSelector == null) {
+      localSelector = new QueryBuilder();
+    }
+    localSelector.limit(1);
+    List<PersistentObject> pl = await select(classType, selector);
+    if (pl.isEmpty) {
+      return null;
+    } else {
+      return pl.first;
+    }
   }
 
   Future<int> count(Type classType, [QueryBuilder selector]) async {

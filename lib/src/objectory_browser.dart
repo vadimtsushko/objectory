@@ -7,6 +7,7 @@ import 'query_builder.dart';
 import 'package:bson/bson.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 //import 'package:angular2/core.dart';
 //import 'package:instock/service/event_bus.dart';
 
@@ -87,11 +88,12 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
   Map<int, Completer> awaitedRequests = new Map<int, Completer>();
   int requestId = 0;
   ObjectoryWebsocketBrowserImpl(
-      String uri, Function registerClassesCallback,)
+    String uri,
+    Function registerClassesCallback,
+  )
       : super(uri, registerClassesCallback);
 
   Future open() {
-    print('Objectory open');
     return setupWebsocket(uri);
   }
 
@@ -99,13 +101,10 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
       new ObjectoryCollectionWebsocketBrowserImpl(this);
 
   Future<bool> setupWebsocket(String uri) {
-    print('setupWebsocket $uri');
     Completer completer = new Completer();
-    webSocket = new WebSocket("ws://$uri/ws");
+    webSocket = new WebSocket("$uri/ws");
 //    webSocket = new WebSocket('ws://localhost:4040/ws');
     webSocket.onOpen.listen((event) {
-      print('webSocket.onOpen.listen $event');
-
       isConnected = true;
       completer.complete(true);
     });
@@ -115,7 +114,6 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
 //      DataCache.singleton.eventBus.fire(APPLICATION_ERROR_MESSAGE,new ApplicationErrorMessage(this,'ОШИБКА СОЕДИНЕНИЯ С СЕРВЕРОМ БАЗЫ ДАННЫХ!!!!!'));
     });
     webSocket.onClose.listen((e) {
-      print('webSocket.onClose $e');
 //      eventBus.appError.add('СОЕДИНЕНИЕ С БАЗОЙ ДАННЫХ ЗАКРЫТО!!!!!');
 //      DataCache.singleton.eventBus.fire(APPLICATION_ERROR_MESSAGE,new ApplicationErrorMessage(this,'СОЕДИНЕНИЕ С БАЗОЙ ДАННЫХ ЗАКРЫТО!!!!!'));
       isConnected = false;
@@ -176,7 +174,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
   Future doUpdate(String collection, var id, Map toUpdate) {
     assert(id.runtimeType == idType);
     return _postMessage(
-        _createCommand('update', collection), toUpdate, {"_id": id});
+        _createCommand('update', collection), toUpdate, {"id": id});
   }
 
   Future doInsert(String tableName, Map map) =>
@@ -185,6 +183,9 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
   Future remove(PersistentObject persistentObject) => _postMessage(
       _createCommand('remove', persistentObject.tableName),
       persistentObject.map);
+
+  Future truncate(Type classType) =>
+      _postMessage(_createCommand('truncate', tableName(classType)), null);
 
   Future<Map> dropDb() {
     return _postMessage(_createCommand('dropDb', null), {});
@@ -198,31 +199,27 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
     return queryDb({"getlasterror": 1});
   }
 
-
-  Future<int> count(Type classType,[QueryBuilder selector]) {
-
-    Completer completer = new Completer();
+  Future<int> count(Type classType, [QueryBuilder selector]) async {
     if (selector == null) {
       selector = new QueryBuilder();
     }
-    _postMessage(_createCommand('count', tableName(classType)),
-        selector.map, selector.extParamsMap)
-        .then((int _count) {
-      completer.complete(_count);
-    });
-    return completer.future;
+    int count = await _postMessage(
+        _createCommand('count', tableName(classType)),
+        selector.map,
+        selector.extParamsMap);
+
+    return count;
   }
 
-  Future<List<PersistentObject>> find(Type classType,[QueryBuilder selector]) {
+  Future<List<PersistentObject>> find(Type classType, [QueryBuilder selector]) {
     Completer completer = new Completer();
     if (selector == null) {
       selector = new QueryBuilder();
     }
     var result = objectory.createTypedList(classType);
 
-        _postMessage(_createCommand('find', tableName(classType)),
-        selector.map, selector.extParamsMap)
-        .then((list) {
+    _postMessage(_createCommand('find', tableName(classType)), selector.map,
+        selector.extParamsMap).then((list) {
       for (var map in list) {
         PersistentObject obj = objectory.map2Object(classType, map);
         result.add(obj);
@@ -238,32 +235,17 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
     return completer.future;
   }
 
-  Future<PersistentObject> findOne(Type classType,[QueryBuilder selector]) {
+  Future<PersistentObject> findOne(Type classType, [QueryBuilder selector]) {
     Completer completer = new Completer();
     if (selector == null) {
       selector = new QueryBuilder();
     }
 
-        _postMessage(_createCommand('findOne', tableName(classType)),
-        selector.map, selector.extParamsMap)
-        .then((map) {
+    _postMessage(_createCommand('findOne', tableName(classType)), selector.map,
+        selector.extParamsMap).then((map) {
       completeFindOne(map, completer, selector, classType);
     });
     return completer.future;
-  }
-
-
-
-
-  Future insert(PersistentObject persistentObject) async {
-    if (persistentObject.tableName.startsWith('Agreement') ||
-        persistentObject.tableName.startsWith('User')) {
-      return _postMessage(
-          _createCommand('insert', persistentObject.tableName),
-          persistentObject.map);
-    } else {
-      throw new Exception('Вставка строк запрещена в веб режиме');
-    }
   }
 
   Future<List<Map>> findRawObjects(String tableName,
@@ -271,8 +253,8 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
     if (selector == null) {
       selector = new QueryBuilder();
     }
-    return await _postMessage(_createCommand('find', tableName),
-        selector.map, selector.extParamsMap);
+    return await _postMessage(
+        _createCommand('find', tableName), selector.map, selector.extParamsMap);
   }
 
   Future<bool> authenticate(String authToken, String userName) async {

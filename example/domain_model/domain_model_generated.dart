@@ -4,15 +4,16 @@ part of domain_model;
 class $User {
   static Field get name =>
       const Field(id: 'name',label: '',title: '',
-          type: String,logChanges: false, foreignKey: false);
+          type: String,logChanges: true, foreignKey: false);
   static Field get email =>
       const Field(id: 'email',label: '',title: '',
-          type: String,logChanges: false, foreignKey: false);
+          type: String,logChanges: true, foreignKey: false);
   static Field get login =>
       const Field(id: 'login',label: '',title: '',
-          type: String,logChanges: false, foreignKey: false);
+          type: String,logChanges: true, foreignKey: false);
  static TableSchema schema = new TableSchema(
       tableName: 'User',
+      logChanges: false,
       fields: {'name': name,'email': email,'login': login});
 }
 
@@ -32,15 +33,16 @@ class $Person {
           type: String,logChanges: true, foreignKey: false);
   static Field get lastName =>
       const Field(id: 'lastName',label: '',title: '',
-          type: String,logChanges: false, foreignKey: false);
+          type: String,logChanges: true, foreignKey: false);
   static Field get father =>
       const Field(id: 'father',label: '',title: '',
-          type: Person,logChanges: false, foreignKey: true);
+          type: Person,logChanges: true, foreignKey: true);
   static Field get mother =>
       const Field(id: 'mother',label: '',title: '',
-          type: Person,logChanges: false, foreignKey: true);
+          type: Person,logChanges: true, foreignKey: true);
  static TableSchema schema = new TableSchema(
       tableName: 'Person',
+      logChanges: true,
       fields: {'firstName': firstName,'lastName': lastName,'father': father,'mother': mother});
 }
 
@@ -59,15 +61,16 @@ class Person extends PersistentObject {
 class $Author {
   static Field get name =>
       const Field(id: 'name',label: '',title: '',
-          type: String,logChanges: false, foreignKey: false);
+          type: String,logChanges: true, foreignKey: false);
   static Field get email =>
       const Field(id: 'email',label: '',title: '',
-          type: String,logChanges: false, foreignKey: false);
+          type: String,logChanges: true, foreignKey: false);
   static Field get age =>
       const Field(id: 'age',label: '',title: '',
-          type: int,logChanges: false, foreignKey: false);
+          type: int,logChanges: true, foreignKey: false);
  static TableSchema schema = new TableSchema(
       tableName: 'Author',
+      logChanges: true,
       fields: {'name': name,'email': email,'age': age});
 }
 
