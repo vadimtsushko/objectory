@@ -9,6 +9,6 @@ import 'implementation_test_lib.dart';
 const DefaultUri = 'mongodb://127.0.0.1/objectory_vm1_tests';
 
 main() async {
-  objectory = new ObjectoryHttpImpl('http://localhost:7777', registerClasses, dropCollectionsOnStartup: true );
+  objectory = new ObjectoryHttpImpl('http://localhost:7777', registerClasses, dropCollectionsOnStartup: false );
   group('VM implementation tests', () => allImplementationTests());
 }

@@ -1,12 +1,12 @@
 library persistent_object;
 
-import 'objectory_query_builder.dart';
+import 'query_builder.dart';
 import 'package:bson/bson.dart';
 import 'objectory_base.dart';
 import 'dart:async';
 import 'dart:collection';
-import 'package:quiver/core.dart';
-part 'persistent_list.dart';
+import 'field.dart';
+
 
 enum PropertyType {
   String,
@@ -47,26 +47,15 @@ class BasePersistentObject {
 
   BasePersistentObject() {}
   Set<String> get dirtyFields => _dirtyFields;
-  EmbeddedPersistentObject getEmbeddedObject(Type classType, String property) {
-    EmbeddedPersistentObject result = _compoundProperties[property];
-    if (result == null) {
-      result = objectory.newInstance(classType);
-      result.map = map[property];
-      map[property] = result.map;
-      result._parent = this;
-      result._pathToMe = property;
-    }
-    return result;
-  }
 
-  PersistentList getPersistentList(Type classType, String property) {
-    PersistentList result = _compoundProperties[property];
-    if (result == null) {
-      result = new PersistentList(this, classType, property);
-      _compoundProperties[property] = result;
-    }
-    return result;
-  }
+//  PersistentList getPersistentList(Type classType, String property) {
+//    PersistentList result = _compoundProperties[property];
+//    if (result == null) {
+//      result = new PersistentList(this, classType, property);
+//      _compoundProperties[property] = result;
+//    }
+//    return result;
+//  }
 
   PersistentObject getLinkedObject(String property, Type type) {
     var objId = map[property];
@@ -129,13 +118,15 @@ class BasePersistentObject {
     return this.map[property];
   }
 
-  String toString() => "$collectionName($map)";
+  String toString() => "$tableName($map)";
 
   void init() {}
 
   /// Name of MongoDB collection where instance of this class would  be persistet in DB.
   /// By default equals to class name, but may be overwritten
-  String get collectionName {
+  String get tableName => $schema.tableName;
+
+  TableSchema get $schema {
     throw new Exception('Must be implemented');
   }
 
@@ -173,14 +164,14 @@ class BasePersistentObject {
 }
 
 class PersistentObject extends BasePersistentObject {
-  dynamic get id => map['_id'];
+  dynamic get id => map['id'];
 
-  DbRef get dbRef => new DbRef(this.collectionName, this.id);
+  DbRef get dbRef => new DbRef(this.tableName, this.id);
   set id(var value) {
     assert(value == null || value.runtimeType == objectory.idType);
-    map['_id'] = value;
+    map['id'] = value;
   }
-
+  Map<String,Field> get $fields => throw new Exception('Should be implemented');
   PersistentObject() : super() {
     _setMap(map);
   }
@@ -205,7 +196,7 @@ class PersistentObject extends BasePersistentObject {
   }
 
   void _initMap() {
-    map["_id"] = null;
+    map["id"] = null;
     super._initMap();
   }
 
@@ -224,7 +215,7 @@ class PersistentObject extends BasePersistentObject {
   }
 
   Future getMeFromDb() {
-    return objectory[objectory.getClassTypeByCollection(this.collectionName)]
+    return objectory[objectory.getClassTypeByCollection(this.tableName)]
         .findOne(where.id(this.id));
   }
 
@@ -247,35 +238,8 @@ class PersistentObject extends BasePersistentObject {
     if (this.isFetched) {
       return new Future.value(this);
     } else {
-      return objectory[this.runtimeType].findOne(where.id(id));
+      return objectory.selectOne(this.runtimeType,where.id(id));
     }
   }
 }
 
-class EmbeddedPersistentObject extends BasePersistentObject {
-  BasePersistentObject _parent;
-  String _pathToMe;
-  bool _elementListMode = false;
-  void setDirty(String fieldName) {
-    super.setDirty(fieldName);
-    if (_parent != null) {
-      _elementListMode
-          ? _parent.setDirty('${_pathToMe}')
-          : _parent.setDirty('${_pathToMe}.${fieldName}');
-    }
-  }
-
-  remove() {
-    throw new Exception('Must not be invoked');
-  }
-
-  save() {
-    throw new Exception('Must not be invoked');
-  }
-
-  bool operator ==(o) => o is EmbeddedPersistentObject &&
-      o._parent == _parent &&
-      o._pathToMe == _pathToMe &&
-      o.map == map;
-  int get hashCode => hash3(_parent, _pathToMe, map);
-}

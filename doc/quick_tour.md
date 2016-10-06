@@ -34,7 +34,7 @@ class User extends PersistentObject {
 Class User extends class PersistentObject. That means that in MongoDb we'll have respective collection in application database - by default named 'User'.
 An individual document in that collection may look in MongoDB like this:
     
-    { "_id" : ObjectId("5073e1ec10c273e788000000"), "birthday" : ISODate("1979-12-31T19:00:00Z"), "name" : "John" }
+    { "id" : ObjectId("5073e1ec10c273e788000000"), "birthday" : ISODate("1979-12-31T19:00:00Z"), "name" : "John" }
 
 So simple value type (null, boolean, String, int, double and Date) properties of MongoDb documents are mapped to pairs of setter/getters annotated by respective type.
 List can be represented or as simple value type or as persistent list, see below.
@@ -88,7 +88,7 @@ user.homeAddress.streetName = 'Baker street';
 
 That gives us in MongoDb:
 
-    { "_id" : ObjectId("5073e9d33d36d08806000000"), "birthday" : ISODate("1979-12-31T19:00:00Z"), "name" : "John", "homeAddress" : { "cityName" : "London", streetName : "Baker street" } }
+    { "id" : ObjectId("5073e9d33d36d08806000000"), "birthday" : ISODate("1979-12-31T19:00:00Z"), "name" : "John", "homeAddress" : { "cityName" : "London", streetName : "Baker street" } }
 
 
 ##### Linked objects
@@ -113,7 +113,7 @@ class Person extends PersistentObject {
 
 Given above class definition corresponding MongoDb document may look like:
 
-    { "_id" : ObjectId("5073f63aa462dc976a000000"), "name" : "James Bricks", "father" : { "ns" : "Person", "id" : ObjectId("5073f63aa462dc976a000001") }, "mother" : { "ns" : "Person", "id" : ObjectId("5073f63aa462dc976a000002") } }
+    { "id" : ObjectId("5073f63aa462dc976a000000"), "name" : "James Bricks", "father" : { "ns" : "Person", "id" : ObjectId("5073f63aa462dc976a000001") }, "mother" : { "ns" : "Person", "id" : ObjectId("5073f63aa462dc976a000002") } }
 
 Document property of linked object type may contain reference to linked object or null. Document must be saved before reference to it may be set as value to such a property.
 
@@ -157,7 +157,7 @@ with a reference on persistent object, type of elements for list and name of pro
 
 In MongoDB such a document may look like:
 
-    { "_id" : ObjectId("5075084ec1058b6801000001"), "title" : "My first article", "body" : "It's been a hard days night", "comments" : [    {       "body" : "great article, dude",         "date" : ISODate("2012-10-06T04:15:20Z") },     {"body" : "It is lame, sweety" } ], "author" : { "ns" : "Author", "id" : ObjectId("5075084ec1058b6801000000") } }
+    { "id" : ObjectId("5075084ec1058b6801000001"), "title" : "My first article", "body" : "It's been a hard days night", "comments" : [    {       "body" : "great article, dude",         "date" : ISODate("2012-10-06T04:15:20Z") },     {"body" : "It is lame, sweety" } ], "author" : { "ns" : "Author", "id" : ObjectId("5075084ec1058b6801000000") } }
 
 Embedded lists may contain elements of concrete mongodb types, embedded documents or linked documents. 
 
