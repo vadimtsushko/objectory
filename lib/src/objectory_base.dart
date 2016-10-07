@@ -25,17 +25,17 @@ class HistoryRecord {
 class ObjectoryCollection {
   String tableName;
   Type classType;
-  Future<PersistentObject> findOne([QueryBuilder selector]) {
-    throw new UnimplementedError();
-  }
-
-  Future<int> count([QueryBuilder selector]) {
-    throw new UnimplementedError();
-  }
-
-  Future<List<PersistentObject>> find([QueryBuilder selector]) {
-    throw new UnimplementedError();
-  }
+//  Future<PersistentObject> findOne([QueryBuilder selector]) {
+//    throw new UnimplementedError();
+//  }
+//
+//  Future<int> count([QueryBuilder selector]) {
+//    throw new UnimplementedError();
+//  }
+//
+//  Future<List<PersistentObject>> find([QueryBuilder selector]) {
+//    throw new UnimplementedError();
+//  }
 
   Future<PersistentObject> get(int id) {
     assert(id.runtimeType == objectory.idType);

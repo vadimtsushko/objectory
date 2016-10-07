@@ -1,11 +1,5 @@
 import 'package:postgresql/postgresql.dart';
-import 'sql_builder.dart';
-import 'dart:async';
-import 'persistent_object.dart';
 import 'query_builder.dart';
-import 'objectory_base.dart' hide objectory;
-import 'objectory_collection_console.dart';
-import 'field.dart';
 import 'package:bson/bson.dart';
 import 'dart:io';
 import 'package:logging/logging.dart';
@@ -163,7 +157,8 @@ class ObjectoryClient {
   find(RequestHeader header, Map selector, Map extParams) async {
     log.fine(() => 'find $header $selector $extParams');
     if (!isUserVerified) {
-      return [];
+      sendError(header,'!!!Authentication error');;
+      return;
     }
     List<Map> responseData = await objectory.findRawObjects(
         header.collection, _queryBuilder(selector, extParams));
@@ -177,7 +172,8 @@ class ObjectoryClient {
 
   findOne(RequestHeader header, Map selector, Map extParams) async {
     if (!isUserVerified) {
-      return {};
+      sendError(header,'!!!Authentication error');;
+      return;
     }
     List<Map> list = await find(header, selector, extParams);
     Map responseData = {};
@@ -189,11 +185,24 @@ class ObjectoryClient {
 
   authenticate(RequestHeader header, Map selector) async {
     userName = selector['userName'];
-    authToken = selector['authToken'];
-    print('Objectory authenticate. userName: $userName');
+    String secret = selector['authToken'];
+    print('Objectory authenticate. userName: $userName $secret');
     var result = <String, String>{};
-
+    var authRes = await server.authenticator.authenticate(userName, secret);
+    if (authRes.authenticated) {
+      isUserVerified = true;
+      result['userName'] = userName;
+      result['authToken'] = authRes.authToken;
+      print('$userName authenticated successfully');
+    } else {
+      return sendError(header,'!!! Error authenticating $userName');
+    }
     sendResult(header, result);
+  }
+
+  sendError(header, String errorMessage) async {
+    print(errorMessage);
+    sendResult(header, {'error': errorMessage});
   }
 
   listSessions(RequestHeader header) async {
@@ -278,8 +287,9 @@ class ObjectoryServerImpl {
     try {
       objectoryConsole = new ObjectoryConsole(postgresUri, () => null);
       await objectoryConsole.initDomainModel();
+      print('ws://$hostName:$port');
       HttpServer server = await HttpServer.bind(hostName, port);
-      print('Objectory server started. Listening on http://$hostName:$port');
+      print('Objectory server started. Listening on ws://$hostName:$port');
       server.transform(new WebSocketTransformer()).listen(
           (WebSocket webSocket) {
         _token += 1;

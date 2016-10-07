@@ -1,7 +1,6 @@
 import 'package:objectory/objectory_console.dart';
 import 'domain_model.dart';
 import 'package:test/test.dart';
-import 'package:bson/bson.dart';
 
 main(){
   objectory = new Objectory(null,null);

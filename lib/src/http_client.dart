@@ -27,7 +27,6 @@ class ObjectoryCollectionHttpImpl extends ObjectoryCollection {
     if (selector == null) {
       selector = new QueryBuilder();
     }
-    var obj;
     objectoryImpl
         ._postMessage(objectoryImpl._createCommand('count', tableName),
             selector.map, selector.extParamsMap)
@@ -67,7 +66,6 @@ class ObjectoryCollectionHttpImpl extends ObjectoryCollection {
     if (selector == null) {
       selector = new QueryBuilder();
     }
-    var obj;
     objectoryImpl
         ._postMessage(objectoryImpl._createCommand('findOne', tableName),
             selector.map, selector.extParamsMap)

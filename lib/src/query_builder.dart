@@ -1,6 +1,5 @@
 library objectory_query;
 
-import 'persistent_object.dart';
 import 'field.dart';
 import 'dart:convert';
 import 'dart:collection';

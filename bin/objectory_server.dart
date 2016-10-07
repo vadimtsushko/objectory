@@ -16,12 +16,10 @@ import 'package:logging_handlers/logging_handlers_shared.dart';
     return;
   }
   startQuickLogging();
-  Authenticator authenticator = new DummyAuthenticator();
   String host = argMap['ip'];
   int port = int.parse(argMap['port']);
   String postgresUri = argMap['uri'];
   bool verbose = argMap['verbose'];
   var server = new ObjectoryServerImpl(host,port,postgresUri,false,verbose, new DummyAuthenticator());
   await server.start();
-  //server.oauthClientId = argMap['oauth'];
 }

@@ -47,7 +47,7 @@ class ObjectoryConsole extends Objectory {
     output.write('CREATE TABLE "$tableName" (\n');
     output.write(
         '  "id" integer NOT NULL DEFAULT nextval(\'"${tableName}_id_seq"\'::regclass),\n');
-    po.$fields.values.forEach((fld) => _outputField(fld, output));
+    po.$schema.fields.values.forEach((fld) => _outputField(fld, output));
     output.write('  CONSTRAINT "${tableName}_px" PRIMARY KEY ("id")\n');
     output.write(')');
     command = output.toString();

@@ -1,7 +1,6 @@
 
 import 'package:objectory/objectory_browser.dart';
 import '../domain_model/domain_model.dart';
-import 'dart:developer';
 import 'dart:html' as dom;
 
 main() async {

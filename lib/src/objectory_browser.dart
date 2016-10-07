@@ -137,7 +137,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
       data = new Uint8List.view(data);
     }*/
     var jdata = new BSON().deserialize(new BsonBinary.from(JSON.decode(data)));
-    //log.info('onmessage: $jdata');
+    print('onmessage: $jdata');
     var message = new ObjectoryMessage.fromMessage(jdata);
     int receivedRequestId = message.command['requestId'];
     if (receivedRequestId == null) {
@@ -145,10 +145,10 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
     }
     var completer = awaitedRequests[receivedRequestId];
     if (completer != null) {
-      //log.fine("Complete request: $receivedRequestId message: $message");
+      print("Complete request: $receivedRequestId message: $message");
       completer.complete(message.content);
     } else {
-      //log.shout('Not found completer for request: $receivedRequestId');
+      print('!!!Not found completer for request: $receivedRequestId');
     }
   }
 
@@ -257,9 +257,9 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
         _createCommand('find', tableName), selector.map, selector.extParamsMap);
   }
 
-  Future<bool> authenticate(String authToken, String userName) async {
+  Future<bool> authenticate(String userName, String secret ) async {
     var authResult = await _postMessage(_createCommand('authenticate', null),
-        {'authToken': authToken, 'userName': userName});
+        {'authToken': secret, 'userName': userName});
     print('authResult: $authResult');
     if (authResult.isEmpty) {
       return false;

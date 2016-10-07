@@ -7,7 +7,6 @@ import 'dart:async';
 import 'dart:collection';
 import 'field.dart';
 
-
 enum PropertyType {
   String,
   int,
@@ -36,7 +35,6 @@ class BasePersistentObject {
   Map _map = objectory.dataMapDecorator(new LinkedHashMap());
 
   Set<String> _dirtyFields = new Set<String>();
-  Map<String, dynamic> _compoundProperties = new Map<String, dynamic>();
   bool saveOnUpdate = false;
   Map get map => _map;
   set map(Map newValue) {
@@ -171,7 +169,9 @@ class PersistentObject extends BasePersistentObject {
     assert(value == null || value.runtimeType == objectory.idType);
     map['id'] = value;
   }
-  Map<String,Field> get $fields => throw new Exception('Should be implemented');
+
+  Map<String, Field> get $fields =>
+      throw new Exception('Should be implemented');
   PersistentObject() : super() {
     _setMap(map);
   }
@@ -190,7 +190,6 @@ class PersistentObject extends BasePersistentObject {
       _map.clear();
       newValue.forEach((k, v) => _map[k] = v);
     }
-    _compoundProperties = new Map<String, dynamic>();
     init();
     _dirtyFields = new Set<String>();
   }
@@ -215,8 +214,8 @@ class PersistentObject extends BasePersistentObject {
   }
 
   Future getMeFromDb() {
-    return objectory[objectory.getClassTypeByCollection(this.tableName)]
-        .findOne(where.id(this.id));
+    return objectory.selectOne(
+        objectory.getClassTypeByCollection(this.tableName), where.id(this.id));
   }
 
   Future reRead() {
@@ -238,8 +237,7 @@ class PersistentObject extends BasePersistentObject {
     if (this.isFetched) {
       return new Future.value(this);
     } else {
-      return objectory.selectOne(this.runtimeType,where.id(id));
+      return objectory.selectOne(this.runtimeType, where.id(id));
     }
   }
 }
-

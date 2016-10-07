@@ -1,5 +1,4 @@
 import 'query_builder.dart';
-import 'persistent_object.dart';
 
 class SqlQueryBuilder {
   QueryBuilder parent;

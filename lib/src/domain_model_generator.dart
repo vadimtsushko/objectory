@@ -88,7 +88,7 @@ part of domain_model;
         }
 
         output.write(
-            '  objectory.registerClass($cls,()=>new $cls(),()=>new List<$cls>(), $linkedTypeMap);\n');
+            '  objectory.registerClass($cls.value(())=>new $cls(),()=>new List<$cls>(), $linkedTypeMap);\n');
       }
       output.write('}\n');
     }
@@ -145,7 +145,7 @@ part of domain_model;
     if (propertyGenerator.propertyType == PropertyType.PERSISTENT_LIST) {
       output.write(
           '  ${propertyGenerator.type} get ${propertyGenerator.name} => '
-          "getPersistentList(${propertyGenerator.listElementType},'${propertyGenerator.name}');\n");
+          "getPersistentList(${propertyGenerator.listElementType}.value('${propertyGenerator.name}'));\n");
     }
   }
 
@@ -179,22 +179,24 @@ part of domain_model;
     output.write('class \$${classGenerator.type} {\n');
     List<PropertyGenerator> allProperties = [PropertyGenerator.id];
     allProperties.addAll(classGenerator.properties);
+
     allProperties.forEach((propertyGenerator) {
+      Type fieldType = propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT ? int : propertyGenerator.type;
       output.write(
-          "  static Field<${propertyGenerator.type}> get ${propertyGenerator.name} =>\n");
+          "  static Field<$fieldType> get ${propertyGenerator.name} =>\n");
       output.write(
-          "      const Field<${propertyGenerator.type}>(id: '${propertyGenerator.name}',label: '${propertyGenerator.field.label}',title: '${propertyGenerator.field.title}',\n");
+          "      const Field<$fieldType>(id: '${propertyGenerator.name}',label: '${propertyGenerator.field.label}',title: '${propertyGenerator.field.title}',\n");
       output.write(
           "          type: ${propertyGenerator.type},logChanges: ${propertyGenerator.field.logChanges}, foreignKey: ${propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT});\n");
     });
     var fields = classGenerator.properties
-        .map((PropertyGenerator e) => "'${e.name}': ${e.name}")
+        .map((PropertyGenerator e) => "          '${e.name}': ${e.name}")
         .toList()
-        .join(',');
+        .join(',\n');
     output.writeln(" static TableSchema schema = new TableSchema(");
     output.writeln("      tableName: '${classGenerator.type}',");
     output.writeln("      logChanges: ${classGenerator.table.logChanges},");
-    output.writeln('      fields: {$fields});');
+    output.writeln('      fields: {\n$fields\n      });');
     output.writeln('}\n');
   }
 
@@ -276,19 +278,12 @@ class PropertyGenerator {
     vm.metadata.where((m) => m.reflectee is Field).forEach((m) {
       field = m.reflectee as Field;
     });
+    if (field == null) {
+      field = const Field();
+    }
     Type t = vm.type.reflectedType;
     type = t;
-    if (t == int || t == double || t == String || t == DateTime || t == bool) {
-      return;
-    }
-
-    if (vm.type.simpleName == #List) {
-      propertyType = PropertyType.PERSISTENT_LIST;
-      if (vm.type.typeArguments.length != 1) {
-        throw new StateError('List property $name should use type argument');
-      }
-      ;
-      listElementType = vm.type.typeArguments.first.reflectedType;
+    if (t == int || t == double || t == String || t == DateTime || t == bool || t == num) {
       return;
     }
     propertyType = PropertyType.PERSISTENT_OBJECT;
