@@ -8,7 +8,6 @@ import 'package:objectory/src/persistent_object.dart';
 //
 //export 'package:objectory/src/field.dart';
 
-
 class Field {
   final String label;
   final String title;
@@ -20,7 +19,6 @@ class Table {
   final bool logChanges;
   const Table({this.logChanges: true});
 }
-
 
 ///<-- Metadata
 
@@ -179,10 +177,13 @@ part of domain_model;
 
   void generateOuputForTableSchema(ClassGenerator classGenerator) {
     output.write('class \$${classGenerator.type} {\n');
-    classGenerator.properties.forEach((propertyGenerator) {
-      output.write("  static Field get ${propertyGenerator.name} =>\n");
+    List<PropertyGenerator> allProperties = [PropertyGenerator.id];
+    allProperties.addAll(classGenerator.properties);
+    allProperties.forEach((propertyGenerator) {
       output.write(
-          "      const Field(id: '${propertyGenerator.name}',label: '${propertyGenerator.field.label}',title: '${propertyGenerator.field.title}',\n");
+          "  static Field<${propertyGenerator.type}> get ${propertyGenerator.name} =>\n");
+      output.write(
+          "      const Field<${propertyGenerator.type}>(id: '${propertyGenerator.name}',label: '${propertyGenerator.field.label}',title: '${propertyGenerator.field.title}',\n");
       output.write(
           "          type: ${propertyGenerator.type},logChanges: ${propertyGenerator.field.logChanges}, foreignKey: ${propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT});\n");
     });
@@ -264,6 +265,13 @@ class PropertyGenerator {
   PropertyType propertyType = PropertyType.SIMPLE;
   String toString() => 'PropertyGenerator($name,$type,$propertyType)';
   String get commentLine => '  // $type $name\n';
+
+  static PropertyGenerator id = new PropertyGenerator()
+    ..name = 'id'
+    ..type = int
+    ..field = const Field()
+    ..propertyType = PropertyType.SIMPLE;
+
   processVariableMirror(VariableMirror vm) {
     vm.metadata.where((m) => m.reflectee is Field).forEach((m) {
       field = m.reflectee as Field;

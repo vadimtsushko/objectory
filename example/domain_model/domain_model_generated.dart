@@ -59,8 +59,8 @@ class Person extends PersistentObject {
 }
 
 class $Author {
-  static Field get name =>
-      const Field(id: 'name',label: '',title: '',
+  static Field<String> get name =>
+      const Field<String>(id: 'name',label: '',title: '',
           type: String,logChanges: true, foreignKey: false);
   static Field get email =>
       const Field(id: 'email',label: '',title: '',

@@ -7,23 +7,26 @@ import 'domain_model/domain_model.dart';
 
 main() async {
   print(where.sortBy($Author.age, descending: true));
+  print($Author.name.value('asdfasdf'));
 
-
-
-  String username = 'test';
-  String password = 'test';
-  String database = 'objectory_test';
-  String host = 'localhost';
-  int port = 5432;
-  String uri = 'postgres://$username:$password@$host:$port/$database';
-  print('$uri');
-  objectory = new ObjectoryConsole(uri, registerClasses);
-  ObjectoryConsole objectoryConsole = objectory;
-  await objectory.initDomainModel();
-  Author author = await objectory[Author].findOne(where.sortBy($Author.age, descending: true));
-  print(author);
-  await objectory.close();
-//  await objectoryConsole.recreateSchema();
+//
+//
+//  String username = 'test';
+//  String password = 'test';
+//  String database = 'objectory_test';
+//  String host = 'localhost';
+//  int port = 5432;
+//  String uri = 'postgres://$username:$password@$host:$port/$database';
+//  print('$uri');
+//  objectory = new ObjectoryConsole(uri, registerClasses);
+//  ObjectoryConsole objectoryConsole = objectory;
+//  await objectory.initDomainModel();
+//  Author author = await objectory[Author].findOne(where.sortBy($Author.age, descending: true));
+//  print(author);
+//
+//
+//  await objectory.close();
+////  await objectoryConsole.recreateSchema();
 //  var res = await objectoryConsole.connection.query('SELECT * FROM "Author"  WHERE id = @p1', {'p1': 2}).toList();
 //  print(res);
 

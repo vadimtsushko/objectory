@@ -10,7 +10,7 @@ allImplementationTests() {
   setUp(() async {
     await objectory.initDomainModel();
   });
-  tearDown(()async{
+  tearDown(() async {
     await objectory.close();
   });
   test('Simple test for insert object', () async {
@@ -21,10 +21,9 @@ allImplementationTests() {
     author.email = 'who@cares.net';
     await author.save();
     expect(author.id, isNotNull);
-    Author authFromDb = await objectory.selectOne(Author,where.id(author.id));
+    Author authFromDb = await objectory.selectOne(Author, where.id(author.id));
     expect(authFromDb, isNotNull);
     expect(authFromDb.age, 32);
-
   });
 
   test('Insert object, then update it', () async {
@@ -37,10 +36,9 @@ allImplementationTests() {
     expect(author.id, isNotNull);
     author.age = 4;
     await author.save();
-    Author authFromDb = await objectory.selectOne(Author,where.id(author.id));
+    Author authFromDb = await objectory.selectOne(Author, where.id(author.id));
     expect(authFromDb, isNotNull);
     expect(authFromDb.age, 4);
-
   });
   test('simpleTestInsertAndRemove', () async {
     await objectory.truncate(Author);
@@ -50,13 +48,12 @@ allImplementationTests() {
     author.age = 3;
     author.email = 'who@cares.net';
     await author.save();
-    Author authFromDb = await objectory.selectOne(Author,where.id(author.id));
+    Author authFromDb = await objectory.selectOne(Author, where.id(author.id));
     expect(authFromDb, isNotNull);
     expect(authFromDb.age, 3);
     await authFromDb.remove();
-    authFromDb = await objectory.selectOne(Author,where.id(author.id));
+    authFromDb = await objectory.selectOne(Author, where.id(author.id));
     expect(authFromDb, isNull);
-
   });
   test('testInsertionAndUpdate', () async {
     await objectory.truncate(Author);
@@ -71,7 +68,6 @@ allImplementationTests() {
     expect(coll.length, 1);
     Author authFromPg = coll[0];
     expect(authFromPg.age, 4);
-
   });
   test('testSaveWithoutChanges', () async {
     await objectory.truncate(Author);
@@ -87,11 +83,10 @@ allImplementationTests() {
     Author authFromPg = coll[0];
     expect(authFromPg.age, 4);
     authFromPg.save();
-    var author1 = await objectory.selectOne(Author,where.id(authFromPg.id));
+    var author1 = await objectory.selectOne(Author, where.id(authFromPg.id));
     expect(author1.age, 4);
     expect(author1.name, 'Dan'); // Converted to uppecase in setter
     expect(author1.email, 'who@cares.net');
-
   });
   test('Like ', () async {
     await objectory.truncate(Person);
@@ -105,11 +100,10 @@ allImplementationTests() {
     person.firstName = 'Nickolay';
     await person.save();
     var coll = await objectory.select(Person,
-        where.like($Person.firstName, 'niCk%y', caseInsensitive: true));
+        where.like($Person.firstName.value('niCk%y'), caseInsensitive: true));
     expect(coll.length, 1);
     Person personFromPg = coll[0];
     expect(personFromPg.firstName, 'Nickolay');
-
   });
 
   test('tesFindWithoutParams', () async {
@@ -125,7 +119,6 @@ allImplementationTests() {
     await person.save();
     var coll = await objectory.select(Person);
     expect(coll.length, 3);
-
   });
   test('testLimit', () async {
     await objectory.truncate(Author);
@@ -134,11 +127,10 @@ allImplementationTests() {
       author.age = n;
       await author.save();
     }
-    var coll = await objectory.select(Author,where.skip(20).limit(10));
+    var coll = await objectory.select(Author, where.skip(20).limit(10));
     expect(coll.length, 10);
     Author authFromPg = coll[0];
     expect(authFromPg.age, 20);
-
   });
   test('testCount', () async {
     await objectory.truncate(Author);
@@ -150,7 +142,6 @@ allImplementationTests() {
     }
     var _count = await objectory.count(Author);
     expect(_count, 27);
-
   });
 
   test('findOne should not get object from cache', () async {
@@ -158,9 +149,8 @@ allImplementationTests() {
     Author author = new Author();
     author.id = 233;
     objectory.addToCache(author);
-    author = await objectory.selectOne(Author,where.id(author.id));
+    author = await objectory.selectOne(Author, where.id(author.id));
     expect(author, isNull);
-
   });
 
   test('find with fetchLinks mode', () async {
@@ -174,12 +164,12 @@ allImplementationTests() {
     int sonId = son.id;
 
     objectory.clearCache(Person);
-    Person sonFromDb = await objectory.selectOne(Person,where.id(sonId));
+    Person sonFromDb = await objectory.selectOne(Person, where.id(sonId));
     expect(sonFromDb.firstName, 'Nick');
     expect(sonFromDb.father.id, isNotNull);
     expect(sonFromDb.father.firstName, isNull);
     objectory.clearCache(Person);
-    sonFromDb = await objectory.selectOne(Person,where.id(sonId).fetchLinks());
+    sonFromDb = await objectory.selectOne(Person, where.id(sonId).fetchLinks());
     expect(sonFromDb.firstName, 'Nick');
     expect(sonFromDb.father.id, isNotNull);
     expect(sonFromDb.father.firstName, 'Vadim');
@@ -200,13 +190,13 @@ allImplementationTests() {
     person.firstName = '111';
     person.lastName = 'initial setup';
     await person.save();
-    person =
-        await objectory.selectOne(Person,where.eq($Person.firstName, '111'));
+    person = await objectory.selectOne(
+        Person, where.eq($Person.firstName.value('111')));
     expect(person, isNotNull);
     expect(person.lastName, 'initial setup');
     person.lastName = 'unsaved changes';
-    person =
-        await objectory.selectOne(Person,where.eq($Person.firstName, '111'));
+    person = await objectory.selectOne(
+        Person, where.eq($Person.firstName.value('111')));
     expect(person.lastName, 'initial setup',
         reason: 'Find operations should get objects from Db');
     person.lastName = 'unsaved changes';
@@ -214,7 +204,6 @@ allImplementationTests() {
     expect(person.lastName, 'unsaved changes',
         reason:
             'Collection get method should get objects from objectory cache');
-
   });
 
   test('< OR >', () async {
@@ -225,10 +214,10 @@ allImplementationTests() {
       auth.age = n;
       await objectory.save(auth);
     }
-    int count = await objectory.count(Author,where.lte($Author.age, 5).or(where.gt($Author.age, 15)));
+    int count = await objectory.count(Author,
+        where.lte($Author.age.value(5)).or(where.gt($Author.age.value(15))));
     expect(count, 10);
   });
-
 
   test('Remove', () async {
     await objectory.truncate(Author);
@@ -238,15 +227,15 @@ allImplementationTests() {
       auth.age = n;
       await objectory.save(auth);
     }
-    Author toRemove = await objectory.selectOne(Author,where.eq($Author.age, 4));
+    Author toRemove =
+        await objectory.selectOne(Author, where.eq($Author.age.value(4)));
     expect(toRemove, isNotNull);
     await objectory.remove(toRemove);
 
-    Author check = await objectory.selectOne(Author,where.eq($Author.age, 4));
+    Author check =
+        await objectory.selectOne(Author, where.eq($Author.age.value(4)));
     expect(check, isNull);
-
   });
-
 
   test('oneFrom', () async {
     await objectory.truncate(Author);
@@ -256,7 +245,8 @@ allImplementationTests() {
       auth.age = n;
       await objectory.save(auth);
     }
-    int count = await objectory.count(Author,where.oneFrom($Author.age,[12, 19, 29]));
+    int count = await objectory.count(
+        Author, where.oneFrom($Author.age.values([12, 19, 29])));
     expect(count, 2);
   });
 
@@ -268,9 +258,8 @@ allImplementationTests() {
       auth.age = n;
       await objectory.save(auth);
     }
-    Author author = await objectory.selectOne(Author,where.sortBy($Author.age, descending: true));
+    Author author = await objectory.selectOne(
+        Author, where.sortBy($Author.age, descending: true));
     expect(author.age, 10);
   });
-
-
 }

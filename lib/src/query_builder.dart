@@ -67,72 +67,74 @@ class QueryBuilder {
     }
   }
 
-  QueryBuilder eq(Field field, value) {
-    _addExpression(field.id, {"=": value});
+  QueryBuilder eq(FieldValue fieldValue) {
+    _addExpression(fieldValue.fieldName, {"=": fieldValue.value});
     return this;
   }
 
   QueryBuilder id(int value) {
-    return eq(Fields.id, value);
+    return eq(Fields.id.value(value));
   }
 
-  QueryBuilder ne(Field field, value) {
-    _addExpression(field.id, {"<>": value});
+  QueryBuilder ne(FieldValue fieldValue) {
+    _addExpression(fieldValue.fieldName, {"<>": fieldValue.value});
     return this;
   }
 
-  QueryBuilder gt(Field field, value) {
-    _addExpression(field.id, {">": value});
+  QueryBuilder gt(FieldValue fieldValue) {
+    _addExpression(fieldValue.fieldName, {">": fieldValue.value});
     return this;
   }
 
-  QueryBuilder lt(Field field, value) {
-    _addExpression(field.id, {"<": value});
+  QueryBuilder lt(FieldValue fieldValue) {
+    _addExpression(fieldValue.fieldName, {"<": fieldValue.value});
     return this;
   }
 
-  QueryBuilder gte(Field field, value) {
-    _addExpression(field.id, {">=": value});
+  QueryBuilder gte(FieldValue fieldValue) {
+    _addExpression(fieldValue.fieldName, {">=": fieldValue.value});
     return this;
   }
 
-  QueryBuilder lte(Field field, value) {
-    _addExpression(field.id, {"<=": value});
+  QueryBuilder lte(FieldValue fieldValue) {
+    _addExpression(fieldValue.fieldName, {"<=": fieldValue.value});
     return this;
   }
 
-  QueryBuilder like(Field field, String value, {bool caseInsensitive: false}) {
-    _addExpression(field.id, {'LIKE': value, 'caseInsensitive': caseInsensitive});
+  QueryBuilder like(FieldValue fieldValue, {bool caseInsensitive: false}) {
+    _addExpression(fieldValue.fieldName,
+        {'LIKE': fieldValue.value, 'caseInsensitive': caseInsensitive});
     return this;
   }
 
 //  QueryBuilder all(Field field, List values) {
-//    _addExpression(field.id, {"\$all": values});
+//    _addExpression(fieldValue.fieldName, {"\$all": fieldValue.values});
 //    return this;
 //  }
 
 //  QueryBuilder notIn(Field field, List values) {
-//    _addExpression(field.id, {"\$nin": values});
+//    _addExpression(fieldValue.fieldName, {"\$nin": fieldValue.values});
 //    return this;
 //  }
 
-  QueryBuilder oneFrom(Field field, List values) {
-    _addExpression(field.id, {"IN": values, "DUMMY": 0});
+  QueryBuilder oneFrom(FieldValues fieldValues) {
+    _addExpression(
+        fieldValues.fieldName, {"IN": fieldValues.values, "DUMMY": 0});
     return this;
   }
 
 //  QueryBuilder exists(Field field) {
-//    _addExpression(field.id, {"\$exists": true});
+//    _addExpression(fieldValue.fieldName, {"\$exists": true});
 //    return this;
 //  }
 //
 //  QueryBuilder notExists(Field field) {
-//    _addExpression(field.id, {"\$exists": false});
+//    _addExpression(fieldValue.fieldName, {"\$exists": false});
 //    return this;
 //  }
 
 //  QueryBuilder mod(Field field, int value) {
-//    _addExpression(field.id, {
+//    _addExpression(fieldValue.fieldName, {
 //      "\$mod": [value, 0]
 //    });
 //    return this;
@@ -140,7 +142,7 @@ class QueryBuilder {
 
 //  SelectorBuilder match(Field field, String pattern,
 //      {bool multiLine, bool caseInsensitive, bool dotAll, bool extended}) {
-//    _addExpression(field.id, {
+//    _addExpression(fieldValue.fieldName, {
 //      '\$regex': new BsonRegexp(pattern,
 //          multiLine: multiLine,
 //          caseInsensitive: caseInsensitive,
@@ -163,7 +165,7 @@ class QueryBuilder {
 //    } else {
 //      rangeMap["\$lt"] = max;
 //    }
-//    _addExpression(field.id, rangeMap);
+//    _addExpression(fieldValue.fieldName, rangeMap);
 //    return this;
 //  }
 
@@ -176,7 +178,6 @@ class QueryBuilder {
     map['ORDERBY'][field.id] = order;
     return this;
   }
-
 
   QueryBuilder fields(List<String> fields) {
     _ensureParamFields();
@@ -209,19 +210,19 @@ class QueryBuilder {
     return this;
   }
 
-//  QueryBuilder within(Field field, value) {
-//    _addExpression(field.id, {
-//      "\$within": {"\$box": value}
+//  QueryBuilder within(FieldValue fieldValue) {
+//    _addExpression(fieldValue.fieldName, {
+//      "\$within": {"\$box": fieldValue.value}
 //    });
 //    return this;
 //  }
 //
 //  QueryBuilder near(Field field, var value, [double maxDistance]) {
 //    if (maxDistance == null) {
-//      _addExpression(field.id, {"\$near": value});
+//      _addExpression(fieldValue.fieldName, {"\$near": fieldValue.value});
 //    } else {
 //      _addExpression(
-//          field.id, {"\$near": value, "\$maxDistance": maxDistance});
+//          fieldValue.fieldName, {"\$near": fieldValue.value, "\$maxDistance": maxDistance});
 //    }
 //    return this;
 //  }
@@ -280,11 +281,9 @@ class QueryBuilder {
     return this;
   }
 
-
   QueryBuilder clone() {
     var copy = where;
     copy.map = new Map.from(map);
     return copy;
   }
 }
-
