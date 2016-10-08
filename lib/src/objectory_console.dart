@@ -47,6 +47,11 @@ class ObjectoryConsole extends Objectory {
     output.write('CREATE TABLE "$tableName" (\n');
     output.write(
         '  "id" integer NOT NULL DEFAULT nextval(\'"${tableName}_id_seq"\'::regclass),\n');
+    output.write(
+        '  "modifiedDate" DATE NOT NULL DEFAULT CURRENT_DATE,\n');
+    output.write(
+        '  "modifiedTime" TIME WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIME,\n');
+
     po.$schema.fields.values.forEach((fld) => _outputField(fld, output));
     output.write('  CONSTRAINT "${tableName}_px" PRIMARY KEY ("id")\n');
     output.write(')');
@@ -69,7 +74,7 @@ class ObjectoryConsole extends Objectory {
     } else if (field.type == bool) {
       output.write('BOOLEAN NOT NULL DEFAULT FALSE,\n');
     } else if (field.type == DateTime) {
-      output.write('TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n');
+      output.write("TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT '1999-01-08',\n");
     } else if (field.type == int) {
       output.write('INTEGER NOT NULL DEFAULT 0,\n');
     } else if (field.type == num) {

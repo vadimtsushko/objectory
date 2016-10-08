@@ -86,20 +86,20 @@ class ObjectoryClient {
           find(header, content, extParams);
           return;
         }
-//        if (header.command == "queryDb") {
-//          queryDb(header, content);
-//          return;
-//        }
-//        if (header.command == "dropDb") {
-//          dropDb(header);
-//          return;
-//        }
+        if (header.command == "listSessions") {
+          listSessions(header);
+          return;
+        }
+        if (header.command == "refreshUsers") {
+          refreshUsers(header);
+          return;
+        }
         if (header.command == "truncate") {
           truncate(header);
           return;
         }
-        log.shout('Unexpected message: $message');
-        sendResult(header, content);
+        log.shout('Unexpected message: $jdata');
+        sendError(header, 'Unexpexted message: $jdata');
       } catch (e) {
         log.severe(e);
       }
@@ -202,7 +202,7 @@ class ObjectoryClient {
 
   sendError(header, String errorMessage) async {
     print(errorMessage);
-    sendResult(header, {'error': errorMessage});
+    sendResult(header, {'error': 'Objectory Server error: $errorMessage'});
   }
 
   listSessions(RequestHeader header) async {
@@ -217,6 +217,14 @@ class ObjectoryClient {
     }
     sendResult(header, result);
   }
+
+  refreshUsers(RequestHeader header) async {
+    print('Objectory refreshUsers');
+    var result = [];
+    await server.authenticator.refreshUsers();
+    sendResult(header, result);
+  }
+
 
   count(RequestHeader header, Map selector, Map extParams) async {
     int res = await objectory.doCount(

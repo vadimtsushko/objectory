@@ -137,7 +137,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
       data = new Uint8List.view(data);
     }*/
     var jdata = new BSON().deserialize(new BsonBinary.from(JSON.decode(data)));
-    print('onmessage: $jdata');
+
     var message = new ObjectoryMessage.fromMessage(jdata);
     int receivedRequestId = message.command['requestId'];
     if (receivedRequestId == null) {
@@ -146,7 +146,15 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
     var completer = awaitedRequests[receivedRequestId];
     if (completer != null) {
       print("Complete request: $receivedRequestId message: $message");
-      completer.complete(message.content);
+      var error;
+      if (message.content is Map) {
+        error = message.content['error'];
+      }
+      if (error == null) {
+        completer.complete(message.content);
+      } else {
+        completer.completeError(error);
+      }
     } else {
       print('!!!Not found completer for request: $receivedRequestId');
     }
