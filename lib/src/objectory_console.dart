@@ -55,6 +55,12 @@ class ObjectoryConsole extends Objectory {
         '  "modifiedTime" TIME WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIME,\n');
 
     po.$schema.fields.values.forEach((fld) => _outputField(fld, output));
+    List<String> extKeys = po.$schema.fields.values.where((fld) => fld.externalKey)
+        .map((fld) => fld.id)
+        .toList();
+    if (extKeys.isNotEmpty) {
+      output.write('CONSTRAINT "${tableName}_ExtKey" UNIQUE (${extKeys.join(', ')}),');
+    }
     output.write('  CONSTRAINT "${tableName}_px" PRIMARY KEY ("id")\n');
     output.write(')');
     command = output.toString();

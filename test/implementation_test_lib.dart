@@ -157,10 +157,9 @@ allImplementationTests() {
     await father.save();
     Person son = new Person()
       ..firstName = 'Nick'
-      ..father = father;
+      ..setFatherId(father.id);
     await son.save();
     int sonId = son.id;
-
     objectory.clearCache(Person);
     Person sonFromDb = await objectory.selectOne(Person, where.id(sonId));
     expect(sonFromDb.firstName, 'Nick');
