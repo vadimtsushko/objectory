@@ -9,6 +9,8 @@ const DefaultUri = 'postgres://test:test@localhost:5432/objectory_test';
 
 main() async {
   objectory = new ObjectoryConsole(DefaultUri, registerClasses);
+  await objectory.initDomainModel();
   await objectory.recreateSchema();
+  await objectory.close();
   group('VM implementation tests', () => allImplementationTests());
 }

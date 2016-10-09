@@ -9,6 +9,10 @@ import 'package:bson/bson.dart';
 import 'field.dart';
 import 'dart:developer';
 
+
+
+
+
 Objectory objectory;
 
 class HistoryRecord {
@@ -311,7 +315,7 @@ class Objectory {
       });
     }
     await saveObjectToHistory(persistentObject, 'u');
-    return doUpdate(persistentObject.tableName, id, toUpdate);
+    return doUpdate(persistentObject.tableNameForUpdate, id, toUpdate);
   }
 
   completeFindOne(

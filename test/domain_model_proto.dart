@@ -33,9 +33,25 @@ class Person {
   Person father;
   @Field()
   Person mother;
-//  List<Person> children;
+  Occupation occupation;
 }
 
+class Occupation {
+  String name;
+}
+
+@Table(
+    isView: true,
+    createScript: '''
+CREATE VIEW "PersonView" AS
+ SELECT "Person".*,
+    "Occupation".name as "occupationName"
+   FROM "Person"
+     LEFT JOIN "Occupation" ON "Person"."occupation" = "Occupation".id;
+    ''')
+class PersonView extends Person {
+  String occupationName;
+}
 
 main() {
   new ModelGenerator(#domain_model_proto)

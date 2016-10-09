@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'field.dart' as schema;
 
-
 class Field {
   final String label;
   final String title;
@@ -20,7 +19,9 @@ class Field {
 
 class Table {
   final bool logChanges;
-  const Table({this.logChanges: true});
+  final bool isView;
+  final String createScript;
+  const Table({this.logChanges: true, this.isView: false, this.createScript: ''});
 }
 
 ///<-- Metadata
@@ -95,7 +96,6 @@ part of domain_model;
       }
       output.write('}\n');
     }
-
   }
 
   void saveOuput(String fileName) {
@@ -109,9 +109,9 @@ part of domain_model;
 
   void generateOuputForClass(ClassGenerator classGenerator) {
     output.write(
-        'class ${classGenerator.persistentClassName} extends PersistentObject {\n');
+        'class ${classGenerator.type} extends ${classGenerator.superClass} {\n');
     output.writeln(
-        "  TableSchema get \$schema => \$${classGenerator.persistentClassName}.schema;");
+        "  TableSchema get \$schema => \$${classGenerator.type}.schema;");
     classGenerator.properties.forEach(generateOuputForProperty);
     _linkedTypes[classGenerator.type] = classGenerator.properties
         .where((PropertyGenerator p) =>
@@ -135,9 +135,10 @@ part of domain_model;
       output.write(
           '  ${propertyGenerator.type} get ${propertyGenerator.name} => '
           "getLinkedObject('${propertyGenerator.name}', ${propertyGenerator.type});\n");
-      String capitalized = propertyGenerator.name.substring(0,1).toUpperCase() + propertyGenerator.name.substring(1);
-      output.write(
-          '  set${capitalized}Id(int value) => '
+      String capitalized =
+          propertyGenerator.name.substring(0, 1).toUpperCase() +
+              propertyGenerator.name.substring(1);
+      output.write('  set${capitalized}Id(int value) => '
           "setForeignKey('${propertyGenerator.name}',value);\n");
     }
     if (propertyGenerator.propertyType == PropertyType.PERSISTENT_LIST) {
@@ -149,19 +150,19 @@ part of domain_model;
 
   void generateOuputForTableSchema(ClassGenerator classGenerator) {
     output.write('class \$${classGenerator.type} {\n');
-    List<PropertyGenerator> allProperties = [
-      schema.Fields.id,
-      schema.Fields.deleted,
-      schema.Fields.modifiedDate,
-      schema.Fields.modifiedTime
-    ].map((schema.Field fld) {
-      Field metaField = new Field(label: fld.label, title: fld.title);
-      return new PropertyGenerator()
-        ..name = fld.id
-        ..type = fld.type
-        ..field = metaField
-        ..propertyType = PropertyType.SIMPLE;
-    }).toList();
+    List<PropertyGenerator> allProperties = [];
+//      schema.Fields.id,
+//      schema.Fields.deleted,
+//      schema.Fields.modifiedDate,
+//      schema.Fields.modifiedTime
+//    ].map((schema.Field fld) {
+//      Field metaField = new Field(label: fld.label, title: fld.title);
+//      return new PropertyGenerator()
+//        ..name = fld.id
+//        ..type = fld.type
+//        ..field = metaField
+//        ..propertyType = PropertyType.SIMPLE;
+//    }).toList();
     allProperties.addAll(classGenerator.properties);
 
     allProperties.forEach((propertyGenerator) {
@@ -183,12 +184,14 @@ part of domain_model;
     output.writeln(" static TableSchema schema = new TableSchema(");
     output.writeln("      tableName: '${classGenerator.type}',");
     output.writeln("      logChanges: ${classGenerator.table.logChanges},");
+    output.writeln("      isView: ${classGenerator.table.isView},");
+    output.writeln("      createScript: '''\n${classGenerator.table.createScript}''',");
+    output.writeln("      superSchema: \$${classGenerator.superClass}.schema,");
     output.writeln('      fields: {\n$fields\n      });');
     output.writeln('}\n');
   }
 
-  generateFieldDescriptors(List<PropertyGenerator> simpleProperties) {
-  }
+  generateFieldDescriptors(List<PropertyGenerator> simpleProperties) {}
 
   processAll() {
     _classesOrdered.forEach(processClass);
@@ -206,7 +209,10 @@ part of domain_model;
     } else {
       generatorClass.table = new Table();
     }
-
+    generatorClass.superClass = classMirror.superclass.reflectedType.toString();
+    if (generatorClass.superClass == 'Object') {
+      generatorClass.superClass = 'PersistentObject';
+    }
     classMirror.declarations.forEach((Symbol name, DeclarationMirror vm) =>
         processProperty(generatorClass, name, vm));
   }
@@ -256,8 +262,7 @@ class PropertyGenerator {
 class ClassGenerator {
   Table table;
   Type type;
-  String asClass;
-  String get persistentClassName => asClass == null ? '$type' : asClass;
+  String superClass;
   List<PropertyGenerator> properties = new List<PropertyGenerator>();
   String toString() => 'ClassGenerator($properties)';
 }

@@ -9,7 +9,16 @@ class TableSchema {
   final Map<String, Field> fields;
   final String tableName;
   final bool logChanges;
-  const TableSchema({this.fields, this.tableName, this.logChanges});
+  final bool isView;
+  final TableSchema superSchema;
+  final String createScript;
+  const TableSchema(
+      {this.fields,
+      this.tableName,
+      this.logChanges,
+      this.isView,
+      this.createScript,
+      this.superSchema});
 }
 
 class FieldValue<T> {
@@ -52,4 +61,50 @@ class Field<T> {
       this.logChanges: false,
       this.externalKey: false,
       this.foreignKey: false});
+}
+
+class $PersistentObject {
+  static Field<int> get id => const Field<int>(
+      id: 'id',
+      label: '',
+      title: '',
+      type: int,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false);
+  static Field<bool> get deleted => const Field<bool>(
+      id: 'deleted',
+      label: '',
+      title: '',
+      type: bool,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false);
+  static Field<DateTime> get modifiedDate => const Field<DateTime>(
+      id: 'modifiedDate',
+      label: '',
+      title: '',
+      type: DateTime,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false);
+  static Field<DateTime> get modifiedTime => const Field<DateTime>(
+      id: 'modifiedTime',
+      label: '',
+      title: '',
+      type: DateTime,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false);
+  static TableSchema schema = new TableSchema(
+      tableName: null,
+      logChanges: false,
+      isView: true,
+      superSchema: null,
+      fields: {
+        'id': id,
+        'deleted': deleted,
+        'modifiedDate': modifiedDate,
+        'modifiedTime': modifiedTime,
+      });
 }

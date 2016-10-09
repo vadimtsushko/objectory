@@ -32,44 +32,59 @@ class ObjectoryConsole extends Objectory {
 //  ObjectoryCollection constructCollection() =>
 //      new ObjectoryCollectionConsole(this);
 
-  Future createTable(Type persistentClass) async {
-    var po = this.newInstance(persistentClass);
-    String tableName = po.tableName;
-    String command =
-        'CREATE SEQUENCE "${tableName}_id_seq"  INCREMENT 1  MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1';
-    try {
-      await connection.execute(command);
-    } catch (e) {
-      print(e);
+  Future createTable(Type persistentClass, bool viewMode) async {
+    TableSchema schema = this.tableSchema(persistentClass);
+    if (schema.isView != viewMode) {
+      return;
     }
+    if (schema.isView) {
+      if (schema.createScript != '') {
+        try {
+          await connection.execute(schema.createScript);
+        } catch (e) {
+          print(e);
+        }
+      }
+      return;
+    } else {
+      var po = this.newInstance(persistentClass);
+      String tableName = po.tableName;
+      String command =
+          'CREATE SEQUENCE "${tableName}_id_seq"  INCREMENT 1  MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1';
+      try {
+        await connection.execute(command);
+      } catch (e) {
+        print(e);
+      }
 
-    StringBuffer output = new StringBuffer();
-    output.write('CREATE TABLE "$tableName" (\n');
-    output.write(
-        '  "id" integer NOT NULL DEFAULT nextval(\'"${tableName}_id_seq"\'::regclass),\n');
-    output.write(
-        '  "deleted" BOOLEAN NOT NULL DEFAULT FALSE,\n');
-    output.write(
-        '  "modifiedDate" DATE NOT NULL DEFAULT CURRENT_DATE,\n');
-    output.write(
-        '  "modifiedTime" TIME WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIME,\n');
+      StringBuffer output = new StringBuffer();
+      output.write('CREATE TABLE "$tableName" (\n');
+      output.write(
+          '  "id" integer NOT NULL DEFAULT nextval(\'"${tableName}_id_seq"\'::regclass),\n');
+      output.write('  "deleted" BOOLEAN NOT NULL DEFAULT FALSE,\n');
+      output.write('  "modifiedDate" DATE NOT NULL DEFAULT CURRENT_DATE,\n');
+      output.write(
+          '  "modifiedTime" TIME WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIME,\n');
 
-    po.$schema.fields.values.forEach((fld) => _outputField(fld, output));
-    List<String> extKeys = po.$schema.fields.values.where((fld) => fld.externalKey)
-        .map((fld) => fld.id)
-        .toList();
-    if (extKeys.isNotEmpty) {
-      output.write('CONSTRAINT "${tableName}_ExtKey" UNIQUE (${extKeys.join(', ')}),');
-    }
-    output.write('  CONSTRAINT "${tableName}_px" PRIMARY KEY ("id")\n');
-    output.write(')');
-    command = output.toString();
-    try {
-      await connection.execute(command);
-    } catch (e) {
-      print(e);
-      print('\n\n');
-      print(command);
+      po.$schema.fields.values.forEach((fld) => _outputField(fld, output));
+      List<String> extKeys = po.$schema.fields.values
+          .where((fld) => fld.externalKey)
+          .map((fld) => fld.id)
+          .toList();
+      if (extKeys.isNotEmpty) {
+        output.write(
+            'CONSTRAINT "${tableName}_ExtKey" UNIQUE (${extKeys.join(', ')}),');
+      }
+      output.write('  CONSTRAINT "${tableName}_px" PRIMARY KEY ("id")\n');
+      output.write(')');
+      command = output.toString();
+      try {
+        await connection.execute(command);
+      } catch (e) {
+        print(e);
+        print('\n\n');
+        print(command);
+      }
     }
   }
 
@@ -92,30 +107,51 @@ class ObjectoryConsole extends Objectory {
     }
   }
 
-  Future dropTable(Type persistentClass) async {
+  Future dropTable(Type persistentClass, bool viewMode) async {
     String tableName = this.tableName(persistentClass);
-    String command = 'DROP TABLE "$tableName"';
-    try {
-      await connection.execute(command);
-    } catch (e) {
-      print(e);
+    TableSchema schema = this.tableSchema(persistentClass);
+    if (schema.isView != viewMode) {
+      return;
     }
+    if (schema.isView) {
+      String command = 'DROP View "$tableName"';
+      try {
+        await connection.execute(command);
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      String command = 'DROP TABLE "$tableName"';
+      try {
+        await connection.execute(command);
+      } catch (e) {
+        print(e);
+      }
 
-    command = 'DROP SEQUENCE "${tableName}_id_seq"';
-    try {
-      await connection.execute(command);
-    } catch (e) {
-      print(e);
+      command = 'DROP SEQUENCE "${tableName}_id_seq"';
+      try {
+        await connection.execute(command);
+      } catch (e) {
+        print(e);
+      }
     }
   }
 
   Future recreateSchema() async {
     for (Type type in persistentTypes) {
-      await dropTable(type);
+      await dropTable(type, true);
     }
     for (Type type in persistentTypes) {
-      await createTable(type);
+      await dropTable(type, false);
     }
+
+    for (Type type in persistentTypes) {
+      await createTable(type, false);
+    }
+    for (Type type in persistentTypes) {
+      await createTable(type, true);
+    }
+
   }
 
   Future truncate(Type persistentType) async {
@@ -150,9 +186,8 @@ class ObjectoryConsole extends Objectory {
   Future<int> doCount(String tableName, selector) async {
     SqlQueryBuilder sqlBuilder = new SqlQueryBuilder(tableName, selector);
     String command = sqlBuilder.getQueryCountSql();
-    List<Row> rows = await connection
-        .query(command, sqlBuilder.params)
-        .toList();
+    List<Row> rows =
+        await connection.query(command, sqlBuilder.params).toList();
     return rows.first.toList().first;
   }
 

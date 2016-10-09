@@ -109,9 +109,12 @@ class BasePersistentObject {
 
   void init() {}
 
-  /// Name of MongoDB collection where instance of this class would  be persistet in DB.
-  /// By default equals to class name, but may be overwritten
+  /// Name of PostgreSQL table where instance of this class would  be persistet in DB.
   String get tableName => $schema.tableName;
+
+  /// Simple default implementation for updatable views
+  String get tableNameForUpdate =>
+      $schema.isView ? $schema.superSchema.tableName : $schema.tableName;
 
   TableSchema get $schema {
     throw new Exception('Must be implemented');
