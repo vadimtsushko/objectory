@@ -80,7 +80,7 @@ part of domain_model;
       }
     });
     if (register) {
-      output.write('registerClasses() {\n');
+      output.write('registerClasses(Objectory objectoryParam) {\n');
       for (Type cls in _classesOrdered) {
         var linkedTypeMap = {};
         for (List each in _linkedTypes[cls]) {
@@ -88,7 +88,7 @@ part of domain_model;
         }
 
         output.write(
-            '  objectory.registerClass($cls.value(())=>new $cls(),()=>new List<$cls>(), $linkedTypeMap);\n');
+            '  objectoryParam.registerClass($cls,()=>new $cls(),()=>new List<$cls>(), $linkedTypeMap);\n');
       }
       output.write('}\n');
     }

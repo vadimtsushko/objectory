@@ -8,8 +8,6 @@ import 'package:bson/bson.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-//import 'package:angular2/core.dart';
-//import 'package:instock/service/event_bus.dart';
 
 class ObjectoryMessage {
   Map command;
@@ -145,7 +143,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
     }
     var completer = awaitedRequests[receivedRequestId];
     if (completer != null) {
-      print("Complete request: $receivedRequestId message: $message");
+//      print("Complete request: $receivedRequestId message: $message");
       var error;
       if (message.content is Map) {
         error = message.content['error'];

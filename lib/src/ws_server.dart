@@ -28,7 +28,7 @@ class ObjectoryClient {
   DateTime startDate = new DateTime.now();
   DateTime lastActivity;
   Connection connection;
-  ObjectoryConsole get objectory => server.objectoryConsole;
+  ObjectoryConsole objectory;
   int token;
   WebSocket socket;
   bool isUserVerified = false;
@@ -36,7 +36,11 @@ class ObjectoryClient {
   String authToken;
   bool testMode;
   bool closed = false;
-  ObjectoryClient(this.token, this.socket, this.testMode, this.server) {
+  ObjectoryClient(this.token, this.socket, this.testMode, this.server);
+
+  init() async {
+    objectory = new ObjectoryConsole(server.postgresUri, (_) => null);
+    objectory.connection = await connect(server.postgresUri);
     server.sessions.add(this);
     if (server.authenticator is DummyAuthenticator) {
       isUserVerified = true;
@@ -113,6 +117,7 @@ class ObjectoryClient {
       server.sessions.remove(this);
     });
   }
+
   sendResult(RequestHeader header, content) {
     if (closed) {
       log.warning(
@@ -157,7 +162,8 @@ class ObjectoryClient {
   find(RequestHeader header, Map selector, Map extParams) async {
     log.fine(() => 'find $header $selector $extParams');
     if (!isUserVerified) {
-      sendError(header,'!!!Authentication error');;
+      sendError(header, '!!!Authentication error');
+      ;
       return;
     }
     List<Map> responseData = await objectory.findRawObjects(
@@ -172,7 +178,8 @@ class ObjectoryClient {
 
   findOne(RequestHeader header, Map selector, Map extParams) async {
     if (!isUserVerified) {
-      sendError(header,'!!!Authentication error');;
+      sendError(header, '!!!Authentication error');
+      ;
       return;
     }
     List<Map> list = await find(header, selector, extParams);
@@ -195,7 +202,7 @@ class ObjectoryClient {
       result['authToken'] = authRes.authToken;
       print('$userName authenticated successfully');
     } else {
-      return sendError(header,'!!! Error authenticating $userName');
+      return sendError(header, '!!! Error authenticating $userName');
     }
     sendResult(header, result);
   }
@@ -225,7 +232,6 @@ class ObjectoryClient {
     sendResult(header, result);
   }
 
-
   count(RequestHeader header, Map selector, Map extParams) async {
     int res = await objectory.doCount(
         header.collection, _queryBuilder(selector, extParams));
@@ -234,11 +240,9 @@ class ObjectoryClient {
   }
 
   truncate(RequestHeader header) async {
-    int res = await objectory.truncateTable(
-        header.collection);
+    int res = await objectory.truncateTable(header.collection);
     sendResult(header, res);
   }
-
 
 //  queryDb(RequestHeader header, Map query) {
 //    db
@@ -274,7 +278,7 @@ class ObjectoryServerImpl {
   final Set<ObjectoryClient> sessions = new Set<ObjectoryClient>();
 
   Authenticator authenticator;
-  ObjectoryConsole objectoryConsole;
+//  ObjectoryConsole objectoryConsole;
   bool testMode = false;
   String hostName;
   int port;
@@ -293,15 +297,14 @@ class ObjectoryServerImpl {
   }
   start() async {
     try {
-      objectoryConsole = new ObjectoryConsole(postgresUri, () => null);
-      await objectoryConsole.initDomainModel();
       print('ws://$hostName:$port');
       HttpServer server = await HttpServer.bind(hostName, port);
       print('Objectory server started. Listening on ws://$hostName:$port');
       server.transform(new WebSocketTransformer()).listen(
-          (WebSocket webSocket) {
+          (WebSocket webSocket) async {
         _token += 1;
-        new ObjectoryClient(_token, webSocket, testMode, this);
+        var client = new ObjectoryClient(_token, webSocket, testMode, this);
+        await client.init();
         log.fine('adding connection token = ${_token}');
       }, onError: (e) => log.severe(e.toString()));
     } catch (e) {

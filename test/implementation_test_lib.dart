@@ -4,7 +4,7 @@ import 'package:objectory/objectory.dart';
 import 'package:test/test.dart';
 import 'domain_model.dart';
 
-allImplementationTests() async {
+allImplementationTests() {
   setUp(() async {
     await objectory.initDomainModel();
   });

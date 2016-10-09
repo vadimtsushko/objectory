@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 
 main(){
   objectory = new Objectory(null,null);
-  registerClasses();
+  registerClasses(objectory);
   group("PersistenObjectTests", ()  {
     test("testAuthorCreation",() {
       var author = new Author();

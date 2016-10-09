@@ -17,7 +17,11 @@ class $User {
  static TableSchema schema = new TableSchema(
       tableName: 'User',
       logChanges: false,
-      fields: {'name': name,'email': email,'login': login});
+      fields: {
+          'name': name,
+          'email': email,
+          'login': login
+      });
 }
 
 class User extends PersistentObject {
@@ -40,16 +44,21 @@ class $Person {
   static Field<String> get lastName =>
       const Field<String>(id: 'lastName',label: '',title: '',
           type: String,logChanges: true, foreignKey: false);
-  static Field<Person> get father =>
-      const Field<Person>(id: 'father',label: '',title: '',
+  static Field<int> get father =>
+      const Field<int>(id: 'father',label: '',title: '',
           type: Person,logChanges: true, foreignKey: true);
-  static Field<Person> get mother =>
-      const Field<Person>(id: 'mother',label: '',title: '',
+  static Field<int> get mother =>
+      const Field<int>(id: 'mother',label: '',title: '',
           type: Person,logChanges: true, foreignKey: true);
  static TableSchema schema = new TableSchema(
       tableName: 'Person',
       logChanges: true,
-      fields: {'firstName': firstName,'lastName': lastName,'father': father,'mother': mother});
+      fields: {
+          'firstName': firstName,
+          'lastName': lastName,
+          'father': father,
+          'mother': mother
+      });
 }
 
 class Person extends PersistentObject {
@@ -80,7 +89,11 @@ class $Author {
  static TableSchema schema = new TableSchema(
       tableName: 'Author',
       logChanges: true,
-      fields: {'name': name,'email': email,'age': age});
+      fields: {
+          'name': name,
+          'email': email,
+          'age': age
+      });
 }
 
 class Author extends PersistentObject {
@@ -93,8 +106,8 @@ class Author extends PersistentObject {
   set age (int value) => setProperty('age',value);
 }
 
-registerClasses() {
-  objectory.registerClass(User,()=>new User(),()=>new List<User>(), {});
-  objectory.registerClass(Person,()=>new Person(),()=>new List<Person>(), {'father': Person, 'mother': Person});
-  objectory.registerClass(Author,()=>new Author(),()=>new List<Author>(), {});
+registerClasses(Objectory objectoryParam) {
+  objectoryParam.registerClass(User,()=>new User(),()=>new List<User>(), {});
+  objectoryParam.registerClass(Person,()=>new Person(),()=>new List<Person>(), {'father': Person, 'mother': Person});
+  objectoryParam.registerClass(Author,()=>new Author(),()=>new List<Author>(), {});
 }

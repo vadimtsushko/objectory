@@ -36,6 +36,7 @@ class Field<T> {
   final String label;
   final String title;
   final Type type;
+  final bool externalKey;
   final bool foreignKey;
   final bool logChanges;
   FieldValue<T> value(T value) => new FieldValue<T>(id, value);
@@ -46,5 +47,6 @@ class Field<T> {
       this.title: '',
       this.type: Object,
       this.logChanges: false,
+      this.externalKey: false,
       this.foreignKey: false});
 }

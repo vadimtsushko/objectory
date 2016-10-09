@@ -5,13 +5,11 @@ import 'query_builder.dart';
 import 'dart:collection';
 import 'dart:async';
 import 'package:bson/bson.dart';
-import 'package:mongo_dart_query/mongo_dart_query.dart' hide where;
+
+import 'field.dart';
 import 'dart:developer';
 
-
 Objectory objectory;
-
-
 
 class HistoryRecord {
   DateTime timestamp;
@@ -160,8 +158,9 @@ class Objectory {
       .map((ObjectoryCollection oc) => oc.tableName)
       .toList();
 
-  String tableName(Type type) =>
-      _collections[type].tableName;
+  String tableName(Type type) => _collections[type].tableName;
+
+  TableSchema tableSchema(Type type) => newInstance(type).$schema;
 
   Future save(PersistentObject persistentObject) async {
     var res;
@@ -270,8 +269,6 @@ class Objectory {
     throw new UnimplementedError();
   }
 
-
-
   Future truncate(Type persistentType) {
     throw new UnimplementedError();
   }
@@ -289,7 +286,7 @@ class Objectory {
   }
 
   Future initDomainModel() async {
-    registerClassesCallback();
+    registerClassesCallback(this);
     await open();
     _isOpen = true;
   }
@@ -317,8 +314,8 @@ class Objectory {
     return doUpdate(persistentObject.tableName, id, toUpdate);
   }
 
-  completeFindOne(Map map, Completer completer, QueryBuilder selector,
-      Type classType) {
+  completeFindOne(
+      Map map, Completer completer, QueryBuilder selector, Type classType) {
     var obj;
     if (map == null) {
       completer.complete(null);
@@ -338,27 +335,23 @@ class Objectory {
     if (object.dirtyFields.isEmpty) {
       return const {};
     }
-    if (saveAuditData) {
-      object.map['modifiedBy'] = userName;
-      object.map['modifiedAt'] = new DateTime.now();
-    }
-    if (!useFieldLevelUpdate) {
-      return object.map;
-    }
-    var builder = modify;
+//    if (saveAuditData) {
+//      object.map['modifiedBy'] = userName;
+//      object.map['modifiedAt'] = new DateTime.now();
+//    }
+//    if (!useFieldLevelUpdate) {
+//      return object.map;
+//    }
+    Map updateMap = {};
 
     for (var attr in object.dirtyFields) {
-      var root = object.map;
-      for (var field in attr.split('.')) {
-        root = root[field];
-      }
-      builder.set(attr, root);
+      updateMap[attr] = object.map[attr];
     }
-    if (saveAuditData) {
-      builder.set('modifiedBy', object.map['modifiedBy']);
-      builder.set('modifiedAt', object.map['modifiedAt']);
-    }
-    return builder.map;
+//    if (saveAuditData) {
+//      builder.set('modifiedBy', object.map['modifiedBy']);
+//      builder.set('modifiedAt', object.map['modifiedAt']);
+//    }
+    return updateMap;
   }
 
   Future<PersistentObject> fetchLinks(PersistentObject obj) async {

@@ -120,12 +120,11 @@ class ObjectoryConsole extends Objectory {
   }
 
   Future doUpdate(String collection, int id, Map toUpdate) {
-    Map content = toUpdate[r'$set'];
-    if (content == null) {
-      throw new Exception('doUpdate called with invalid params: $toUpdate');
+    if (toUpdate == null || toUpdate.isEmpty) {
+      throw new Exception('doUpdate called with empty params: $toUpdate');
     }
     var builder = new SqlQueryBuilder(collection, new QueryBuilder().id(id));
-    String command = builder.getUpdateSql(content);
+    String command = builder.getUpdateSql(toUpdate);
 //    print('$command       ${builder.params}');
     return connection.execute(command, builder.params);
   }
