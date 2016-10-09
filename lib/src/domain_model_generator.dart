@@ -3,16 +3,19 @@ library schema_generator;
 import 'dart:mirrors';
 import 'dart:io';
 import 'package:path/path.dart' as path;
-import 'package:objectory/src/persistent_object.dart';
-//import 'package:objectory/src/field.dart';
-//
-//export 'package:objectory/src/field.dart';
+import 'field.dart' as schema;
+
 
 class Field {
   final String label;
   final String title;
   final bool logChanges;
-  const Field({this.label: '', this.title: '', this.logChanges: true});
+  final bool externalKey;
+  const Field(
+      {this.label: '',
+      this.title: '',
+      this.logChanges: true,
+      this.externalKey: false});
 }
 
 class Table {
@@ -93,12 +96,6 @@ part of domain_model;
       output.write('}\n');
     }
 
-//    output.write('\n\n /// Postgresql DB Schema \n');
-//    output.write('/*\n');
-//    classGenerators.forEach((cls) {
-//      generateOuputForTable(cls);
-//    });
-//    output.write('*/\n');
   }
 
   void saveOuput(String fileName) {
@@ -138,9 +135,10 @@ part of domain_model;
       output.write(
           '  ${propertyGenerator.type} get ${propertyGenerator.name} => '
           "getLinkedObject('${propertyGenerator.name}', ${propertyGenerator.type});\n");
+      String capitalized = propertyGenerator.name.substring(0,1).toUpperCase() + propertyGenerator.name.substring(1);
       output.write(
-          '  set ${propertyGenerator.name} (${propertyGenerator.type} value) => '
-          "setLinkedObject('${propertyGenerator.name}',value);\n");
+          '  set${capitalized}Id(int value) => '
+          "setForeignKey('${propertyGenerator.name}',value);\n");
     }
     if (propertyGenerator.propertyType == PropertyType.PERSISTENT_LIST) {
       output.write(
@@ -149,45 +147,34 @@ part of domain_model;
     }
   }
 
-//  void generateOuputForTableColumn(PropertyGenerator propertyGenerator) {
-//    //output.write(propertyGenerator.commentLine);
-//    if (propertyGenerator.propertyType == PropertyType.SIMPLE) {
-//      output.write('  "${propertyGenerator.name}" ');
-//      if (propertyGenerator.type == String) {
-//        output.write('CHARACTER VARYING (255) NOT NULL DEFAULT '',\n');
-//      } else if (propertyGenerator.type == bool) {
-//        output.write('BOOLEAN NOT NULL DEFAULT FALSE,\n');
-//      } else if (propertyGenerator.type == DateTime) {
-//        output.write('timestamp,\n');
-//      } else if (propertyGenerator.type == int) {
-//        output.write('integer,\n');
-//      } else if (propertyGenerator.type == num) {
-//        output.write('double precision,\n');
-//      } else {
-//        throw new Exception('Not supported type');
-//      }
-//    } else if (propertyGenerator.propertyType ==
-//        PropertyType.PERSISTENT_OBJECT) {
-//      output.write('  "${propertyGenerator.name}" character varying(255),\n');
-//    } else {
-//      throw new Exception(
-//          'Not supported type: ${PropertyType.PERSISTENT_LIST}');
-//    }
-//  }
-
   void generateOuputForTableSchema(ClassGenerator classGenerator) {
     output.write('class \$${classGenerator.type} {\n');
-    List<PropertyGenerator> allProperties = [PropertyGenerator.id];
+    List<PropertyGenerator> allProperties = [
+      schema.Fields.id,
+      schema.Fields.deleted,
+      schema.Fields.modifiedDate,
+      schema.Fields.modifiedTime
+    ].map((schema.Field fld) {
+      Field metaField = new Field(label: fld.label, title: fld.title);
+      return new PropertyGenerator()
+        ..name = fld.id
+        ..type = fld.type
+        ..field = metaField
+        ..propertyType = PropertyType.SIMPLE;
+    }).toList();
     allProperties.addAll(classGenerator.properties);
 
     allProperties.forEach((propertyGenerator) {
-      Type fieldType = propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT ? int : propertyGenerator.type;
+      Type fieldType =
+          propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT
+              ? int
+              : propertyGenerator.type;
       output.write(
           "  static Field<$fieldType> get ${propertyGenerator.name} =>\n");
       output.write(
           "      const Field<$fieldType>(id: '${propertyGenerator.name}',label: '${propertyGenerator.field.label}',title: '${propertyGenerator.field.title}',\n");
       output.write(
-          "          type: ${propertyGenerator.type},logChanges: ${propertyGenerator.field.logChanges}, foreignKey: ${propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT});\n");
+          "          type: ${propertyGenerator.type},logChanges: ${propertyGenerator.field.logChanges}, foreignKey: ${propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT},externalKey: ${propertyGenerator.field.externalKey});\n");
     });
     var fields = classGenerator.properties
         .map((PropertyGenerator e) => "          '${e.name}': ${e.name}")
@@ -201,30 +188,7 @@ part of domain_model;
   }
 
   generateFieldDescriptors(List<PropertyGenerator> simpleProperties) {
-//    output.writeln("  static final List<PropertyDescriptor> simpleFields = [");
-//    var comma = '';
-//    for (var property in simpleProperties) {
-//      var label = property.label == null ? property.name : property.label;
-//      output.writeln(
-//          "    ${comma}const PropertyDescriptor('${property.name}', PropertyType.${property.type}, '$label')");
-//      comma = ',';
-//    }
-//    output.writeln("  ];");
   }
-
-//  bool isEmbeddedPersistent(PropertyGenerator propertyGenerator) {
-//    if (propertyGenerator.propertyType != PropertyType.PERSISTENT_OBJECT) {
-//      return false;
-//    }
-//    ClassGenerator targetClass = classGenerators.firstWhere(
-//        (cg) => cg.type == propertyGenerator.type,
-//        orElse: () => null);
-//    if (targetClass == null) {
-//      throw new StateError(
-//          'Not found class ${propertyGenerator.type} in prototype schema');
-//    }
-//    return targetClass.isEmbedded;
-//  }
 
   processAll() {
     _classesOrdered.forEach(processClass);
@@ -258,7 +222,7 @@ part of domain_model;
 }
 
 class PropertyGenerator {
-  PropertyDescriptor descriptor;
+//  PropertyDescriptor descriptor;
   String name;
   Field field;
 
@@ -267,12 +231,6 @@ class PropertyGenerator {
   PropertyType propertyType = PropertyType.SIMPLE;
   String toString() => 'PropertyGenerator($name,$type,$propertyType)';
   String get commentLine => '  // $type $name\n';
-
-  static PropertyGenerator id = new PropertyGenerator()
-    ..name = 'id'
-    ..type = int
-    ..field = const Field()
-    ..propertyType = PropertyType.SIMPLE;
 
   processVariableMirror(VariableMirror vm) {
     vm.metadata.where((m) => m.reflectee is Field).forEach((m) {
@@ -283,7 +241,12 @@ class PropertyGenerator {
     }
     Type t = vm.type.reflectedType;
     type = t;
-    if (t == int || t == double || t == String || t == DateTime || t == bool || t == num) {
+    if (t == int ||
+        t == double ||
+        t == String ||
+        t == DateTime ||
+        t == bool ||
+        t == num) {
       return;
     }
     propertyType = PropertyType.PERSISTENT_OBJECT;

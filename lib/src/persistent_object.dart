@@ -7,29 +7,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'field.dart';
 
-enum PropertyType {
-  String,
-  int,
-  double,
-  bool,
-  DateTime,
-  ObjectId,
-  LinkedObject,
-  EmbeddedPersistentObject,
-  List,
-  ListOfLinks,
-  ListOfEmbeddedObjects
-}
-
-class PropertyDescriptor {
-  final PropertyType type;
-  final String name;
-  final String label;
-  //final Type persistentType;
-  bool get isNumeric =>
-      (type == PropertyType.int) || (type == PropertyType.double);
-  const PropertyDescriptor(this.name, this.type, this.label);
-}
+PersistentObject getStub(int id) => new PersistentObject()..id = id;
 
 class BasePersistentObject {
   Map _map = objectory.dataMapDecorator(new LinkedHashMap());
@@ -81,6 +59,17 @@ class BasePersistentObject {
       onValueChanging(property, value.id);
       map[property] = value.id;
     }
+  }
+
+  setForeignKey(String property, int fk) {
+    if (fk == null) {
+      throw new Exception('Attemt to set NULL value to foreign key');
+    }
+    if (this.map[property] == fk) {
+      return;
+    }
+    onValueChanging(property, fk);
+    map[property] = fk;
   }
 
   void _initMap() {}
@@ -162,13 +151,19 @@ class BasePersistentObject {
 }
 
 class PersistentObject extends BasePersistentObject {
-  dynamic get id => map['id'];
-
-  DbRef get dbRef => new DbRef(this.tableName, this.id);
-  set id(var value) {
-    assert(value == null || value.runtimeType == objectory.idType);
+  int get id => map['id'];
+  set id(int value) {
     map['id'] = value;
   }
+
+  bool get deleted => map['deleted'];
+  set deleted(bool value) {
+    setProperty('deleted', value);
+  }
+
+  DateTime get modifiedDate => map['modifiedDate'];
+
+  DateTime get modifiedTime => map['modifiedTime'];
 
   Map<String, Field> get $fields =>
       throw new Exception('Should be implemented');

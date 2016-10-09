@@ -1,5 +1,8 @@
 class Fields {
   static const id = const Field(id: 'id', type: int);
+  static const deleted = const Field(id: 'deleted', type: bool);
+  static const modifiedDate = const Field(id: 'modifiedDate', type: DateTime);
+  static const modifiedTime = const Field(id: 'modifiedTime', type: DateTime);
 }
 
 class TableSchema {

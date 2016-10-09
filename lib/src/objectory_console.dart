@@ -48,6 +48,8 @@ class ObjectoryConsole extends Objectory {
     output.write(
         '  "id" integer NOT NULL DEFAULT nextval(\'"${tableName}_id_seq"\'::regclass),\n');
     output.write(
+        '  "deleted" BOOLEAN NOT NULL DEFAULT FALSE,\n');
+    output.write(
         '  "modifiedDate" DATE NOT NULL DEFAULT CURRENT_DATE,\n');
     output.write(
         '  "modifiedTime" TIME WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIME,\n');
