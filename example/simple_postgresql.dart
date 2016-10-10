@@ -21,30 +21,7 @@ main() async {
   objectory = new ObjectoryConsole(uri, registerClasses);
 
   await objectory.initDomainModel();
-
-  await objectory.truncate(Person);
-  await objectory.truncate(Occupation);
-  Occupation occupation = new Occupation()..name = 'Test occupation';
-  await objectory.save(occupation);
-
-  Person person = new Person()..firstName = 'VadimOccupation'..setOccupationId(occupation.id);
-  await objectory.save(person);
-  int personId = person.id;
-  objectory.clearCache(Occupation);
-  objectory.clearCache(Person);
-
-  PersonView personView = await objectory.selectOne(PersonView, where.eq($Person.firstName.value('VadimOccupation')));
-
-
-  personView.firstName = 'VadimChanded';
-  await objectory.update(personView);
-
-  objectory.clearCache(Occupation);
-  objectory.clearCache(Person);
-  objectory.clearCache(PersonView);
-
-  personView = await objectory.selectOne(PersonView, where.eq($Person.firstName.value('VadimOccupation')));
-  print(personView);
+  await objectory.recreateSchema();
 
   await objectory.close();
 //  Author author = await objectory[Author].findOne(where.sortBy($Author.age, descending: true));

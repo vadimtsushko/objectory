@@ -96,8 +96,10 @@ class Objectory {
   }
 
   List<Type> get persistentTypes => _collections.keys.toList();
-  void addToCache(PersistentObject obj) {
-    _cache[obj.runtimeType.toString()][obj.id.toString()] = obj;
+  void completeFetch(PersistentObject obj) {
+    if (obj.$schema.cacheValues) {
+      _cache[obj.runtimeType.toString()][obj.id.toString()] = obj;
+    }
     obj.markAsFetched();
   }
 
@@ -148,7 +150,7 @@ class Objectory {
     if (result is PersistentObject) {
       result.id = map["id"];
       if (result.id != null) {
-        objectory.addToCache(result);
+        objectory.completeFetch(result);
       }
     }
     return result;
@@ -219,7 +221,7 @@ class Objectory {
     int newId =
         await doInsert(persistentObject.tableName, persistentObject.map);
     persistentObject.id = newId;
-    objectory.addToCache(persistentObject);
+    objectory.completeFetch(persistentObject);
     return newId;
   }
 

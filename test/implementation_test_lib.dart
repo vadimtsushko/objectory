@@ -146,7 +146,7 @@ allImplementationTests() {
     await objectory.truncate(Author);
     Author author = new Author();
     author.id = 233;
-    objectory.addToCache(author);
+    objectory.completeFetch(author);
     author = await objectory.selectOne(Author, where.id(author.id));
     expect(author, isNull);
   });

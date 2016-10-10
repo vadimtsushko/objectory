@@ -22,7 +22,7 @@ class User {
   @Field()
   String login;
 }
-
+@Table(cacheValues: true)
 class Person {
   @Field(logChanges: true)
   String firstName;

@@ -20,8 +20,9 @@ class Field {
 class Table {
   final bool logChanges;
   final bool isView;
+  final bool cacheValues;
   final String createScript;
-  const Table({this.logChanges: true, this.isView: false, this.createScript: ''});
+  const Table({this.logChanges: true, this.isView: false, this.createScript: '', this.cacheValues: false});
 }
 
 ///<-- Metadata
@@ -185,6 +186,7 @@ part of domain_model;
     output.writeln("      tableName: '${classGenerator.type}',");
     output.writeln("      logChanges: ${classGenerator.table.logChanges},");
     output.writeln("      isView: ${classGenerator.table.isView},");
+    output.writeln("      cacheValues: ${classGenerator.table.cacheValues},");
     output.writeln("      createScript: '''\n${classGenerator.table.createScript}''',");
     output.writeln("      superSchema: \$${classGenerator.superClass}.schema,");
     output.writeln('      fields: {\n$fields\n      });');

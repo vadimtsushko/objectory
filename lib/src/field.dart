@@ -11,6 +11,7 @@ class TableSchema {
   final bool logChanges;
   final bool isView;
   final TableSchema superSchema;
+  final bool cacheValues;
   final String createScript;
   const TableSchema(
       {this.fields,
@@ -18,6 +19,7 @@ class TableSchema {
       this.logChanges,
       this.isView,
       this.createScript,
+      this.cacheValues,
       this.superSchema});
 }
 

@@ -38,12 +38,9 @@ class ObjectoryConsole extends Objectory {
       return;
     }
     if (schema.isView) {
+
       if (schema.createScript != '') {
-        try {
-          await connection.execute(schema.createScript);
-        } catch (e) {
-          print(e);
-        }
+        await _execute(schema.createScript);
       }
       return;
     } else {
@@ -51,12 +48,7 @@ class ObjectoryConsole extends Objectory {
       String tableName = po.tableName;
       String command =
           'CREATE SEQUENCE "${tableName}_id_seq"  INCREMENT 1  MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1';
-      try {
-        await connection.execute(command);
-      } catch (e) {
-        print(e);
-      }
-
+      await _execute(command);
       StringBuffer output = new StringBuffer();
       output.write('CREATE TABLE "$tableName" (\n');
       output.write(
@@ -78,13 +70,25 @@ class ObjectoryConsole extends Objectory {
       output.write('  CONSTRAINT "${tableName}_px" PRIMARY KEY ("id")\n');
       output.write(')');
       command = output.toString();
-      try {
-        await connection.execute(command);
-      } catch (e) {
-        print(e);
-        print('\n\n');
-        print(command);
+      await _execute(command);
+
+      for (Field foreignKey
+          in po.$schema.fields.values.where((fld) => fld.foreignKey)) {
+        command =
+            '''CREATE INDEX "${po.$schema.tableName}_${foreignKey.id}_idx" ON "${po.$schema.tableName}"
+            USING btree ("${foreignKey.id}")''';
+        await _execute(command);
       }
+
+    }
+  }
+
+  _execute(String command) async {
+    try {
+      await connection.execute(command);
+    } catch (e) {
+      print(e);
+      print(command);
     }
   }
 
@@ -97,7 +101,7 @@ class ObjectoryConsole extends Objectory {
     } else if (field.type == bool) {
       output.write('BOOLEAN NOT NULL DEFAULT FALSE,\n');
     } else if (field.type == DateTime) {
-      output.write("TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT '1999-01-08',\n");
+      output.write("DATE NOT NULL DEFAULT '1999-01-01',\n");
     } else if (field.type == int) {
       output.write('INTEGER NOT NULL DEFAULT 0,\n');
     } else if (field.type == num) {
@@ -115,25 +119,12 @@ class ObjectoryConsole extends Objectory {
     }
     if (schema.isView) {
       String command = 'DROP View "$tableName"';
-      try {
-        await connection.execute(command);
-      } catch (e) {
-        print(e);
-      }
+      await _execute(command);
     } else {
       String command = 'DROP TABLE "$tableName"';
-      try {
-        await connection.execute(command);
-      } catch (e) {
-        print(e);
-      }
-
+      await _execute(command);
       command = 'DROP SEQUENCE "${tableName}_id_seq"';
-      try {
-        await connection.execute(command);
-      } catch (e) {
-        print(e);
-      }
+      await _execute(command);
     }
   }
 
@@ -151,7 +142,6 @@ class ObjectoryConsole extends Objectory {
     for (Type type in persistentTypes) {
       await createTable(type, true);
     }
-
   }
 
   Future truncate(Type persistentType) async {

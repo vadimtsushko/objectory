@@ -9,6 +9,7 @@ class $Occupation {
       tableName: 'Occupation',
       logChanges: true,
       isView: false,
+      cacheValues: false,
       createScript: '''
 ''',
       superSchema: $PersistentObject.schema,
@@ -37,6 +38,7 @@ class $User {
       tableName: 'User',
       logChanges: false,
       isView: false,
+      cacheValues: false,
       createScript: '''
 ''',
       superSchema: $PersistentObject.schema,
@@ -65,6 +67,7 @@ class $PersonView {
       tableName: 'PersonView',
       logChanges: true,
       isView: true,
+      cacheValues: false,
       createScript: '''
 CREATE VIEW "PersonView" AS
  SELECT "Person".*,
@@ -104,6 +107,7 @@ class $Person {
       tableName: 'Person',
       logChanges: true,
       isView: false,
+      cacheValues: false,
       createScript: '''
 ''',
       superSchema: $PersistentObject.schema,
@@ -144,6 +148,7 @@ class $Author {
       tableName: 'Author',
       logChanges: true,
       isView: false,
+      cacheValues: false,
       createScript: '''
 ''',
       superSchema: $PersistentObject.schema,
