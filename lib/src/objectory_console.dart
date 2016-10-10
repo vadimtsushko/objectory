@@ -69,7 +69,7 @@ class ObjectoryConsole extends Objectory {
       po.$schema.fields.values.forEach((fld) => _outputField(fld, output));
       List<String> extKeys = po.$schema.fields.values
           .where((fld) => fld.externalKey)
-          .map((fld) => fld.id)
+          .map((fld) => '"${fld.id}"')
           .toList();
       if (extKeys.isNotEmpty) {
         output.write(
