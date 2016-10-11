@@ -22,7 +22,11 @@ class Table {
   final bool isView;
   final bool cacheValues;
   final String createScript;
-  const Table({this.logChanges: true, this.isView: false, this.createScript: '', this.cacheValues: false});
+  const Table(
+      {this.logChanges: true,
+      this.isView: false,
+      this.createScript: '',
+      this.cacheValues: false});
 }
 
 ///<-- Metadata
@@ -46,6 +50,7 @@ class ModelGenerator {
 part of domain_model;
 
 ''';
+
   Symbol libraryName;
   List<ClassGenerator> classGenerators = new List<ClassGenerator>();
   Map<Type, ClassMirror> classMirrors = new Map<Type, ClassMirror>();
@@ -68,6 +73,44 @@ part of domain_model;
     processAll();
     generateOutput();
     saveOuput(outFileName);
+    generateJsWrapperOutput();
+    saveOuput('js_$outFileName');
+  }
+
+  generateJsWrapperOutput() {
+    const JS_WRAPPER_HEADER = '''
+/// Warning! That file is generated. Do not edit it manually
+
+@JS()
+library js_wrapper;
+import 'package:js/js.dart';
+
+
+@JS()
+@anonymous
+class PersistentObjectItem{
+  external int get id;
+  external set id(int value);
+  external String get modifiedBy;
+  external set modifiedBy(String value);
+  external DateTime get modifiedAtDate;
+  external set modifiedAtDate(DateTime value);
+  external DateTime get modifiedAtTime;
+  external set modifiedAtTime(DateTime value);
+  external DateTime get modifiedAt;
+  external set modifiedAt(DateTime value);
+  external factory PersistentObjectItem ();
+}
+
+
+  ''';
+
+    output = new StringBuffer();
+    output.write(JS_WRAPPER_HEADER);
+
+    classGenerators.forEach((cls) {
+      generateOuputForJsWrapper(cls);
+    });
   }
 
   void generateOutput(
@@ -122,6 +165,15 @@ part of domain_model;
     output.write('}\n\n');
   }
 
+  void generateOuputForJsWrapper(ClassGenerator classGenerator) {
+    output.write('@JS()\n@anonymous\n');
+    output.write(
+        'class ${classGenerator.type}Item extends ${classGenerator.superClass}Item {\n');
+    output.writeln("  external factory ${classGenerator.type}Item();");
+    classGenerator.properties.forEach(generateOuputForJsProperty);
+    output.write('}\n\n');
+  }
+
   void generateOuputForProperty(PropertyGenerator propertyGenerator) {
     //output.write(propertyGenerator.commentLine);
     if (propertyGenerator.propertyType == PropertyType.SIMPLE) {
@@ -147,6 +199,15 @@ part of domain_model;
           '  ${propertyGenerator.type} get ${propertyGenerator.name} => '
           "getPersistentList(${propertyGenerator.listElementType}.value('${propertyGenerator.name}'));\n");
     }
+  }
+
+  void generateOuputForJsProperty(PropertyGenerator propertyGenerator) {
+    //output.write(propertyGenerator.commentLine);
+    Type type = propertyGenerator.propertyType == PropertyType.SIMPLE
+        ? propertyGenerator.type
+        : int;
+    output.write('  external $type get ${propertyGenerator.name};\n');
+    output.write('  external set ${propertyGenerator.name} ($type value);\n');
   }
 
   void generateOuputForTableSchema(ClassGenerator classGenerator) {
@@ -187,7 +248,8 @@ part of domain_model;
     output.writeln("      logChanges: ${classGenerator.table.logChanges},");
     output.writeln("      isView: ${classGenerator.table.isView},");
     output.writeln("      cacheValues: ${classGenerator.table.cacheValues},");
-    output.writeln("      createScript: '''\n${classGenerator.table.createScript}''',");
+    output.writeln(
+        "      createScript: '''\n${classGenerator.table.createScript}''',");
     output.writeln("      superSchema: \$${classGenerator.superClass}.schema,");
     output.writeln('      fields: {\n$fields\n      });');
     output.writeln('}\n');
