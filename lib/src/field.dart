@@ -52,6 +52,8 @@ class Field<T> {
   final Type type;
   final bool externalKey;
   final bool foreignKey;
+  final int width;
+  final bool tootltipsOnContent;
   final bool logChanges;
   FieldValue<T> value(T value) => new FieldValue<T>(id, value);
   FieldValues<T> values(List<T> values) => new FieldValues<T>(id, values);
@@ -61,6 +63,8 @@ class Field<T> {
       this.title: '',
       this.type: Object,
       this.logChanges: false,
+      this.tootltipsOnContent: false,
+      this.width: 0,
       this.externalKey: false,
       this.foreignKey: false});
 }

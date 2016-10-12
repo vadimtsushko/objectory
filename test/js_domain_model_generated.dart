@@ -26,7 +26,7 @@ class PersistentObjectItem{
 @anonymous
 class OccupationItem extends PersistentObjectItem {
   external factory OccupationItem();
- external String get name;
+  external String get name;
   external set name (String value);
 }
 
@@ -34,11 +34,11 @@ class OccupationItem extends PersistentObjectItem {
 @anonymous
 class UserItem extends PersistentObjectItem {
   external factory UserItem();
- external String get name;
+  external String get name;
   external set name (String value);
- external String get email;
+  external String get email;
   external set email (String value);
- external String get login;
+  external String get login;
   external set login (String value);
 }
 
@@ -46,7 +46,7 @@ class UserItem extends PersistentObjectItem {
 @anonymous
 class PersonViewItem extends PersonItem {
   external factory PersonViewItem();
- external String get occupationName;
+  external String get occupationName;
   external set occupationName (String value);
 }
 
@@ -54,15 +54,15 @@ class PersonViewItem extends PersonItem {
 @anonymous
 class PersonItem extends PersistentObjectItem {
   external factory PersonItem();
- external String get firstName;
+  external String get firstName;
   external set firstName (String value);
- external String get lastName;
+  external String get lastName;
   external set lastName (String value);
- external int get father;
+  external int get father;
   external set father (int value);
- external int get mother;
+  external int get mother;
   external set mother (int value);
- external int get occupation;
+  external int get occupation;
   external set occupation (int value);
 }
 
@@ -70,11 +70,11 @@ class PersonItem extends PersistentObjectItem {
 @anonymous
 class AuthorItem extends PersistentObjectItem {
   external factory AuthorItem();
- external String get name;
+  external String get name;
   external set name (String value);
- external String get email;
+  external String get email;
   external set email (String value);
- external int get age;
+  external int get age;
   external set age (int value);
 }
 

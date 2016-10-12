@@ -21,7 +21,7 @@ main() async {
   objectory = new ObjectoryConsole(uri, registerClasses);
 
   await objectory.initDomainModel();
-  await objectory.recreateSchema();
+  await objectory.recreateSchema(objectory.persistentTypes);
 
   await objectory.close();
 //  Author author = await objectory[Author].findOne(where.sortBy($Author.age, descending: true));

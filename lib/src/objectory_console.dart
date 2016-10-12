@@ -128,18 +128,18 @@ class ObjectoryConsole extends Objectory {
     }
   }
 
-  Future recreateSchema() async {
-    for (Type type in persistentTypes) {
+  Future recreateSchema(List<Type> typesToRecreate) async {
+    for (Type type in typesToRecreate) {
       await dropTable(type, true);
     }
-    for (Type type in persistentTypes) {
+    for (Type type in typesToRecreate) {
       await dropTable(type, false);
     }
 
-    for (Type type in persistentTypes) {
+    for (Type type in typesToRecreate) {
       await createTable(type, false);
     }
-    for (Type type in persistentTypes) {
+    for (Type type in typesToRecreate) {
       await createTable(type, true);
     }
   }

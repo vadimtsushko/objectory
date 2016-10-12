@@ -4,7 +4,7 @@ part of domain_model;
 class $Occupation {
   static Field<String> get name =>
       const Field<String>(id: 'name',label: '',title: '',
-          type: String,logChanges: true, foreignKey: false,externalKey: false);
+          type: String,logChanges: true, foreignKey: false,externalKey: false,width: 0,tootltipsOnContent: false);
  static TableSchema schema = new TableSchema(
       tableName: 'Occupation',
       logChanges: true,
@@ -27,13 +27,13 @@ class Occupation extends PersistentObject {
 class $User {
   static Field<String> get name =>
       const Field<String>(id: 'name',label: '',title: '',
-          type: String,logChanges: true, foreignKey: false,externalKey: false);
+          type: String,logChanges: true, foreignKey: false,externalKey: false,width: 0,tootltipsOnContent: false);
   static Field<String> get email =>
       const Field<String>(id: 'email',label: '',title: '',
-          type: String,logChanges: true, foreignKey: false,externalKey: false);
+          type: String,logChanges: true, foreignKey: false,externalKey: false,width: 0,tootltipsOnContent: false);
   static Field<String> get login =>
       const Field<String>(id: 'login',label: '',title: '',
-          type: String,logChanges: true, foreignKey: false,externalKey: false);
+          type: String,logChanges: true, foreignKey: false,externalKey: false,width: 0,tootltipsOnContent: false);
  static TableSchema schema = new TableSchema(
       tableName: 'User',
       logChanges: false,
@@ -62,7 +62,7 @@ class User extends PersistentObject {
 class $PersonView {
   static Field<String> get occupationName =>
       const Field<String>(id: 'occupationName',label: '',title: '',
-          type: String,logChanges: true, foreignKey: false,externalKey: false);
+          type: String,logChanges: true, foreignKey: false,externalKey: false,width: 0,tootltipsOnContent: false);
  static TableSchema schema = new TableSchema(
       tableName: 'PersonView',
       logChanges: true,
@@ -90,19 +90,19 @@ class PersonView extends Person {
 class $Person {
   static Field<String> get firstName =>
       const Field<String>(id: 'firstName',label: '',title: '',
-          type: String,logChanges: true, foreignKey: false,externalKey: false);
+          type: String,logChanges: true, foreignKey: false,externalKey: false,width: 0,tootltipsOnContent: false);
   static Field<String> get lastName =>
       const Field<String>(id: 'lastName',label: '',title: '',
-          type: String,logChanges: true, foreignKey: false,externalKey: false);
+          type: String,logChanges: true, foreignKey: false,externalKey: false,width: 0,tootltipsOnContent: false);
   static Field<int> get father =>
       const Field<int>(id: 'father',label: '',title: '',
-          type: Person,logChanges: true, foreignKey: true,externalKey: false);
+          type: Person,logChanges: true, foreignKey: true,externalKey: false,width: 0,tootltipsOnContent: false);
   static Field<int> get mother =>
       const Field<int>(id: 'mother',label: '',title: '',
-          type: Person,logChanges: true, foreignKey: true,externalKey: false);
+          type: Person,logChanges: true, foreignKey: true,externalKey: false,width: 0,tootltipsOnContent: false);
   static Field<int> get occupation =>
       const Field<int>(id: 'occupation',label: '',title: '',
-          type: Occupation,logChanges: true, foreignKey: true,externalKey: false);
+          type: Occupation,logChanges: true, foreignKey: true,externalKey: false,width: 0,tootltipsOnContent: false);
  static TableSchema schema = new TableSchema(
       tableName: 'Person',
       logChanges: true,
@@ -137,13 +137,13 @@ class Person extends PersistentObject {
 class $Author {
   static Field<String> get name =>
       const Field<String>(id: 'name',label: '',title: '',
-          type: String,logChanges: true, foreignKey: false,externalKey: false);
+          type: String,logChanges: true, foreignKey: false,externalKey: false,width: 0,tootltipsOnContent: false);
   static Field<String> get email =>
       const Field<String>(id: 'email',label: '',title: '',
-          type: String,logChanges: true, foreignKey: false,externalKey: false);
+          type: String,logChanges: true, foreignKey: false,externalKey: false,width: 0,tootltipsOnContent: false);
   static Field<int> get age =>
       const Field<int>(id: 'age',label: '',title: '',
-          type: int,logChanges: true, foreignKey: false,externalKey: false);
+          type: int,logChanges: true, foreignKey: false,externalKey: false,width: 0,tootltipsOnContent: false);
  static TableSchema schema = new TableSchema(
       tableName: 'Author',
       logChanges: true,

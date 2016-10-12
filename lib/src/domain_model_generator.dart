@@ -9,11 +9,15 @@ class Field {
   final String label;
   final String title;
   final bool logChanges;
+  final int width;
+  final bool tootltipsOnContent;
   final bool externalKey;
   const Field(
       {this.label: '',
       this.title: '',
       this.logChanges: true,
+      this.tootltipsOnContent: false,
+      this.width: 0,
       this.externalKey: false});
 }
 
@@ -237,7 +241,7 @@ class PersistentObjectItem{
       output.write(
           "      const Field<$fieldType>(id: '${propertyGenerator.name}',label: '${propertyGenerator.field.label}',title: '${propertyGenerator.field.title}',\n");
       output.write(
-          "          type: ${propertyGenerator.type},logChanges: ${propertyGenerator.field.logChanges}, foreignKey: ${propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT},externalKey: ${propertyGenerator.field.externalKey});\n");
+          "          type: ${propertyGenerator.type},logChanges: ${propertyGenerator.field.logChanges}, foreignKey: ${propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT},externalKey: ${propertyGenerator.field.externalKey},width: ${propertyGenerator.field.width},tootltipsOnContent: ${propertyGenerator.field.tootltipsOnContent});\n");
     });
     var fields = classGenerator.properties
         .map((PropertyGenerator e) => "          '${e.name}': ${e.name}")
