@@ -4,7 +4,6 @@ import 'package:objectory/src/sql_builder.dart';
 import 'package:objectory/objectory_console.dart';
 import 'domain_model/domain_model.dart';
 
-
 main() async {
 //  print(where.sortBy($Author.age, descending: true));
 //  print($Author.name.value('asdfasdf'));
@@ -23,6 +22,59 @@ main() async {
   await objectory.initDomainModel();
   await objectory.recreateSchema(objectory.persistentTypes);
 
+  await objectory.truncate(Person);
+  await objectory.truncate(Occupation);
+  Occupation occupation = new Occupation()..name = 'Test occupation';
+  await objectory.save(occupation);
+
+  Person father = new Person()..firstName = 'Father';
+  await objectory.save(father);
+
+  Person son = new Person()
+    ..firstName = 'Son'
+    ..father = father
+    ..occupation = occupation;
+
+  await objectory.save(son);
+  print('son: $son');
+  int count = await objectory.count(
+      Person,
+      where
+          .ne($PersistentObject.deleted.value(true))
+          .eq($PersistentObject.id.value(father.id))
+          .or(where
+              .ne($PersistentObject.deleted.value(true))
+              .oneFrom($Person.father.values([-1,-3,father.id]))
+              .oneFrom($Person.occupation.values([-2,-5,occupation.id]))));
+
+  print('count: $count');
+
+
+  List<Person> lst = await objectory.select(
+      Person,
+      where
+          .ne($PersistentObject.deleted.value(true))
+          .eq($PersistentObject.id.value(father.id))
+          .or(where
+          .ne($PersistentObject.deleted.value(true))
+          .oneFrom($Person.father.values([father.id]))
+          .oneFrom($Person.occupation.values([occupation.id]))));
+
+  print('count: $lst');
+
+
+  lst = await objectory.select(
+      Person,
+      where
+
+          .ne($PersistentObject.deleted.value(true))
+          .oneFrom($Person.father.values([father.id]))
+          .oneFrom($Person.occupation.values([occupation.id])));
+
+  print('count: $lst');
+
+
+
   await objectory.close();
 //  Author author = await objectory[Author].findOne(where.sortBy($Author.age, descending: true));
 //  print(author);
@@ -32,7 +84,6 @@ main() async {
 ////  await objectoryConsole.recreateSchema();
 //  var res = await objectoryConsole.connection.query('SELECT * FROM "Author"  WHERE id = @p1', {'p1': 2}).toList();
 //  print(res);
-
 
 //  await objectoryConsole.createTable(Author);
   //await objectoryConsole.recreateSchema();
@@ -44,8 +95,6 @@ main() async {
 //
 //  print(builder.getQuerySql());
 //  print(builder.params);
-
-
 
 //  await objectory.truncate(Person);
 //  var person = new Person();
@@ -91,6 +140,4 @@ main() async {
 //  print('Total count: $count');
 //
 //  await objectory.close();
-
-
 }

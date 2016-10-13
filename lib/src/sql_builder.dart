@@ -87,7 +87,7 @@ class SqlQueryBuilder {
             subQuery.add('"$key" = (@$paramCounter)');
             paramCounter++;
           }
-
+          paramCounter--;
           return '(${subQuery.join(' OR ')})';
         }
       }

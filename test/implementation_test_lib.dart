@@ -310,4 +310,32 @@ allImplementationTests() {
 
     expect(personView.firstName, 'VadimChanded');
   });
+
+  test('Troublesome comtpound query', () async {
+    await objectory.truncate(Person);
+    await objectory.truncate(Occupation);
+    Occupation occupation = new Occupation()..name = 'Test occupation';
+    await objectory.save(occupation);
+
+    Person father = new Person()..firstName = 'Father';
+    await objectory.save(father);
+
+    Person son = new Person()
+      ..firstName = 'Son'
+      ..father = father
+      ..occupation = occupation;
+
+    await objectory.save(son);
+
+    int count = await objectory.count(
+        Person,
+        where
+            .ne($PersistentObject.deleted.value(true))
+            .eq($PersistentObject.id.value(father.id))
+            .or(where
+            .ne($PersistentObject.deleted.value(true))
+            .oneFrom($Person.father.values([-1,-3,father.id]))
+            .oneFrom($Person.occupation.values([-2,-5,occupation.id]))));
+
+  });
 }

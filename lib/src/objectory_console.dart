@@ -193,6 +193,7 @@ class ObjectoryConsole extends Objectory {
   Stream<Row> queryPostres(String tableName, QueryBuilder selector) {
     SqlQueryBuilder sqlBuilder = new SqlQueryBuilder(tableName, selector);
     String command = sqlBuilder.getQuerySql();
+//    print('queryPostres command: $command\n params: ${sqlBuilder.params}');
     return connection.query(command, sqlBuilder.params);
   }
 
