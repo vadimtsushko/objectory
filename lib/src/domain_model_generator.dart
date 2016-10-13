@@ -192,11 +192,16 @@ class PersistentObjectItem{
       output.write(
           '  ${propertyGenerator.type} get ${propertyGenerator.name} => '
           "getLinkedObject('${propertyGenerator.name}', ${propertyGenerator.type});\n");
-      String capitalized =
-          propertyGenerator.name.substring(0, 1).toUpperCase() +
-              propertyGenerator.name.substring(1);
-      output.write('  set${capitalized}Id(int value) => '
-          "setForeignKey('${propertyGenerator.name}',value);\n");
+
+      output.write(
+          '  set ${propertyGenerator.name}(${propertyGenerator.type} value) => '
+              "setLinkedObject('${propertyGenerator.name}', value);\n");
+
+//      String capitalized =
+//          propertyGenerator.name.substring(0, 1).toUpperCase() +
+//              propertyGenerator.name.substring(1);
+//      output.write('  set${capitalized}Id(int value) => '
+//          "setForeignKey('${propertyGenerator.name}',value);\n");
     }
     if (propertyGenerator.propertyType == PropertyType.PERSISTENT_LIST) {
       output.write(

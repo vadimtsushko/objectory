@@ -157,7 +157,7 @@ allImplementationTests() {
     await father.save();
     Person son = new Person()
       ..firstName = 'Nick'
-      ..setFatherId(father.id);
+      ..father = father;
     await son.save();
     int sonId = son.id;
     objectory.clearCache(Person);
@@ -267,7 +267,7 @@ allImplementationTests() {
 
     Person person = new Person()
       ..firstName = 'VadimOccupation'
-      ..setOccupationId(occupation.id);
+      ..occupation = occupation;
     await objectory.save(person);
     int personId = person.id;
     objectory.clearCache(Occupation);
@@ -287,7 +287,7 @@ allImplementationTests() {
 
     Person person = new Person()
       ..firstName = 'VadimOccupation'
-      ..setOccupationId(occupation.id);
+      ..occupation = occupation;
     await objectory.save(person);
     int personId = person.id;
     objectory.clearCache(Occupation);

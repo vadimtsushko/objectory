@@ -127,11 +127,11 @@ class Person extends PersistentObject {
   String get lastName => getProperty('lastName');
   set lastName (String value) => setProperty('lastName',value);
   Person get father => getLinkedObject('father', Person);
-  setFatherId(int value) => setForeignKey('father',value);
+  set father(Person value) => setLinkedObject('father', value);
   Person get mother => getLinkedObject('mother', Person);
-  setMotherId(int value) => setForeignKey('mother',value);
+  set mother(Person value) => setLinkedObject('mother', value);
   Occupation get occupation => getLinkedObject('occupation', Occupation);
-  setOccupationId(int value) => setForeignKey('occupation',value);
+  set occupation(Occupation value) => setLinkedObject('occupation', value);
 }
 
 class $Author {
