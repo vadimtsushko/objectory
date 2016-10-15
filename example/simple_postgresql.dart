@@ -44,7 +44,7 @@ main() async {
           .eq($PersistentObject.id.value(father.id))
           .or(where
               .ne($PersistentObject.deleted.value(true))
-              .oneFrom($Person.father.values([-1,-3,father.id]))
+              .oneFrom($Person.father.values([]))
               .oneFrom($Person.occupation.values([-2,-5,occupation.id]))));
 
   print('count: $count');

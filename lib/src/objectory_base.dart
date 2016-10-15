@@ -5,7 +5,6 @@ import 'query_builder.dart';
 import 'dart:collection';
 import 'dart:async';
 import 'package:bson/bson.dart';
-
 import 'field.dart';
 import 'dart:developer';
 
@@ -77,8 +76,8 @@ class Objectory {
   Type idType = int;
   DataMapDecorator dataMapDecorator = (Map map) => map;
   DataListDecorator dataListDecorator = (List list) => list;
-  final Map<String, Map<String, BasePersistentObject>> _cache =
-      new Map<String, Map<String, BasePersistentObject>>();
+  final Map<Type, Map<int, BasePersistentObject>> cache =
+      new Map<Type, Map<int, BasePersistentObject>>();
   final Map<Type, FactoryMethod> _factories = new Map<Type, FactoryMethod>();
   final Map<Type, Map<String, Type>> _linkedTypes =
       new Map<Type, Map<String, Type>>();
@@ -92,26 +91,27 @@ class Objectory {
   bool saveAuditData = false;
   Objectory(this.uri, this.registerClassesCallback);
   void clearCache(Type classType) {
-    _cache[classType.toString()].clear();
+    cache[classType].clear();
   }
 
   List<Type> get persistentTypes => _collections.keys.toList();
   void completeFetch(PersistentObject obj) {
     if (obj.$schema.cacheValues) {
-      _cache[obj.runtimeType.toString()][obj.id.toString()] = obj;
+      cache[obj.runtimeType][obj.id] = obj;
     }
     obj.markAsFetched();
   }
 
   Type getClassTypeByCollection(String collectionName) =>
       _collectionNameToTypeMap[collectionName];
+
   PersistentObject findInCache(Type classType, int id) {
-    if (id == null) {
+    if (id == null || cache[classType].isEmpty) {
       return null;
     }
-    return _cache[classType.toString()][id.toString()];
+    return cache[classType][id];
   }
-
+  @deprecated
   PersistentObject findInCacheOrGetProxy(int id, Type classType) {
     if (id == null) {
       return null;
@@ -123,6 +123,15 @@ class Objectory {
     }
     return result;
   }
+
+  /// Get object from cache
+  PersistentObject lookup(Type classType,int id) {
+    if (id == null) {
+      return null;
+    }
+    return findInCache(classType, id);
+  }
+
 
   BasePersistentObject newInstance(Type classType) {
     if (_factories.containsKey(classType)) {
@@ -182,7 +191,7 @@ class Objectory {
   void registerClass(Type classType, FactoryMethod factory,
       FactoryMethod listFactory, Map<String, Type> linkedTypes) {
     _factories[classType] = factory;
-    _cache[classType.toString()] = new Map<String, BasePersistentObject>();
+    cache[classType] = new Map<int, BasePersistentObject>();
     _listFactories[classType] = (listFactory == null
         ? () => new List<PersistentObject>()
         : listFactory);

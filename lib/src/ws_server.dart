@@ -57,7 +57,7 @@ class ObjectoryClient {
         var header = new RequestHeader.fromMap(jdata['header']);
         Map content = jdata['content'];
         Map extParams = jdata['extParams'];
-        log.info('$userName ${header.collection} ${header.command} ${content}');
+        log.info('$userName ${header.collection} ${header.command} content: ${content} extParams: ${extParams}');
         if (header.command == 'authenticate') {
           authenticate(header, content);
           return;

@@ -230,7 +230,7 @@ class ObjectoryConsole extends Objectory {
     SqlQueryBuilder sqlBuilder =
         new SqlQueryBuilder(tableName(classType), selector);
     String command = sqlBuilder.getQueryCountSql();
-    print("$command ${sqlBuilder.params}");
+//    print("$command ${sqlBuilder.params}");
     List<Row> rows =
         await connection.query(command, sqlBuilder.params).toList();
     return rows.first.toList().first;

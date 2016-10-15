@@ -336,6 +336,79 @@ allImplementationTests() {
             .ne($PersistentObject.deleted.value(true))
             .oneFrom($Person.father.values([-1,-3,father.id]))
             .oneFrom($Person.occupation.values([-2,-5,occupation.id]))));
+    expect(count,2);
+  });
+
+  test('Another tricky query', () async {
+    await objectory.truncate(Person);
+    await objectory.truncate(Occupation);
+    Occupation occupation = new Occupation()..name = 'Test occupation';
+    await objectory.save(occupation);
+
+    Person father = new Person()..firstName = 'Father';
+    await objectory.save(father);
+
+    Person son = new Person()
+      ..firstName = 'Son'
+      ..father = father
+      ..occupation = occupation;
+
+    await objectory.save(son);
+
+    int count = await objectory.count(
+        Person,
+        where
+            .ne($PersistentObject.deleted.value(true))
+            .eq($PersistentObject.id.value(father.id))
+            .or(where
+            .ne($PersistentObject.deleted.value(true))
+            .oneFrom($Person.father.values([]))
+            .oneFrom($Person.occupation.values([-2,-5,occupation.id]))));
+    expect(count,2);
+  });
+
+  test('Cache', () async {
+    await objectory.truncate(Person);
+
+    Person father = new Person()..firstName = 'Father';
+    await objectory.save(father);
+    int fatherId = father.id;
+    Person son = new Person()
+      ..firstName = 'Son'
+      ..father = father;
+
+    await objectory.save(son);
+    expect(objectory.lookup(Person,fatherId), isNotNull);
+    expect((objectory.lookup(Person,fatherId) as Person).firstName, 'Father');
+
+    objectory.clearCache(Person);
+
+    expect(objectory.lookup(Person,fatherId), isNull);
+
+    await objectory.select(Person);
+
+    expect(objectory.lookup(Person,fatherId), isNotNull);
+    expect((objectory.lookup(Person,fatherId) as Person).firstName, 'Father');
 
   });
+
+
+  test('insert with explicitly null id', () async {
+    await objectory.truncate(Person);
+
+    Person father = new Person()..firstName = 'Father';
+    father.id = null;
+    await objectory.save(father);
+    expect(father.id, isNotNull);
+
+    await objectory.truncate(Author);
+
+    Author author = new Author()..name = 'Test';
+    author.id = null;
+    await objectory.insert(author);
+    expect(author.id, isNotNull);
+  });
+
+
+
 }

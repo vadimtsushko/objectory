@@ -17,6 +17,7 @@ dependencies:
   js: any
   shelf_cors: ^0.2.1
   postgresql: ^0.3.3
+  meta: ^1.0.4
 dev_dependencies:
   args: ^0.13.4
   hop: ^0.27.0

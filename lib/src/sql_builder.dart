@@ -81,6 +81,10 @@ class SqlQueryBuilder {
         }
         List oneFromList = expressionMap['IN'];
         if (oneFromList != null) {
+          if (oneFromList.isEmpty) {
+            paramCounter--;
+            return '(1=1)';
+          }
           List<String> subQuery = [];
           for (var each in oneFromList) {
             params.add(each);
