@@ -28,6 +28,8 @@ class OccupationItem extends PersistentObjectItem {
   external factory OccupationItem();
   external String get name;
   external set name (String value);
+  external int get branch;
+  external set branch (int value);
 }
 
 @JS()
@@ -44,10 +46,20 @@ class UserItem extends PersistentObjectItem {
 
 @JS()
 @anonymous
+class BranchItem extends PersistentObjectItem {
+  external factory BranchItem();
+  external String get name;
+  external set name (String value);
+}
+
+@JS()
+@anonymous
 class PersonViewItem extends PersonItem {
   external factory PersonViewItem();
   external String get occupationName;
   external set occupationName (String value);
+  external String get branchName;
+  external set branchName (String value);
 }
 
 @JS()

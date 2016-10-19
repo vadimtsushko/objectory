@@ -15,6 +15,7 @@ class User {
   String email;
   String login;
 }
+
 @Table(cacheValues: true)
 class Person {
   @Field(logChanges: true)
@@ -26,20 +27,32 @@ class Person {
 }
 
 class Occupation {
+  @Field(label: 'Ocuppation', title: 'Titular name of profession')
   String name;
+  Branch branch;
 }
 
 @Table(
     isView: true,
-    createScript: '''
-CREATE VIEW "PersonView" AS
- SELECT "Person".*,
-    "Occupation".name as "occupationName"
-   FROM "Person"
-     LEFT JOIN "Occupation" ON "Person"."occupation" = "Occupation".id;
-    ''')
+//    createScript: '''
+//CREATE VIEW "PersonView" AS
+// SELECT "Person".*,
+//    "Occupation".name as "occupationName"
+//   FROM "Person"
+//     LEFT JOIN "Occupation" ON "Person"."occupation" = "Occupation".id;
+//    '''
+)
 class PersonView extends Person {
+  @Field(parentTable: Occupation, parentField: 'name')
   String occupationName;
+  @Field(parentTable: Branch, parentField: 'name')
+  String branchName;
+
+}
+
+class Branch {
+  @Field(label: 'Branch', title: 'Branch of wisdom')
+  String name;
 }
 
 main() {

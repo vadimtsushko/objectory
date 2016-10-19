@@ -6,6 +6,13 @@ import 'query_builder.dart';
 import 'objectory_base.dart';
 import 'field.dart';
 
+class _ForeignKeyTuple {
+  Type baseTable;
+  Type foreignTable;
+  String foreignKey;
+  _ForeignKeyTuple({this.baseTable, this.foreignTable, this.foreignKey});
+}
+
 class ObjectoryConsole extends Objectory {
   Connection connection;
   ObjectoryConsole(String uri, Function registerClassesCallback)
@@ -38,11 +45,11 @@ class ObjectoryConsole extends Objectory {
       return;
     }
     if (schema.isView) {
-
-      if (schema.createScript != '') {
-        await _execute(schema.createScript);
+      String script = schema.createScript.trim();
+      if (script == '') {
+        script = getCreateViewScript(schema);
       }
-      return;
+      await _execute(script);
     } else {
       var po = this.newInstance(persistentClass);
       String tableName = po.tableName;
@@ -79,7 +86,74 @@ class ObjectoryConsole extends Objectory {
             USING btree ("${foreignKey.id}")''';
         await _execute(command);
       }
+    }
+  }
 
+  String getCreateViewScript(TableSchema schema) {
+    var buffer = new StringBuffer();
+    buffer.writeln('CREATE VIEW "${schema.tableName}" AS');
+    buffer.writeln('  SELECT "${schema.superSchema.tableName}".*');
+    Map<Type, _ForeignKeyTuple> fkMap = new Map<Type, _ForeignKeyTuple>();
+    Set<Type> transientFK = new Set<Type>();
+    fkMap[schema.superSchema.tableType] = null;
+    for (var field
+        in schema.fields.values.where((Field f) => f.parentTable != null)) {
+      buffer.writeln(
+          '  ,"${field.parentTable}"."${field.parentField}" as "${field.id}"');
+      populateFK(
+          schema.superSchema.tableType, field.parentTable, fkMap, transientFK);
+    }
+    transientFK.remove(schema.superSchema.tableType);
+    for (var each in transientFK.toList()) {
+      populateFK(schema.superSchema.tableType, each, fkMap, transientFK);
+    }
+
+    buffer.writeln('    FROM "${schema.superSchema.tableName}"');
+//    Set<Type> joinTables = schema.fields.values
+//        .where((Field f) => f.parentTable != null)
+//        .map((Field f) => f.parentTable)
+//        .toSet();
+//
+//    for (var each in joinTables) {
+//      fkMap[each] = null;
+//    }
+//    for (Type table in joinTables) {
+//      Field fkey = schema.superSchema.fields.values.firstWhere(
+//          (Field f) => f.type == table && f.foreignKey,
+//          orElse: () => null);
+//      if (fkey == null) {
+//
+//      }
+    for (Type table in fkMap.keys) {
+      _ForeignKeyTuple fkey = fkMap[table];
+      if (fkey != null) {
+        buffer.writeln(
+            '    LEFT JOIN "${fkey.foreignTable}" ON "${fkey.baseTable}"."${fkey.foreignKey}" = "${fkey.foreignTable}"."id"');
+      }
+    }
+
+    return buffer.toString();
+  }
+
+  populateFK(Type baseTable, Type foreignTable,
+      Map<Type, _ForeignKeyTuple> fkMap, Set<Type> transientFK) {
+    TableSchema schema = tableSchema(baseTable);
+    Field fkey = schema.fields.values.firstWhere(
+        (Field f) => f.type == foreignTable && f.foreignKey,
+        orElse: () => null);
+    if (fkey != null) {
+      transientFK.add(baseTable);
+      if (!fkMap.containsKey(foreignTable)) {
+        fkMap[foreignTable] = new _ForeignKeyTuple(
+            baseTable: baseTable,
+            foreignKey: fkey.id,
+            foreignTable: foreignTable);
+      }
+    } else {
+      for (Field each in schema.fields.values
+          .where((Field f) => f.foreignKey && f.type != baseTable)) {
+        populateFK(each.type, foreignTable, fkMap, transientFK);
+      }
     }
   }
 
@@ -129,17 +203,23 @@ class ObjectoryConsole extends Objectory {
   }
 
   Future recreateSchema(List<Type> typesToRecreate) async {
-    for (Type type in typesToRecreate) {
+    /// First drop all views
+    for (Type type in persistentTypes) {
       await dropTable(type, true);
     }
+
+    /// Then drop tables from the types list
     for (Type type in typesToRecreate) {
       await dropTable(type, false);
     }
 
+    /// Recreating  tables from the types list
     for (Type type in typesToRecreate) {
       await createTable(type, false);
     }
-    for (Type type in typesToRecreate) {
+
+    /// Recreate all views
+    for (Type type in persistentTypes) {
       await createTable(type, true);
     }
   }

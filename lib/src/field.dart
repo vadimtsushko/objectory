@@ -8,6 +8,7 @@ class Fields {
 class TableSchema {
   final Map<String, Field> fields;
   final String tableName;
+  final Type tableType;
   final bool logChanges;
   final bool isView;
   final TableSchema superSchema;
@@ -16,6 +17,7 @@ class TableSchema {
   const TableSchema(
       {this.fields,
       this.tableName,
+      this.tableType,
       this.logChanges,
       this.isView,
       this.createScript,
@@ -55,18 +57,23 @@ class Field<T> {
   final int width;
   final bool tootltipsOnContent;
   final bool logChanges;
+  final Type parentTable;
+  final String parentField;
   FieldValue<T> value(T value) => new FieldValue<T>(id, value);
   FieldValues<T> values(List<T> values) => new FieldValues<T>(id, values);
-  const Field(
-      {this.id: '',
-      this.label: '',
-      this.title: '',
-      this.type: Object,
-      this.logChanges: false,
-      this.tootltipsOnContent: false,
-      this.width: 0,
-      this.externalKey: false,
-      this.foreignKey: false});
+  const Field({
+    this.id: '',
+    this.label: '',
+    this.title: '',
+    this.type: Object,
+    this.logChanges: false,
+    this.tootltipsOnContent: false,
+    this.width: 0,
+    this.externalKey: false,
+    this.foreignKey: false,
+    this.parentTable: null,
+    this.parentField: '',
+  });
 }
 
 class $PersistentObject {

@@ -251,6 +251,11 @@ class PersistentObjectItem{
           "  static Field<$fieldType> get ${propertyGenerator.name} =>\n");
       output.write(
           "      const Field<$fieldType>(id: '${propertyGenerator.name}',label: '${propertyGenerator.field.label}',title: '${propertyGenerator.field.title}',\n");
+
+      output.write(
+          "          parentTable: ${propertyGenerator.field.parentTable},parentField: '${propertyGenerator.field.parentField}',\n");
+
+
       output.write(
           "          type: ${propertyGenerator.type},logChanges: ${propertyGenerator.field.logChanges}, foreignKey: ${propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT},externalKey: ${propertyGenerator.field.externalKey},width: ${propertyGenerator.field.width},tootltipsOnContent: ${propertyGenerator.field.tootltipsOnContent});\n");
     });
@@ -260,6 +265,7 @@ class PersistentObjectItem{
         .join(',\n');
     output.writeln(" static TableSchema schema = new TableSchema(");
     output.writeln("      tableName: '${classGenerator.type}',");
+    output.writeln("      tableType: ${classGenerator.type},");
     output.writeln("      logChanges: ${classGenerator.table.logChanges},");
     output.writeln("      isView: ${classGenerator.table.isView},");
     output.writeln("      cacheValues: ${classGenerator.table.cacheValues},");
@@ -282,7 +288,16 @@ class PersistentObjectItem{
           throw new Exception(
               'Parent field not found: ${each.field.parentTable} -> ${each.field.parentField}');
         }
-        each.field = parentFieldGenerator.field;
+
+        Field field = new Field(
+            parentTable: each.field.parentTable,
+            parentField: each.field.parentField,
+            label: parentFieldGenerator.field.label,
+            title: parentFieldGenerator.field.title,
+            tootltipsOnContent: parentFieldGenerator.field.tootltipsOnContent,
+            width: parentFieldGenerator.field.width);
+
+        each.field = field;
       }
     }
   }

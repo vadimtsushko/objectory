@@ -18,60 +18,64 @@ main() async {
   String uri = 'postgres://$username:$password@$host:$port/$database';
   print('$uri');
   objectory = new ObjectoryConsole(uri, registerClasses);
-
+  ObjectoryConsole oc = objectory;
   await objectory.initDomainModel();
-  await objectory.recreateSchema(objectory.persistentTypes);
 
-  await objectory.truncate(Person);
-  await objectory.truncate(Occupation);
-  Occupation occupation = new Occupation()..name = 'Test occupation';
-  await objectory.save(occupation);
+//  String createView = oc.getCreateViewScript(objectory.tableSchema(PersonView));
+//  print(createView);
 
-  Person father = new Person()..firstName = 'Father';
-  await objectory.save(father);
-
-  Person son = new Person()
-    ..firstName = 'Son'
-    ..father = father
-    ..occupation = occupation;
-
-  await objectory.save(son);
-  print('son: $son');
-  int count = await objectory.count(
-      Person,
-      where
-          .ne($PersistentObject.deleted.value(true))
-          .eq($PersistentObject.id.value(father.id))
-          .or(where
-              .ne($PersistentObject.deleted.value(true))
-              .oneFrom($Person.father.values([]))
-              .oneFrom($Person.occupation.values([-2,-5,occupation.id]))));
-
-  print('count: $count');
-
-
-  List<Person> lst = await objectory.select(
-      Person,
-      where
-          .ne($PersistentObject.deleted.value(true))
-          .eq($PersistentObject.id.value(father.id))
-          .or(where
-          .ne($PersistentObject.deleted.value(true))
-          .oneFrom($Person.father.values([father.id]))
-          .oneFrom($Person.occupation.values([occupation.id]))));
-
-  print('count: $lst');
-
-
-  lst = await objectory.select(
-      Person,
-      where
-
-          .ne($PersistentObject.deleted.value(true))
-          .oneFrom($Person.father.values([father.id]))
-          .oneFrom($Person.occupation.values([occupation.id])));
-
-  print('count: $lst');
+  await objectory.recreateSchema([PersonView]);
+//
+//  await objectory.truncate(Person);
+//  await objectory.truncate(Occupation);
+//  Occupation occupation = new Occupation()..name = 'Test occupation';
+//  await objectory.save(occupation);
+//
+//  Person father = new Person()..firstName = 'Father';
+//  await objectory.save(father);
+//
+//  Person son = new Person()
+//    ..firstName = 'Son'
+//    ..father = father
+//    ..occupation = occupation;
+//
+//  await objectory.save(son);
+//  print('son: $son');
+//  int count = await objectory.count(
+//      Person,
+//      where
+//          .ne($PersistentObject.deleted.value(true))
+//          .eq($PersistentObject.id.value(father.id))
+//          .or(where
+//              .ne($PersistentObject.deleted.value(true))
+//              .oneFrom($Person.father.values([]))
+//              .oneFrom($Person.occupation.values([-2,-5,occupation.id]))));
+//
+//  print('count: $count');
+//
+//
+//  List<Person> lst = await objectory.select(
+//      Person,
+//      where
+//          .ne($PersistentObject.deleted.value(true))
+//          .eq($PersistentObject.id.value(father.id))
+//          .or(where
+//          .ne($PersistentObject.deleted.value(true))
+//          .oneFrom($Person.father.values([father.id]))
+//          .oneFrom($Person.occupation.values([occupation.id]))));
+//
+//  print('count: $lst');
+//
+//
+//  lst = await objectory.select(
+//      Person,
+//      where
+//
+//          .ne($PersistentObject.deleted.value(true))
+//          .oneFrom($Person.father.values([father.id]))
+//          .oneFrom($Person.occupation.values([occupation.id])));
+//
+//  print('count: $lst');
 
 
 
