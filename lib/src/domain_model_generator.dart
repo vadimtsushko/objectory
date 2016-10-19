@@ -11,6 +11,8 @@ class Field {
   final bool logChanges;
   final int width;
   final bool tootltipsOnContent;
+  final Type parentTable;
+  final String parentField;
   final bool externalKey;
   const Field(
       {this.label: '',
@@ -18,6 +20,8 @@ class Field {
       this.logChanges: true,
       this.tootltipsOnContent: false,
       this.width: 0,
+      this.parentTable: null,
+      this.parentField: '',
       this.externalKey: false});
 }
 
@@ -60,6 +64,8 @@ part of domain_model;
   Map<Type, ClassMirror> classMirrors = new Map<Type, ClassMirror>();
   List<Type> _classesOrdered = [];
   final Map<Type, List> _linkedTypes = new Map<Type, List>();
+  final Map<String, PropertyGenerator> fieldsMap =
+      new Map<String, PropertyGenerator>();
   ModelGenerator(this.libraryName);
   StringBuffer output = new StringBuffer();
   init() {
@@ -195,7 +201,7 @@ class PersistentObjectItem{
 
       output.write(
           '  set ${propertyGenerator.name}(${propertyGenerator.type} value) => '
-              "setLinkedObject('${propertyGenerator.name}', value);\n");
+          "setLinkedObject('${propertyGenerator.name}', value);\n");
 
 //      String capitalized =
 //          propertyGenerator.name.substring(0, 1).toUpperCase() +
@@ -268,6 +274,17 @@ class PersistentObjectItem{
 
   processAll() {
     _classesOrdered.forEach(processClass);
+    for (PropertyGenerator each in fieldsMap.values) {
+      if (each.field.parentTable != null) {
+        PropertyGenerator parentFieldGenerator =
+            fieldsMap['${each.field.parentTable}|${each.field.parentField}'];
+        if (parentFieldGenerator == null) {
+          throw new Exception(
+              'Parent field not found: ${each.field.parentTable} -> ${each.field.parentField}');
+        }
+        each.field = parentFieldGenerator.field;
+      }
+    }
   }
 
   processClass(Type classType) {
@@ -296,6 +313,7 @@ class PersistentObjectItem{
       classGenerator.properties.add(property);
       property.name = MirrorSystem.getName(name);
       property.processVariableMirror(vm);
+      fieldsMap['${classGenerator.type}|${property.name}'] = property;
     }
   }
 }
@@ -328,6 +346,7 @@ class PropertyGenerator {
         t == num) {
       return;
     }
+
     propertyType = PropertyType.PERSISTENT_OBJECT;
   }
 }

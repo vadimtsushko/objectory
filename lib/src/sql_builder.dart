@@ -83,7 +83,7 @@ class SqlQueryBuilder {
         if (oneFromList != null) {
           if (oneFromList.isEmpty) {
             paramCounter--;
-            return '(1=1)';
+            return '(false)';
           }
           List<String> subQuery = [];
           for (var each in oneFromList) {

@@ -3,7 +3,7 @@ part of domain_model;
 
 class $Occupation {
   static Field<String> get name =>
-      const Field<String>(id: 'name',label: '',title: '',
+      const Field<String>(id: 'name',label: 'Ocuppation',title: 'Titular name of profession',
           type: String,logChanges: true, foreignKey: false,externalKey: false,width: 0,tootltipsOnContent: false);
  static TableSchema schema = new TableSchema(
       tableName: 'Occupation',
@@ -61,7 +61,7 @@ class User extends PersistentObject {
 
 class $PersonView {
   static Field<String> get occupationName =>
-      const Field<String>(id: 'occupationName',label: '',title: '',
+      const Field<String>(id: 'occupationName',label: 'Ocuppation',title: 'Titular name of profession',
           type: String,logChanges: true, foreignKey: false,externalKey: false,width: 0,tootltipsOnContent: false);
  static TableSchema schema = new TableSchema(
       tableName: 'PersonView',

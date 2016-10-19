@@ -26,6 +26,7 @@ class Person {
 }
 
 class Occupation {
+  @Field(label: 'Ocuppation', title: 'Titular name of profession')
   String name;
 }
 
@@ -39,6 +40,7 @@ CREATE VIEW "PersonView" AS
      LEFT JOIN "Occupation" ON "Person"."occupation" = "Occupation".id;
     ''')
 class PersonView extends Person {
+  @Field(parentTable: Occupation, parentField: 'name')
   String occupationName;
 }
 

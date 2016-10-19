@@ -51,5 +51,17 @@ main(){
       var author = objectory.newInstance(Author);
       expect(author is Author, isTrue);
     });
+
+    test("Field metadata inheritance",() {
+      String label1 = $Occupation.name.label;
+      String label2 = $PersonView.occupationName.label;
+      expect(label2, label1);
+      String title1 = $Occupation.name.title;
+      String title2 = $PersonView.occupationName.title;
+      expect(title2, title1);
+
+    });
+
+
   });
 }

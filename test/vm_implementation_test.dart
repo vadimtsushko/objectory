@@ -11,6 +11,7 @@ main() async {
   objectory = new ObjectoryConsole(DefaultUri, registerClasses);
   await objectory.initDomainModel();
   await objectory.recreateSchema(objectory.persistentTypes);
+  print('Database schema recreated');
   await objectory.close();
   group('VM implementation tests', () => allImplementationTests());
 }

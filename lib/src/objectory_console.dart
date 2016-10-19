@@ -101,7 +101,7 @@ class ObjectoryConsole extends Objectory {
     } else if (field.type == bool) {
       output.write('BOOLEAN NOT NULL DEFAULT FALSE,\n');
     } else if (field.type == DateTime) {
-      output.write("DATE NOT NULL DEFAULT '1999-01-01',\n");
+      output.write("DATE,\n");
     } else if (field.type == int) {
       output.write('INTEGER NOT NULL DEFAULT 0,\n');
     } else if (field.type == num) {

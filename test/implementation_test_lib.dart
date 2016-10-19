@@ -364,7 +364,7 @@ allImplementationTests() {
             .ne($PersistentObject.deleted.value(true))
             .oneFrom($Person.father.values([]))
             .oneFrom($Person.occupation.values([-2,-5,occupation.id]))));
-    expect(count,2);
+    expect(count,1);
   });
 
   test('Cache', () async {
@@ -409,6 +409,16 @@ allImplementationTests() {
     expect(author.id, isNotNull);
   });
 
+
+  test('onFrom with empty list should return no rows', () async {
+    await objectory.truncate(Author);
+
+
+    Author author = new Author()..age = 32;
+    await objectory.insert(author);
+    int count = await objectory.count(Author,where.oneFrom($Author.age.values([])));
+    expect(count, 0);
+  });
 
 
 }
