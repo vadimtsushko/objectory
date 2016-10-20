@@ -33,7 +33,7 @@ class Occupation {
 }
 
 @Table(
-    isView: true,
+  isView: true,
 //    createScript: '''
 //CREATE VIEW "PersonView" AS
 // SELECT "Person".*,
@@ -47,7 +47,8 @@ class PersonView extends Person {
   String occupationName;
   @Field(parentTable: Branch, parentField: 'name')
   String branchName;
-
+  @Field(staticValue: '0')
+  int testStatic;
 }
 
 class Branch {

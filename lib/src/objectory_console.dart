@@ -93,6 +93,11 @@ class ObjectoryConsole extends Objectory {
     var buffer = new StringBuffer();
     buffer.writeln('CREATE VIEW "${schema.tableName}" AS');
     buffer.writeln('  SELECT "${schema.superSchema.tableName}".*');
+    for (var field
+        in schema.fields.values.where((Field f) => f.staticValue != '')) {
+      buffer.writeln('  ,${field.staticValue} as "${field.id}"');
+    }
+
     Map<Type, _ForeignKeyTuple> fkMap = new Map<Type, _ForeignKeyTuple>();
     Set<Type> transientFK = new Set<Type>();
     fkMap[schema.superSchema.tableType] = null;

@@ -60,6 +60,8 @@ class PersonViewItem extends PersonItem {
   external set occupationName (String value);
   external String get branchName;
   external set branchName (String value);
+  external int get testStatic;
+  external set testStatic (int value);
 }
 
 @JS()

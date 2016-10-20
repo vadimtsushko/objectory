@@ -59,12 +59,14 @@ class Field<T> {
   final bool logChanges;
   final Type parentTable;
   final String parentField;
+  final String staticValue;
   FieldValue<T> value(T value) => new FieldValue<T>(id, value);
   FieldValues<T> values(List<T> values) => new FieldValues<T>(id, values);
   const Field({
     this.id: '',
     this.label: '',
     this.title: '',
+    this.staticValue: '',
     this.type: Object,
     this.logChanges: false,
     this.tootltipsOnContent: false,

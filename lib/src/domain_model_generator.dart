@@ -14,6 +14,7 @@ class Field {
   final Type parentTable;
   final String parentField;
   final bool externalKey;
+  final String staticValue;
   const Field(
       {this.label: '',
       this.title: '',
@@ -21,6 +22,7 @@ class Field {
       this.tootltipsOnContent: false,
       this.width: 0,
       this.parentTable: null,
+      this.staticValue: '',
       this.parentField: '',
       this.externalKey: false});
 }
@@ -253,8 +255,7 @@ class PersistentObjectItem{
           "      const Field<$fieldType>(id: '${propertyGenerator.name}',label: '${propertyGenerator.field.label}',title: '${propertyGenerator.field.title}',\n");
 
       output.write(
-          "          parentTable: ${propertyGenerator.field.parentTable},parentField: '${propertyGenerator.field.parentField}',\n");
-
+          "          parentTable: ${propertyGenerator.field.parentTable},parentField: '${propertyGenerator.field.parentField}',staticValue: '${propertyGenerator.field.staticValue}',\n");
 
       output.write(
           "          type: ${propertyGenerator.type},logChanges: ${propertyGenerator.field.logChanges}, foreignKey: ${propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT},externalKey: ${propertyGenerator.field.externalKey},width: ${propertyGenerator.field.width},tootltipsOnContent: ${propertyGenerator.field.tootltipsOnContent});\n");
