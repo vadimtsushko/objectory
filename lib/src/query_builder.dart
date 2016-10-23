@@ -72,7 +72,7 @@ class QueryBuilder {
   }
 
   QueryBuilder id(int value) {
-    return eq(Fields.id.value(value));
+    return eq($PersistentObject.id.value(value));
   }
 
   QueryBuilder ne(FieldValue fieldValue) {

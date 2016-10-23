@@ -1,6 +1,5 @@
 //import 'package:postgresql/postgresql.dart';
 //import 'package:objectory/objectory.dart';
-import 'package:objectory/src/sql_builder.dart';
 import 'package:objectory/objectory_console.dart';
 import 'domain_model/domain_model.dart';
 
@@ -18,13 +17,21 @@ main() async {
   String uri = 'postgres://$username:$password@$host:$port/$database';
   print('$uri');
   objectory = new ObjectoryConsole(uri, registerClasses);
-  ObjectoryConsole oc = objectory;
+//  ObjectoryConsole oc = objectory;
   await objectory.initDomainModel();
 
 //  String createView = oc.getCreateViewScript(objectory.tableSchema(PersonView));
 //  print(createView);
+  await objectory.truncate(Author);
 
-  await objectory.recreateSchema([PersonView]);
+
+  Author author = new Author();
+  await objectory.insert(author);
+  author.name = 'asdfasdfasdfasdfasdf';
+  await objectory.save(author);
+  author.name = null;
+  await objectory.save(author);
+  print(author);
 //
 //  await objectory.truncate(Person);
 //  await objectory.truncate(Occupation);

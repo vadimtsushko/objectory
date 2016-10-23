@@ -420,5 +420,30 @@ allImplementationTests() {
     expect(count, 0);
   });
 
+  test('Insert without any fields set', () async {
+    await objectory.truncate(Author);
+
+
+    Author author = new Author();
+    await objectory.insert(author);
+    int count = await objectory.count(Author);
+    expect(count, 1);
+  });
+
+
+  test('Update with null value on not null field should set default value', () async {
+    await objectory.truncate(Author);
+
+
+    Author author = new Author();
+    await objectory.insert(author);
+    author.name = 'asdfasdfasdfasdfasdf';
+    await objectory.save(author);
+    author.name = null;
+    await objectory.save(author);
+    expect(author.name, '');
+  });
+
+
 
 }

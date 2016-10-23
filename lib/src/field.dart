@@ -1,10 +1,3 @@
-class Fields {
-  static const id = const Field(id: 'id', type: int);
-  static const deleted = const Field(id: 'deleted', type: bool);
-  static const modifiedDate = const Field(id: 'modifiedDate', type: DateTime);
-  static const modifiedTime = const Field(id: 'modifiedTime', type: DateTime);
-}
-
 class TableSchema {
   final Map<String, Field> fields;
   final String tableName;
@@ -23,6 +16,16 @@ class TableSchema {
       this.createScript,
       this.cacheValues,
       this.superSchema});
+  Field findField(String fieldName) {
+    Field result = fields[fieldName];
+    if (result != null) {
+      return result;
+    }
+    if (superSchema == null) {
+      return null;
+    }
+    return (superSchema.findField(fieldName));
+  }
 }
 
 class FieldValue<T> {
@@ -60,6 +63,7 @@ class Field<T> {
   final Type parentTable;
   final String parentField;
   final String staticValue;
+  final defaultValue;
   FieldValue<T> value(T value) => new FieldValue<T>(id, value);
   FieldValues<T> values(List<T> values) => new FieldValues<T>(id, values);
   const Field({
@@ -68,6 +72,7 @@ class Field<T> {
     this.title: '',
     this.staticValue: '',
     this.type: Object,
+    this.defaultValue: null,
     this.logChanges: false,
     this.tootltipsOnContent: false,
     this.width: 0,
@@ -81,32 +86,32 @@ class Field<T> {
 class $PersistentObject {
   static Field<int> get id => const Field<int>(
       id: 'id',
-      label: '',
-      title: '',
+      label: 'Ид.',
+      title: 'Внутренний идентификатор строки',
       type: int,
       logChanges: true,
       foreignKey: false,
       externalKey: false);
   static Field<bool> get deleted => const Field<bool>(
       id: 'deleted',
-      label: '',
-      title: '',
+      label: 'Уд.',
+      title: 'Пометка на удаление',
       type: bool,
       logChanges: true,
       foreignKey: false,
       externalKey: false);
   static Field<DateTime> get modifiedDate => const Field<DateTime>(
       id: 'modifiedDate',
-      label: '',
-      title: '',
+      label: 'Дата изм.',
+      title: 'Дата изменения строки',
       type: DateTime,
       logChanges: true,
       foreignKey: false,
       externalKey: false);
   static Field<DateTime> get modifiedTime => const Field<DateTime>(
       id: 'modifiedTime',
-      label: '',
-      title: '',
+      label: 'Время изм.',
+      title: 'Время изменения строки',
       type: DateTime,
       logChanges: true,
       foreignKey: false,

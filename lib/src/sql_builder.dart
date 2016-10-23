@@ -139,6 +139,8 @@ class SqlQueryBuilder {
     List<String> fieldNames = content.keys.toList();
     fieldNames.remove('id');
     List<String> paramNames = fieldNames.map((el) => '@$el').toList();
+    fieldNames.add('id');
+    paramNames.add('DEFAULT');
     return '''
     INSERT INTO "${tableName}"
       (${fieldNames.map((el)=>'"$el"').join(',')})

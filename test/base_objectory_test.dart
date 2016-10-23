@@ -59,8 +59,18 @@ main(){
       String title1 = $Occupation.name.title;
       String title2 = $PersonView.occupationName.title;
       expect(title2, title1);
-
     });
+
+    test("fiendField",() {
+      PersonView person = new PersonView();
+      Field field = person.$schema.findField($Person.firstName.id);
+      expect(field, isNotNull);
+      field = person.$schema.findField($PersonView.occupationName.id);
+      expect(field, isNotNull);
+      field = person.$schema.findField('ABRAKADABRA');
+      expect(field, isNull);
+    });
+
 
 
   });

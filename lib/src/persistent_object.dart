@@ -93,7 +93,9 @@ class BasePersistentObject {
     return !_dirtyFields.isEmpty;
   }
 
-  void setProperty(String property, value) {
+  void setProperty(String property, val) {
+    Field field = this.$schema.findField(property);
+    var value = val ?? field.defaultValue;
     if (this.map[property] == value) {
       return;
     }

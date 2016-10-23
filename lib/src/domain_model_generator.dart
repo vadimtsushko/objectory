@@ -3,7 +3,6 @@ library schema_generator;
 import 'dart:mirrors';
 import 'dart:io';
 import 'package:path/path.dart' as path;
-import 'field.dart' as schema;
 
 class Field {
   final String label;
@@ -15,6 +14,7 @@ class Field {
   final String parentField;
   final bool externalKey;
   final String staticValue;
+  final defaultValue;
   const Field(
       {this.label: '',
       this.title: '',
@@ -22,6 +22,7 @@ class Field {
       this.tootltipsOnContent: false,
       this.width: 0,
       this.parentTable: null,
+      this.defaultValue: null,
       this.staticValue: '',
       this.parentField: '',
       this.externalKey: false});
@@ -256,7 +257,17 @@ class PersistentObjectItem{
 
       output.write(
           "          parentTable: ${propertyGenerator.field.parentTable},parentField: '${propertyGenerator.field.parentField}',staticValue: '${propertyGenerator.field.staticValue}',\n");
-
+      var defaultValue = propertyGenerator.field.defaultValue;
+      if (defaultValue == null) {
+        if (propertyGenerator.type == bool) {
+          defaultValue = false;
+        } else if (propertyGenerator.type == String) {
+          defaultValue = "''";
+        } else if (propertyGenerator.type == int || propertyGenerator.type == double || propertyGenerator.type == num) {
+          defaultValue = 0;
+        }
+      }
+      output.writeln("          defaultValue: $defaultValue,");
       output.write(
           "          type: ${propertyGenerator.type},logChanges: ${propertyGenerator.field.logChanges}, foreignKey: ${propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT},externalKey: ${propertyGenerator.field.externalKey},width: ${propertyGenerator.field.width},tootltipsOnContent: ${propertyGenerator.field.tootltipsOnContent});\n");
     });
