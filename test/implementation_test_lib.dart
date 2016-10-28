@@ -81,7 +81,7 @@ allImplementationTests() {
     Author authFromPg = coll[0];
     expect(authFromPg.age, 4);
     authFromPg.save();
-    var author1 = await objectory.selectOne(Author, where.id(authFromPg.id));
+    Author author1 = await objectory.selectOne(Author, where.id(authFromPg.id));
     expect(author1.age, 4);
     expect(author1.name, 'Dan'); // Converted to uppecase in setter
     expect(author1.email, 'who@cares.net');

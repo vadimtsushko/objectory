@@ -41,7 +41,7 @@ class FieldValue<T> {
 
 class FieldValues<T> {
   final String fieldName;
-  final List<T> values;
+  final Iterable<T> values;
   FieldValues(this.fieldName, this.values);
 
   @override
@@ -65,7 +65,7 @@ class Field<T> {
   final String staticValue;
   final defaultValue;
   FieldValue<T> value(T value) => new FieldValue<T>(id, value);
-  FieldValues<T> values(List<T> values) => new FieldValues<T>(id, values);
+  FieldValues<T> values(Iterable<T> values) => new FieldValues<T>(id, values);
   const Field({
     this.id: '',
     this.label: '',

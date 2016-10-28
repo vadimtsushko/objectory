@@ -118,7 +118,7 @@ class QueryBuilder {
 
   QueryBuilder oneFrom(FieldValues fieldValues) {
     _addExpression(
-        fieldValues.fieldName, {"IN": fieldValues.values, "DUMMY": 0});
+        fieldValues.fieldName, {"IN": fieldValues.values.toList(), "DUMMY": 0});
     return this;
   }
 

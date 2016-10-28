@@ -3,7 +3,7 @@ import 'package:args/args.dart';
 import 'package:objectory/src/ws_server.dart';
 import 'package:objectory/src/authenticator.dart';
 import 'package:logging_handlers/logging_handlers_shared.dart';
- main(args) async {
+ main(List<String> args) async {
   var parser = new ArgParser();
   parser.addOption('uri', abbr: 'u', defaultsTo: 'postgres://test:test@localhost:5432/objectory_test', help: "Uri for MongoDb database to connect");
   parser.addOption('port', abbr: 'p', defaultsTo: '7777', help: "Port for objectory_server");

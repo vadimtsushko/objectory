@@ -6,7 +6,7 @@ import 'package:logging/logging.dart';
 import 'dart:convert';
 import 'authenticator.dart';
 import 'objectory_console.dart';
-
+import 'dart:async';
 //Map<String, ObjectoryClient> connections;
 class RequestHeader {
   String command;
@@ -27,7 +27,6 @@ class ObjectoryClient {
   Logger log = new Logger('Objectory');
   DateTime startDate = new DateTime.now();
   DateTime lastActivity;
-  Connection connection;
   ObjectoryConsole objectory;
   int token;
   WebSocket socket;
@@ -55,7 +54,7 @@ class ObjectoryClient {
         var binary = new BsonBinary.from(JSON.decode(message));
         var jdata = new BSON().deserialize(binary);
         var header = new RequestHeader.fromMap(jdata['header']);
-        Map content = jdata['content'];
+        Map<String, dynamic> content = jdata['content'] as Map<String, dynamic>;
         Map extParams = jdata['extParams'];
         log.info('$userName ${header.collection} ${header.command} content: ${content} extParams: ${extParams}');
         if (header.command == 'authenticate') {
@@ -133,7 +132,7 @@ class ObjectoryClient {
         new BSON().serialize({'header': header, 'content': content}).byteList));
   }
 
-  save(RequestHeader header, Map mapToSave, [Map idMap]) async {
+  save(RequestHeader header, Map<String, dynamic> mapToSave, [Map idMap]) async {
     if (header.command == 'insert') {
       int newId = await objectory.doInsert(header.collection, mapToSave);
       sendResult(header, newId);
@@ -182,7 +181,8 @@ class ObjectoryClient {
       ;
       return;
     }
-    List<Map> list = await find(header, selector, extParams);
+    List<Map> list = await objectory.findRawObjects(
+        header.collection, _queryBuilder(selector, extParams));await find(header, selector, extParams);
     Map responseData = {};
     if (list.isNotEmpty) {
       responseData = list.first;
@@ -204,8 +204,11 @@ class ObjectoryClient {
     } else {
       return sendError(header, '!!! Error authenticating $userName');
     }
+    await objectory.initSqlSession(userName);
     sendResult(header, result);
   }
+
+
 
   sendError(header, String errorMessage) async {
     print(errorMessage);

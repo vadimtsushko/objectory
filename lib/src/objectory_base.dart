@@ -70,7 +70,7 @@ typedef dynamic IdGenerator();
 
 class Objectory {
   String uri;
-  String userName;
+  String userName = '';
   Function registerClassesCallback;
   IdGenerator idGenerator = () => new ObjectId();
   Type idType = int;
@@ -238,7 +238,7 @@ class Objectory {
     throw new UnimplementedError();
   }
 
-  Future doUpdate(String collection, int id, Map toUpdate) {
+  Future doUpdate(String collection, int id, Map<String, dynamic> toUpdate) {
     throw new UnimplementedError();
   }
 
@@ -247,7 +247,7 @@ class Objectory {
     throw new UnimplementedError();
   }
 
-  Future remove(BasePersistentObject persistentObject) {
+  Future remove(PersistentObject persistentObject) {
     throw new UnimplementedError();
   }
 
@@ -318,7 +318,7 @@ class Objectory {
       return new Future.error(
           new Exception('Update operation on object with null id'));
     }
-    Map toUpdate = _getMapForUpdateCommand(persistentObject);
+    var toUpdate = _getMapForUpdateCommand(persistentObject);
     if (toUpdate.isEmpty) {
       return new Future.value({
         'ok': 1.0,
@@ -346,7 +346,7 @@ class Objectory {
     }
   }
 
-  Map _getMapForUpdateCommand(PersistentObject object) {
+  Map<String, dynamic> _getMapForUpdateCommand(PersistentObject object) {
     if (object.dirtyFields.isEmpty) {
       return const {};
     }
@@ -357,7 +357,7 @@ class Objectory {
 //    if (!useFieldLevelUpdate) {
 //      return object.map;
 //    }
-    Map updateMap = {};
+    Map<String, dynamic> updateMap = {};
 
     for (var attr in object.dirtyFields) {
       updateMap[attr] = object.map[attr];

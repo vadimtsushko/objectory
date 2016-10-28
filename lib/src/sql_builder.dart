@@ -49,21 +49,21 @@ class SqlQueryBuilder {
     }
     var key = query.keys.first;
     if (key == 'AND') {
-      List<Map> subComponents = query[key];
+      List<Map> subComponents = query[key] as List<Map>;
       return '(' +
           subComponents
               .map((Map subQuery) => _processQueryNode(subQuery))
               .join(' AND ') +
           ')';
     } else if (key == 'OR') {
-      List<Map> subComponents = query[key];
+      List<Map> subComponents = query[key]  as List<Map>;
       return '(' +
           subComponents
               .map((Map subQuery) => _processQueryNode(subQuery))
               .join(' OR ') +
           ')';
     } else {
-      Map<String, dynamic> expressionMap = query[key];
+      Map<String, dynamic> expressionMap = query[key]  as Map<String, dynamic>;
       paramCounter++;
       if (expressionMap.length == 1) {
         params.add(expressionMap.values.first);
@@ -88,11 +88,11 @@ class SqlQueryBuilder {
           List<String> subQuery = [];
           for (var each in oneFromList) {
             params.add(each);
-            subQuery.add('"$key" = (@$paramCounter)');
+            subQuery.add('@$paramCounter');
             paramCounter++;
           }
           paramCounter--;
-          return '(${subQuery.join(' OR ')})';
+          return '( "$key" IN (${subQuery.join(', ')}))';
         }
       }
     }
@@ -135,7 +135,7 @@ class SqlQueryBuilder {
     return 'UPDATE "$tableName" SET ${setOperations.join(', ')} $whereClause';
   }
 
-  static String getInsertCommand(String tableName, Map content) {
+  static String getInsertCommand(String tableName, Map<String, dynamic> content) {
     List<String> fieldNames = content.keys.toList();
     fieldNames.remove('id');
     List<String> paramNames = fieldNames.map((el) => '@$el').toList();

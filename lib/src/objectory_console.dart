@@ -26,7 +26,7 @@ class ObjectoryConsole extends Objectory {
 
   /// Insert the data and returns id of newly inserted row
   Future<int> doInsert(String tableName, Map toInsert) async {
-    var command = SqlQueryBuilder.getInsertCommand(tableName, toInsert);
+    var command = SqlQueryBuilder.getInsertCommand(tableName, toInsert as Map<String, dynamic>);
     List<Row> res = await connection.query(command, toInsert).toList();
     return res.first.toList().first;
   }
@@ -238,7 +238,7 @@ class ObjectoryConsole extends Objectory {
     await connection.execute('TRUNCATE TABLE "$tableName"');
   }
 
-  Future doUpdate(String collection, int id, Map toUpdate) {
+  Future doUpdate(String collection, int id, Map<String, dynamic> toUpdate) {
     if (toUpdate == null || toUpdate.isEmpty) {
       throw new Exception('doUpdate called with empty params: $toUpdate');
     }
@@ -269,17 +269,23 @@ class ObjectoryConsole extends Objectory {
   Future<List<Map>> findRawObjects(String tableName,
       [QueryBuilder selector]) async {
     List<Map> result = [];
-    await queryPostres(tableName, selector).forEach((Row row) {
+    for (Row row in await queryPostres(tableName, selector)) {
       result.add(row.toMap());
-    });
+    }
     return result;
   }
 
-  Stream<Row> queryPostres(String tableName, QueryBuilder selector) {
+  Future<List<Row>> queryPostres(
+      String tableName, QueryBuilder selector) async {
     SqlQueryBuilder sqlBuilder = new SqlQueryBuilder(tableName, selector);
     String command = sqlBuilder.getQuerySql();
-//    print('queryPostres command: $command\n params: ${sqlBuilder.params}');
-    return connection.query(command, sqlBuilder.params);
+    List<Row> result;
+    try {
+      result = await connection.query(command, sqlBuilder.params).toList();
+    } catch(e) {
+      print('Error: $e \n $command');
+    }
+    return result;
   }
 
   Future<List<PersistentObject>> select(Type classType,
@@ -320,6 +326,8 @@ class ObjectoryConsole extends Objectory {
         await connection.query(command, sqlBuilder.params).toList();
     return rows.first.toList().first;
   }
+
+  initSqlSession(String userName) async {}
 
 //
 //

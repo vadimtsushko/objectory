@@ -22,21 +22,18 @@ class ObjectoryMessage {
 class ObjectoryCollectionWebsocketBrowserImpl extends ObjectoryCollection {
   ObjectoryWebsocketBrowserImpl objectoryImpl;
   ObjectoryCollectionWebsocketBrowserImpl(this.objectoryImpl);
-  Future<int> count([QueryBuilder selector]) {
+  Future<int> count([QueryBuilder selector])  async {
     Completer completer = new Completer();
     if (selector == null) {
       selector = new QueryBuilder();
     }
-    objectoryImpl
+    int count = await objectoryImpl
         ._postMessage(objectoryImpl._createCommand('count', tableName),
-            selector.map, selector.extParamsMap)
-        .then((int _count) {
-      completer.complete(_count);
-    });
-    return completer.future;
+            selector.map, selector.extParamsMap);
+    return count;
   }
 
-  Future<List<PersistentObject>> find([QueryBuilder selector]) {
+  Future<List<PersistentObject>> find([QueryBuilder selector]) async {
     Completer completer = new Completer();
     if (selector == null) {
       selector = new QueryBuilder();
@@ -62,7 +59,7 @@ class ObjectoryCollectionWebsocketBrowserImpl extends ObjectoryCollection {
   }
 
   Future<PersistentObject> findOne([QueryBuilder selector]) {
-    Completer completer = new Completer();
+    Completer<PersistentObject> completer = new Completer<PersistentObject>();
     if (selector == null) {
       selector = new QueryBuilder();
     }
@@ -81,7 +78,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
   WebSocket webSocket;
 //  EventBus eventBus;
   bool isConnected = false;
-  String userName = '';
+
   String authToken = '';
   Map<int, Completer> awaitedRequests = new Map<int, Completer>();
   int requestId = 0;
@@ -99,7 +96,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
       new ObjectoryCollectionWebsocketBrowserImpl(this);
 
   Future<bool> setupWebsocket(String uri) {
-    Completer completer = new Completer();
+    Completer<bool> completer = new Completer<bool>();
     webSocket = new WebSocket("$uri/ws");
 //    webSocket = new WebSocket('ws://localhost:4040/ws');
     webSocket.onOpen.listen((event) {
@@ -183,8 +180,10 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
         _createCommand('update', collection), toUpdate, {"id": id});
   }
 
-  Future doInsert(String tableName, Map map) =>
-      _postMessage(_createCommand('insert', tableName), map);
+  Future<int> doInsert(String tableName, Map map) async {
+    int result = await _postMessage(_createCommand('insert', tableName), map);
+    return result;
+  }
 
   Future remove(PersistentObject persistentObject) => _postMessage(
       _createCommand('remove', persistentObject.tableName),
@@ -194,11 +193,11 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
       _postMessage(_createCommand('truncate', tableName(classType)), null);
 
   Future<Map> dropDb() {
-    return _postMessage(_createCommand('dropDb', null), {});
+    return _postMessage(_createCommand('dropDb', null), {}) as Future<Map>;
   }
 
   Future<Map> queryDb(Map map) {
-    return _postMessage(_createCommand('queryDb', null), map);
+    return _postMessage(_createCommand('queryDb', null), map) as Future<Map>;
   }
 
   Future<Map> wait() {
@@ -218,7 +217,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
   }
 
   Future<List<PersistentObject>> find(Type classType, [QueryBuilder selector]) {
-    Completer completer = new Completer();
+    Completer<List<PersistentObject>> completer = new Completer<List<PersistentObject>>();
     if (selector == null) {
       selector = new QueryBuilder();
     }
@@ -242,7 +241,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
   }
 
   Future<PersistentObject> findOne(Type classType, [QueryBuilder selector]) {
-    Completer completer = new Completer();
+    Completer<PersistentObject> completer = new Completer();
     if (selector == null) {
       selector = new QueryBuilder();
     }
@@ -263,7 +262,7 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
         _createCommand('find', tableName), selector.map, selector.extParamsMap);
   }
 
-  Future<bool> authenticate(String userName, String secret ) async {
+  Future<bool> authenticate(String userName, String secret) async {
     var authResult = await _postMessage(_createCommand('authenticate', null),
         {'authToken': secret, 'userName': userName});
     print('authResult: $authResult');
