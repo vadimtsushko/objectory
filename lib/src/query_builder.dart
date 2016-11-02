@@ -100,6 +100,11 @@ class QueryBuilder {
     return this;
   }
 
+  QueryBuilder rawQuery(String value) {
+    _addExpression('RAW_QUERY', value);
+    return this;
+  }
+
   QueryBuilder like(FieldValue fieldValue, {bool caseInsensitive: false}) {
     _addExpression(fieldValue.fieldName,
         {'LIKE': fieldValue.value, 'caseInsensitive': caseInsensitive});

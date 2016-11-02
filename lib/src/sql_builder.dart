@@ -7,6 +7,7 @@ class SqlQueryBuilder {
   String orderByClause = '';
   String limitClause = '';
   String skipClause = '';
+  String rawQuery;
   List params = [];
   List paramPlaceholders = [];
   int paramCounter = -1;
@@ -21,6 +22,10 @@ class SqlQueryBuilder {
       return;
     }
     if (sourceQuery.isEmpty) {
+      return;
+    }
+    rawQuery = sourceQuery['RAW_QUERY'];
+    if (rawQuery != null) {
       return;
     }
     whereClause = ' WHERE ' + _processQueryNode(sourceQuery);
@@ -56,14 +61,14 @@ class SqlQueryBuilder {
               .join(' AND ') +
           ')';
     } else if (key == 'OR') {
-      List<Map> subComponents = query[key]  as List<Map>;
+      List<Map> subComponents = query[key] as List<Map>;
       return '(' +
           subComponents
               .map((Map subQuery) => _processQueryNode(subQuery))
               .join(' OR ') +
           ')';
     } else {
-      Map<String, dynamic> expressionMap = query[key]  as Map<String, dynamic>;
+      Map<String, dynamic> expressionMap = query[key] as Map<String, dynamic>;
       paramCounter++;
       if (expressionMap.length == 1) {
         params.add(expressionMap.values.first);
@@ -102,6 +107,9 @@ class SqlQueryBuilder {
 
   String getQuerySql() {
     processQueryPart();
+    if (rawQuery != null) {
+      return rawQuery;
+    }
     if (parent != null) {
       if (parent.paramLimit != 0) {
         limitClause = ' LIMIT  ${parent.paramLimit}';
@@ -135,7 +143,8 @@ class SqlQueryBuilder {
     return 'UPDATE "$tableName" SET ${setOperations.join(', ')} $whereClause';
   }
 
-  static String getInsertCommand(String tableName, Map<String, dynamic> content) {
+  static String getInsertCommand(
+      String tableName, Map<String, dynamic> content) {
     List<String> fieldNames = content.keys.toList();
     fieldNames.remove('id');
     List<String> paramNames = fieldNames.map((el) => '@$el').toList();

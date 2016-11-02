@@ -333,10 +333,10 @@ allImplementationTests() {
             .ne($PersistentObject.deleted.value(true))
             .eq($PersistentObject.id.value(father.id))
             .or(where
-            .ne($PersistentObject.deleted.value(true))
-            .oneFrom($Person.father.values([-1,-3,father.id]))
-            .oneFrom($Person.occupation.values([-2,-5,occupation.id]))));
-    expect(count,2);
+                .ne($PersistentObject.deleted.value(true))
+                .oneFrom($Person.father.values([-1, -3, father.id]))
+                .oneFrom($Person.occupation.values([-2, -5, occupation.id]))));
+    expect(count, 2);
   });
 
   test('Another tricky query', () async {
@@ -361,10 +361,10 @@ allImplementationTests() {
             .ne($PersistentObject.deleted.value(true))
             .eq($PersistentObject.id.value(father.id))
             .or(where
-            .ne($PersistentObject.deleted.value(true))
-            .oneFrom($Person.father.values([]))
-            .oneFrom($Person.occupation.values([-2,-5,occupation.id]))));
-    expect(count,1);
+                .ne($PersistentObject.deleted.value(true))
+                .oneFrom($Person.father.values([]))
+                .oneFrom($Person.occupation.values([-2, -5, occupation.id]))));
+    expect(count, 1);
   });
 
   test('Cache', () async {
@@ -378,20 +378,18 @@ allImplementationTests() {
       ..father = father;
 
     await objectory.save(son);
-    expect(objectory.lookup(Person,fatherId), isNotNull);
-    expect((objectory.lookup(Person,fatherId) as Person).firstName, 'Father');
+    expect(objectory.lookup(Person, fatherId), isNotNull);
+    expect((objectory.lookup(Person, fatherId) as Person).firstName, 'Father');
 
     objectory.clearCache(Person);
 
-    expect(objectory.lookup(Person,fatherId), isNull);
+    expect(objectory.lookup(Person, fatherId), isNull);
 
     await objectory.select(Person);
 
-    expect(objectory.lookup(Person,fatherId), isNotNull);
-    expect((objectory.lookup(Person,fatherId) as Person).firstName, 'Father');
-
+    expect(objectory.lookup(Person, fatherId), isNotNull);
+    expect((objectory.lookup(Person, fatherId) as Person).firstName, 'Father');
   });
-
 
   test('insert with explicitly null id', () async {
     await objectory.truncate(Person);
@@ -409,20 +407,18 @@ allImplementationTests() {
     expect(author.id, isNotNull);
   });
 
-
   test('onFrom with empty list should return no rows', () async {
     await objectory.truncate(Author);
 
-
     Author author = new Author()..age = 32;
     await objectory.insert(author);
-    int count = await objectory.count(Author,where.oneFrom($Author.age.values([])));
+    int count =
+        await objectory.count(Author, where.oneFrom($Author.age.values([])));
     expect(count, 0);
   });
 
   test('Insert without any fields set', () async {
     await objectory.truncate(Author);
-
 
     Author author = new Author();
     await objectory.insert(author);
@@ -430,10 +426,9 @@ allImplementationTests() {
     expect(count, 1);
   });
 
-
-  test('Update with null value on not null field should set default value', () async {
+  test('Update with null value on not null field should set default value',
+      () async {
     await objectory.truncate(Author);
-
 
     Author author = new Author();
     await objectory.insert(author);
@@ -444,6 +439,23 @@ allImplementationTests() {
     expect(author.name, '');
   });
 
+  test('Simplest raw query', () async {
+    await objectory.truncate(Author);
+    Author author = new Author();
+    author.name = '13';
+    author.age = 13;
+    await objectory.save(author);
+    author = new Author();
+    author.name = '19';
+    author.age = 19;
+    await objectory.save(author);
 
-
+    author.name = '25';
+    author.age = 25;
+    await objectory.save(author);
+    List<Author> authors = await objectory.select(
+            Author, where.rawQuery('SELECT * FROM "Author" WHERE "age" > 20'));
+    expect(authors.length, 1);
+    expect(authors.first.age, 25);
+  });
 }

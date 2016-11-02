@@ -166,6 +166,10 @@ class Objectory {
   }
 
   List createTypedList(Type classType) {
+    var factory = _listFactories[classType];
+    if (factory == null) {
+      return [];
+    }
     return _listFactories[classType]();
   }
 
