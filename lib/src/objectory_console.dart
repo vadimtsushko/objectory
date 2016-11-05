@@ -26,7 +26,8 @@ class ObjectoryConsole extends Objectory {
 
   /// Insert the data and returns id of newly inserted row
   Future<int> doInsert(String tableName, Map toInsert) async {
-    var command = SqlQueryBuilder.getInsertCommand(tableName, toInsert as Map<String, dynamic>);
+    var command = SqlQueryBuilder.getInsertCommand(
+        tableName, toInsert as Map<String, dynamic>);
     List<Row> res = await connection.query(command, toInsert).toList();
     return res.first.toList().first;
   }
@@ -91,7 +92,7 @@ class ObjectoryConsole extends Objectory {
 
   String getCreateViewScript(TableSchema schema) {
     var buffer = new StringBuffer();
-    buffer.writeln('CREATE VIEW "${schema.tableName}" AS');
+    buffer.writeln('CREATE  VIEW "${schema.tableName}" AS');
     buffer.writeln('  SELECT "${schema.superSchema.tableName}".*');
     for (var field
         in schema.fields.values.where((Field f) => f.staticValue != '')) {
@@ -171,20 +172,24 @@ class ObjectoryConsole extends Objectory {
     }
   }
 
-  void _outputField(Field field, StringBuffer output) {
+  void _outputField(Field field, StringBuffer output, {withoutComma: false}) {
+    String comma = ',';
+    if (withoutComma) {
+      comma = '';
+    }
     output.write('  "${field.id}" ');
     if (field.foreignKey) {
-      output.write('INTEGER NOT NULL DEFAULT 0,\n');
+      output.write('INTEGER NOT NULL DEFAULT 0 $comma \n');
     } else if (field.type == String) {
-      output.write("CHARACTER VARYING(255) NOT NULL DEFAULT '',\n");
+      output.write("CHARACTER VARYING(255) NOT NULL DEFAULT '' $comma \n");
     } else if (field.type == bool) {
-      output.write('BOOLEAN NOT NULL DEFAULT FALSE,\n');
+      output.write('BOOLEAN NOT NULL DEFAULT FALSE $comma \n');
     } else if (field.type == DateTime) {
-      output.write("DATE,\n");
+      output.write("DATE $comma \n");
     } else if (field.type == int) {
-      output.write('INTEGER NOT NULL DEFAULT 0,\n');
+      output.write('INTEGER NOT NULL DEFAULT 0 $comma \n');
     } else if (field.type == num) {
-      output.write('FLOAT8 NOT NULL DEFAULT 0,\n');
+      output.write('FLOAT8 NOT NULL DEFAULT 0 $comma \n');
     } else {
       throw new Exception('Not supported type ${field.type}');
     }
@@ -197,17 +202,35 @@ class ObjectoryConsole extends Objectory {
       return;
     }
     if (schema.isView) {
-      String command = 'DROP View "$tableName"';
+      String command = 'DROP View "$tableName" CASCADE';
       await _execute(command);
     } else {
-      String command = 'DROP TABLE "$tableName"';
+      String command = 'DROP TABLE "$tableName" CASCADE';
       await _execute(command);
       command = 'DROP SEQUENCE "${tableName}_id_seq"';
       await _execute(command);
     }
   }
 
-  Future recreateSchema(List<Type> typesToRecreate) async {
+  Future addColumn(Type persistentClass, Field field) async {
+    String tableName = this.tableName(persistentClass);
+    TableSchema schema = this.tableSchema(persistentClass);
+    var buffer = new StringBuffer();
+    buffer.writeln('ALTER TABLE "$tableName"');
+    buffer.writeln('  ADD COLUMN');
+    _outputField(field, buffer, withoutComma: true);
+    String command = buffer.toString();
+    await _execute(command);
+  }
+
+  Future recreateSchema(List<Type> typesToRecreate,
+      {List<String> initHook, List<String> postHook}) async {
+    if (initHook != null) {
+      for (String command in initHook) {
+        await _execute(command);
+      }
+    }
+
     /// First drop all views
     for (Type type in persistentTypes) {
       await dropTable(type, true);
@@ -226,6 +249,12 @@ class ObjectoryConsole extends Objectory {
     /// Recreate all views
     for (Type type in persistentTypes) {
       await createTable(type, true);
+    }
+
+    if (postHook != null) {
+      for (String command in postHook) {
+        await _execute(command);
+      }
     }
   }
 
@@ -282,7 +311,7 @@ class ObjectoryConsole extends Objectory {
     List<Row> result;
     try {
       result = await connection.query(command, sqlBuilder.params).toList();
-    } catch(e) {
+    } catch (e) {
       print('Error: $e \n $command');
     }
     return result;

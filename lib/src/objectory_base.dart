@@ -146,7 +146,7 @@ class Objectory {
 //        dbRef.id, objectory.getClassTypeByCollection(dbRef.collection));
 //  }
 
-  Future recreateSchema(List<Type> typesToRecreate) {
+  Future recreateSchema(List<Type> typesToRecreate, {List<String> initHook, List<String> postHook}) {
     throw new UnimplementedError();
   }
 
