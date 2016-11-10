@@ -19,6 +19,7 @@ dependencies:
   postgresql: ^0.3.3
   meta: ^1.0.4
 dev_dependencies:
+  dart_style : ^0.2.11
   args: ^0.13.4
   hop: ^0.27.0
   stream: ^1.5.3

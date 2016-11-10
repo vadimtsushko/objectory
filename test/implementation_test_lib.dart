@@ -458,4 +458,66 @@ allImplementationTests() {
     expect(authors.length, 1);
     expect(authors.first.age, 25);
   });
+
+  test('Filter by INNER JOIN', () async {
+    await objectory.truncate(Occupation);
+    await objectory.truncate(Person);
+
+    int occ1 = await objectory.insert(new Occupation()..name = 'test1');
+    int occ2 = await objectory.insert(new Occupation()..name = 'test2');
+
+    int p1 = await objectory.insert(new Person()
+      ..lastName = 'PersonTest1'
+      ..occupation = (new Occupation()..id = occ1));
+    int p2 = await objectory.insert(new Person()
+      ..lastName = 'PersonTest2'
+      ..occupation = (new Occupation()..id = occ2));
+
+    Person person = await objectory.selectOne(
+        Person, where.eq($Person.lastName.value('PersonTest2')));
+    Occupation occupation =
+    await objectory.selectOne(Occupation, where.id(person.occupation.id));
+
+    Person person1 = await objectory.selectOne(
+        Person,
+        where.innerJoin($Person.occupation, $Occupation.schema.tableName,
+            $PersistentObject.id, where.eq($Occupation.name.value('test1'))));
+    expect(person1.lastName,'PersonTest1');
+
+    Person person2 = await objectory.selectOne(
+        Person,
+        where.innerJoin($Person.occupation, $Occupation.schema.tableName,
+            $PersistentObject.id, where.eq($Occupation.name.value('test2'))));
+
+    expect(person2.lastName,'PersonTest2');
+  });
+
+  test('COUNT by INNER JOIN', () async {
+    await objectory.truncate(Occupation);
+    await objectory.truncate(Person);
+
+    int occ1 = await objectory.insert(new Occupation()..name = 'test1');
+    int occ2 = await objectory.insert(new Occupation()..name = 'test2');
+
+    int p1 = await objectory.insert(new Person()
+      ..lastName = 'PersonTest1'
+      ..occupation = (new Occupation()..id = occ1));
+    int p2 = await objectory.insert(new Person()
+      ..lastName = 'PersonTest2'
+      ..occupation = (new Occupation()..id = occ2));
+
+    Person person = await objectory.selectOne(
+        Person, where.eq($Person.lastName.value('PersonTest2')));
+    Occupation occupation =
+    await objectory.selectOne(Occupation, where.id(person.occupation.id));
+
+    int count1 = await objectory.count(
+        Person,
+        where.innerJoin($Person.occupation, $Occupation.schema.tableName,
+            $PersistentObject.id, where.eq($Occupation.name.value('test1'))));
+    expect(count1,1);
+  });
+
+
+
 }

@@ -22,16 +22,41 @@ main() async {
 
 //  String createView = oc.getCreateViewScript(objectory.tableSchema(PersonView));
 //  print(createView);
-  await objectory.truncate(Author);
+
+  await objectory.truncate(Occupation);
+  await objectory.truncate(Person);
+
+  int occ1 = await objectory.insert(new Occupation()..name = 'test1');
+  int occ2 = await objectory.insert(new Occupation()..name = 'test2');
+
+  int p1 = await objectory.insert(new Person()
+    ..lastName = 'PersonTest1'
+    ..occupation = (new Occupation()..id = occ1));
+  int p2 = await objectory.insert(new Person()
+    ..lastName = 'PersonTest2'
+    ..occupation = (new Occupation()..id = occ2));
+
+  Person person = await objectory.selectOne(
+      Person, where.eq($Person.lastName.value('PersonTest2')));
+  Occupation occupation =
+      await objectory.selectOne(Occupation, where.id(person.occupation.id));
+  print(occupation);
+
+  person = await objectory.selectOne(
+      Person,
+      where.innerJoin($Person.occupation, $Occupation.schema.tableName,
+          $PersistentObject.id, where.eq($Occupation.name.value('test1'))));
+
+  print(person);
+
+  person = await objectory.selectOne(
+      Person,
+      where.innerJoin($Person.occupation, $Occupation.schema.tableName,
+          $PersistentObject.id, where.eq($Occupation.name.value('test2'))));
+
+  print(person);
 
 
-  Author author = new Author();
-  await objectory.insert(author);
-  author.name = 'asdfasdfasdfasdfasdf';
-  await objectory.save(author);
-  author.name = null;
-  await objectory.save(author);
-  print(author);
 //
 //  await objectory.truncate(Person);
 //  await objectory.truncate(Occupation);
@@ -83,8 +108,6 @@ main() async {
 //          .oneFrom($Person.occupation.values([occupation.id])));
 //
 //  print('count: $lst');
-
-
 
   await objectory.close();
 //  Author author = await objectory[Author].findOne(where.sortBy($Author.age, descending: true));

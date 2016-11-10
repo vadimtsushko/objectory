@@ -308,6 +308,7 @@ class ObjectoryConsole extends Objectory {
       String tableName, QueryBuilder selector) async {
     SqlQueryBuilder sqlBuilder = new SqlQueryBuilder(tableName, selector);
     String command = sqlBuilder.getQuerySql();
+    print(command);
     List<Row> result;
     try {
       result = await connection.query(command, sqlBuilder.params).toList();

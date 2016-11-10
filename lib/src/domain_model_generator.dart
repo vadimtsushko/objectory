@@ -3,6 +3,7 @@ library schema_generator;
 import 'dart:mirrors';
 import 'dart:io';
 import 'package:path/path.dart' as path;
+import 'package:dart_style/dart_style.dart';
 
 class Field {
   final String label;
@@ -33,10 +34,12 @@ class Table {
   final bool isView;
   final bool cacheValues;
   final String createScript;
+  final String queryString;
   const Table(
       {this.logChanges: true,
       this.isView: false,
       this.createScript: '',
+      this.queryString: '',
       this.cacheValues: false});
 }
 
@@ -160,8 +163,14 @@ class PersistentObjectItem{
       var targetDir = path.dirname(path.fromUri(Platform.script));
       fileName = path.join(targetDir, path.basename(fileName));
     }
-    new File(fileName).writeAsStringSync(output.toString());
-    print('Created file: $fileName');
+    var formatter = new DartFormatter();
+    try {
+      var formattedOutput = formatter.format(output.toString(), uri: fileName);
+      new File(fileName).writeAsStringSync(formattedOutput);
+      print('Created file: $fileName');
+    } on FormatterException catch (ex) {
+      print(ex);
+    }
   }
 
   void generateOuputForClass(ClassGenerator classGenerator) {
@@ -263,7 +272,9 @@ class PersistentObjectItem{
           defaultValue = false;
         } else if (propertyGenerator.type == String) {
           defaultValue = "''";
-        } else if (propertyGenerator.type == int || propertyGenerator.type == double || propertyGenerator.type == num) {
+        } else if (propertyGenerator.type == int ||
+            propertyGenerator.type == double ||
+            propertyGenerator.type == num) {
           defaultValue = 0;
         }
       }
@@ -282,10 +293,13 @@ class PersistentObjectItem{
     output.writeln("      isView: ${classGenerator.table.isView},");
     output.writeln("      cacheValues: ${classGenerator.table.cacheValues},");
     output.writeln(
-        "      createScript: '''\n${classGenerator.table.createScript}''',");
+        "      createScript: '''${classGenerator.table.createScript}''',");
+    output.writeln(
+        "      queryString: '''${classGenerator.table.queryString}''',");
+
     output.writeln("      superSchema: \$${classGenerator.superClass}.schema,");
-    output.writeln('      fields: {\n$fields\n      });');
-    output.writeln('}\n');
+    output.writeln('      fields: {$fields\n      });');
+    output.writeln('}');
   }
 
   generateFieldDescriptors(List<PropertyGenerator> simpleProperties) {}

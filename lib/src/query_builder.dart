@@ -127,6 +127,16 @@ class QueryBuilder {
     return this;
   }
 
+  QueryBuilder innerJoin(Field field, String joinTabe, Field joinField,
+      QueryBuilder filterClause) {
+    _addExpression(field.id, {
+      "INNER_JOIN": joinTabe,
+      "JOIN_FIELD": joinField.id,
+      "FILTER": filterClause.map
+    });
+    return this;
+  }
+
 //  QueryBuilder exists(Field field) {
 //    _addExpression(fieldValue.fieldName, {"\$exists": true});
 //    return this;

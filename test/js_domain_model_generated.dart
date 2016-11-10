@@ -2,12 +2,12 @@
 
 @JS()
 library js_wrapper;
-import 'package:js/js.dart';
 
+import 'package:js/js.dart';
 
 @JS()
 @anonymous
-class PersistentObjectItem{
+class PersistentObjectItem {
   external int get id;
   external set id(int value);
   external String get modifiedBy;
@@ -18,18 +18,17 @@ class PersistentObjectItem{
   external set modifiedAtTime(DateTime value);
   external DateTime get modifiedAt;
   external set modifiedAt(DateTime value);
-  external factory PersistentObjectItem ();
+  external factory PersistentObjectItem();
 }
 
-
-  @JS()
+@JS()
 @anonymous
 class OccupationItem extends PersistentObjectItem {
   external factory OccupationItem();
   external String get name;
-  external set name (String value);
+  external set name(String value);
   external int get branch;
-  external set branch (int value);
+  external set branch(int value);
 }
 
 @JS()
@@ -37,11 +36,11 @@ class OccupationItem extends PersistentObjectItem {
 class UserItem extends PersistentObjectItem {
   external factory UserItem();
   external String get name;
-  external set name (String value);
+  external set name(String value);
   external String get email;
-  external set email (String value);
+  external set email(String value);
   external String get login;
-  external set login (String value);
+  external set login(String value);
 }
 
 @JS()
@@ -49,7 +48,7 @@ class UserItem extends PersistentObjectItem {
 class BranchItem extends PersistentObjectItem {
   external factory BranchItem();
   external String get name;
-  external set name (String value);
+  external set name(String value);
 }
 
 @JS()
@@ -57,9 +56,9 @@ class BranchItem extends PersistentObjectItem {
 class PersonViewItem extends PersonItem {
   external factory PersonViewItem();
   external String get occupationName;
-  external set occupationName (String value);
+  external set occupationName(String value);
   external String get branchName;
-  external set branchName (String value);
+  external set branchName(String value);
 }
 
 @JS()
@@ -67,15 +66,15 @@ class PersonViewItem extends PersonItem {
 class PersonItem extends PersistentObjectItem {
   external factory PersonItem();
   external String get firstName;
-  external set firstName (String value);
+  external set firstName(String value);
   external String get lastName;
-  external set lastName (String value);
+  external set lastName(String value);
   external int get father;
-  external set father (int value);
+  external set father(int value);
   external int get mother;
-  external set mother (int value);
+  external set mother(int value);
   external int get occupation;
-  external set occupation (int value);
+  external set occupation(int value);
 }
 
 @JS()
@@ -83,10 +82,9 @@ class PersonItem extends PersistentObjectItem {
 class AuthorItem extends PersistentObjectItem {
   external factory AuthorItem();
   external String get name;
-  external set name (String value);
+  external set name(String value);
   external String get email;
-  external set email (String value);
+  external set email(String value);
   external int get age;
-  external set age (int value);
+  external set age(int value);
 }
-

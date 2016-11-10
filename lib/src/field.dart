@@ -4,6 +4,7 @@ class TableSchema {
   final Type tableType;
   final bool logChanges;
   final bool isView;
+  final String queryString;
   final TableSchema superSchema;
   final bool cacheValues;
   final String createScript;
@@ -14,6 +15,7 @@ class TableSchema {
       this.logChanges,
       this.isView,
       this.createScript,
+      this.queryString,
       this.cacheValues,
       this.superSchema});
   Field findField(String fieldName) {
