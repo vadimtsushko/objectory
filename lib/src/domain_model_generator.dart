@@ -35,11 +35,23 @@ class Table {
   final bool cacheValues;
   final String createScript;
   final String queryString;
+  final bool sessionIdsRole;
+  final bool idField;
+  final bool deletedField;
+  final bool modifiedDateField;
+  final bool modifiedTimeField;
+  final bool modifiedByField;
   const Table(
       {this.logChanges: true,
       this.isView: false,
       this.createScript: '',
       this.queryString: '',
+      this.idField: true,
+      this.deletedField: true,
+      this.modifiedDateField: true,
+      this.modifiedTimeField: true,
+      this.modifiedByField: true,
+      this.sessionIdsRole: false,
       this.cacheValues: false});
 }
 
@@ -282,23 +294,34 @@ class PersistentObjectItem{
       output.write(
           "          type: ${propertyGenerator.type},logChanges: ${propertyGenerator.field.logChanges}, foreignKey: ${propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT},externalKey: ${propertyGenerator.field.externalKey},width: ${propertyGenerator.field.width},tootltipsOnContent: ${propertyGenerator.field.tootltipsOnContent});\n");
     });
+    bool createBaseFields = !classGenerator.table.sessionIdsRole;
     var fields = classGenerator.properties
         .map((PropertyGenerator e) => "          '${e.name}': ${e.name}")
         .toList()
         .join(',\n');
     output.writeln(" static TableSchema schema = new TableSchema(");
-    output.writeln("      tableName: '${classGenerator.type}',");
-    output.writeln("      tableType: ${classGenerator.type},");
-    output.writeln("      logChanges: ${classGenerator.table.logChanges},");
-    output.writeln("      isView: ${classGenerator.table.isView},");
-    output.writeln("      cacheValues: ${classGenerator.table.cacheValues},");
+    output.writeln("tableName: '${classGenerator.type}',");
+    output.writeln("tableType: ${classGenerator.type},");
+    output.writeln("logChanges: ${classGenerator.table.logChanges},");
+    output.writeln("isView: ${classGenerator.table.isView},");
+    output.writeln("sessionIdsRole: ${classGenerator.table.sessionIdsRole},");
     output.writeln(
-        "      createScript: '''${classGenerator.table.createScript}''',");
+        "idField: ${createBaseFields && classGenerator.table.idField},");
     output.writeln(
-        "      queryString: '''${classGenerator.table.queryString}''',");
+        "deletedField: ${createBaseFields && classGenerator.table.deletedField},");
+    output.writeln(
+        "modifiedDateField: ${createBaseFields && classGenerator.table.modifiedDateField},");
+    output.writeln(
+        "modifiedTimeField: ${createBaseFields && classGenerator.table.modifiedTimeField},");
+    output.writeln(
+        "modifiedByField: ${createBaseFields && classGenerator.table.modifiedByField},");
 
-    output.writeln("      superSchema: \$${classGenerator.superClass}.schema,");
-    output.writeln('      fields: {$fields\n      });');
+    output.writeln("cacheValues: ${classGenerator.table.cacheValues},");
+    output.writeln("createScript: '''${classGenerator.table.createScript}''',");
+    output.writeln("queryString: '''${classGenerator.table.queryString}''',");
+
+    output.writeln("superSchema: \$${classGenerator.superClass}.schema,");
+    output.writeln('fields: {$fields\n      });');
     output.writeln('}');
   }
 

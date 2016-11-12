@@ -35,6 +35,12 @@ class $Occupation {
       tableType: Occupation,
       logChanges: true,
       isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
       cacheValues: false,
       createScript: '''''',
       queryString: '''''',
@@ -98,6 +104,12 @@ class $User {
       tableType: User,
       logChanges: false,
       isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
       cacheValues: false,
       createScript: '''''',
       queryString: '''''',
@@ -135,6 +147,12 @@ class $Branch {
       tableType: Branch,
       logChanges: true,
       isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
       cacheValues: false,
       createScript: '''''',
       queryString: '''''',
@@ -182,6 +200,12 @@ class $PersonView {
       tableType: PersonView,
       logChanges: true,
       isView: true,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
       cacheValues: false,
       createScript: '''''',
       queryString: '''''',
@@ -195,6 +219,61 @@ class PersonView extends Person {
   set occupationName(String value) => setProperty('occupationName', value);
   String get branchName => getProperty('branchName');
   set branchName(String value) => setProperty('branchName', value);
+}
+
+class $PersonIds {
+  static Field<int> get sessionId => const Field<int>(
+      id: 'sessionId',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: 0,
+      type: int,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: true,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<int> get person => const Field<int>(
+      id: 'person',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: Person,
+      logChanges: true,
+      foreignKey: true,
+      externalKey: true,
+      width: 0,
+      tootltipsOnContent: false);
+  static TableSchema schema = new TableSchema(
+      tableName: 'PersonIds',
+      tableType: PersonIds,
+      logChanges: true,
+      isView: false,
+      sessionIdsRole: true,
+      idField: false,
+      deletedField: false,
+      modifiedDateField: false,
+      modifiedTimeField: false,
+      modifiedByField: false,
+      cacheValues: false,
+      createScript: '''''',
+      queryString: '''''',
+      superSchema: $PersistentObject.schema,
+      fields: {'sessionId': sessionId, 'person': person});
+}
+
+class PersonIds extends PersistentObject {
+  TableSchema get $schema => $PersonIds.schema;
+  int get sessionId => getProperty('sessionId');
+  set sessionId(int value) => setProperty('sessionId', value);
+  Person get person => getLinkedObject('person', Person);
+  set person(Person value) => setLinkedObject('person', value);
 }
 
 class $Person {
@@ -273,6 +352,12 @@ class $Person {
       tableType: Person,
       logChanges: true,
       isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
       cacheValues: true,
       createScript: '''''',
       queryString: '''''',
@@ -348,6 +433,12 @@ class $Author {
       tableType: Author,
       logChanges: true,
       isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
       cacheValues: false,
       createScript: '''''',
       queryString: '''''',
@@ -374,6 +465,8 @@ registerClasses(Objectory objectoryParam) {
       .registerClass(Branch, () => new Branch(), () => new List<Branch>(), {});
   objectoryParam.registerClass(
       PersonView, () => new PersonView(), () => new List<PersonView>(), {});
+  objectoryParam.registerClass(PersonIds, () => new PersonIds(),
+      () => new List<PersonIds>(), {'person': Person});
   objectoryParam.registerClass(
       Person,
       () => new Person(),

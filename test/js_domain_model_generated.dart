@@ -63,6 +63,16 @@ class PersonViewItem extends PersonItem {
 
 @JS()
 @anonymous
+class PersonIdsItem extends PersistentObjectItem {
+  external factory PersonIdsItem();
+  external int get sessionId;
+  external set sessionId(int value);
+  external int get person;
+  external set person(int value);
+}
+
+@JS()
+@anonymous
 class PersonItem extends PersistentObjectItem {
   external factory PersonItem();
   external String get firstName;

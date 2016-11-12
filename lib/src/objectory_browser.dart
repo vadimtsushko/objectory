@@ -22,14 +22,15 @@ class ObjectoryMessage {
 class ObjectoryCollectionWebsocketBrowserImpl extends ObjectoryCollection {
   ObjectoryWebsocketBrowserImpl objectoryImpl;
   ObjectoryCollectionWebsocketBrowserImpl(this.objectoryImpl);
-  Future<int> count([QueryBuilder selector])  async {
+  Future<int> count([QueryBuilder selector]) async {
     Completer completer = new Completer();
     if (selector == null) {
       selector = new QueryBuilder();
     }
-    int count = await objectoryImpl
-        ._postMessage(objectoryImpl._createCommand('count', tableName),
-            selector.map, selector.extParamsMap);
+    int count = await objectoryImpl._postMessage(
+        objectoryImpl._createCommand('count', tableName),
+        selector.map,
+        selector.extParamsMap);
     return count;
   }
 
@@ -216,8 +217,15 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
     return count;
   }
 
+  Future<int> putIds(Type persistentType, Iterable<int> ids) async {
+    int count = await _postMessage(
+        _createCommand('putIds', tableName(persistentType)), {'ids': ids.toList()}, null);
+    return count;
+  }
+
   Future<List<PersistentObject>> find(Type classType, [QueryBuilder selector]) {
-    Completer<List<PersistentObject>> completer = new Completer<List<PersistentObject>>();
+    Completer<List<PersistentObject>> completer =
+        new Completer<List<PersistentObject>>();
     if (selector == null) {
       selector = new QueryBuilder();
     }

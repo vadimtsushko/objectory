@@ -7,6 +7,12 @@ class TableSchema {
   final String queryString;
   final TableSchema superSchema;
   final bool cacheValues;
+  final bool sessionIdsRole;
+  final bool idField;
+  final bool deletedField;
+  final bool modifiedDateField;
+  final bool modifiedTimeField;
+  final bool modifiedByField;
   final String createScript;
   const TableSchema(
       {this.fields,
@@ -15,6 +21,12 @@ class TableSchema {
       this.logChanges,
       this.isView,
       this.createScript,
+      this.sessionIdsRole,
+      this.idField,
+      this.deletedField,
+      this.modifiedDateField,
+      this.modifiedByField,
+      this.modifiedTimeField,
       this.queryString,
       this.cacheValues,
       this.superSchema});

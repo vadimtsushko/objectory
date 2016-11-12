@@ -4,7 +4,7 @@ import 'dart:async';
 import 'persistent_object.dart';
 import 'query_builder.dart';
 import 'objectory_base.dart';
-import 'field.dart';
+import 'schema.dart';
 
 class _ForeignKeyTuple {
   Type baseTable;
@@ -52,40 +52,78 @@ class ObjectoryConsole extends Objectory {
       }
       await _execute(script);
     } else {
-      var po = this.newInstance(persistentClass);
-      String tableName = po.tableName;
+      TableSchema schema = tableSchema(persistentClass);
+      String tableName = schema.tableName;
       String command =
           'CREATE SEQUENCE "${tableName}_id_seq"  INCREMENT 1  MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1';
       await _execute(command);
       StringBuffer output = new StringBuffer();
       output.write('CREATE TABLE "$tableName" (\n');
-      output.write(
-          '  "id" integer NOT NULL DEFAULT nextval(\'"${tableName}_id_seq"\'::regclass),\n');
-      output.write('  "deleted" BOOLEAN NOT NULL DEFAULT FALSE,\n');
-      output.write('  "modifiedDate" DATE NOT NULL DEFAULT CURRENT_DATE,\n');
-      output.write(
-          '  "modifiedTime" TIME WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIME,\n');
+      var lines = <String>[];
+      if (schema.idField) {
+        lines.add(
+            '"id" integer NOT NULL DEFAULT nextval(\'"${tableName}_id_seq"\'::regclass)');
+      }
+      if (schema.deletedField) {
+        lines.add('"deleted" BOOLEAN NOT NULL DEFAULT FALSE');
+      }
+      if (schema.modifiedDateField) {
+        lines.add('"modifiedDate" DATE NOT NULL DEFAULT CURRENT_DATE');
+      }
+      if (schema.modifiedTimeField) {
+        lines.add(
+            '"modifiedTime" TIME WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIME');
+      }
 
-      po.$schema.fields.values.forEach((fld) => _outputField(fld, output));
-      List<String> extKeys = po.$schema.fields.values
+      schema.fields.values.forEach((fld) => _outputField(fld, output));
+      List<String> extKeys = schema.fields.values
           .where((fld) => fld.externalKey)
           .map((fld) => '"${fld.id}"')
           .toList();
       if (extKeys.isNotEmpty) {
-        output.write(
-            'CONSTRAINT "${tableName}_ExtKey" UNIQUE (${extKeys.join(', ')}),');
+        lines.add(
+            'CONSTRAINT "${tableName}_ExtKey" UNIQUE (${extKeys.join(', ')})');
       }
-      output.write('  CONSTRAINT "${tableName}_px" PRIMARY KEY ("id")\n');
+      if (schema.idField) {
+        lines.add('CONSTRAINT "${tableName}_px" PRIMARY KEY ("id")\n');
+      }
+
+      output.write(lines.join(','));
       output.write(')');
       command = output.toString();
       await _execute(command);
 
       for (Field foreignKey
-          in po.$schema.fields.values.where((fld) => fld.foreignKey)) {
+          in schema.fields.values.where((fld) => fld.foreignKey)) {
         command =
-            '''CREATE INDEX "${po.$schema.tableName}_${foreignKey.id}_idx" ON "${po.$schema.tableName}"
+            '''CREATE INDEX "${schema.tableName}_${foreignKey.id}_idx" ON "${schema.tableName}"
             USING btree ("${foreignKey.id}")''';
         await _execute(command);
+
+        if (schema.sessionIdsRole) {
+          var fieldName =
+              schema.fields.keys.firstWhere((fn) => fn != 'sessionId');
+          var createProcedureCommand = '''
+        CREATE OR REPLACE FUNCTION public."${schema.tableName}_Put"(ids integer[])
+  RETURNS integer AS
+\$BODY\$
+DECLARE
+   number_ids integer := array_length(ids, 1);
+   id_index integer := 1;
+   result integer = nextval('"${schema.tableName}_id_seq"');
+BEGIN
+   WHILE id_index <= number_ids LOOP
+      INSERT INTO "PersonIds"("$fieldName", "sessionId") VALUES(ids[id_index],result);
+      id_index = id_index + 1;
+   END LOOP;
+   RETURN result;
+END;
+\$BODY\$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+        ''';
+          await _execute(createProcedureCommand);
+        }
       }
     }
   }
@@ -358,6 +396,15 @@ class ObjectoryConsole extends Objectory {
   }
 
   initSqlSession(String userName) async {}
+
+  Future<int> putIds(Type persistentType, Iterable<int> ids) async {
+    String tbl = tableName(persistentType);
+    String command = """SELECT public."${tbl}_Put"('{${ids.join(',')}}')""";
+//    String command = "SELECT put_ids()";
+    print(command);
+    var result = await connection.query(command).first;
+    return result.toList().first;
+  }
 
 //
 //

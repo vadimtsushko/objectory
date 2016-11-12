@@ -454,7 +454,7 @@ allImplementationTests() {
     author.age = 25;
     await objectory.save(author);
     List<Author> authors = await objectory.select(
-            Author, where.rawQuery('SELECT * FROM "Author" WHERE "age" > 20'));
+        Author, where.rawQuery('SELECT * FROM "Author" WHERE "age" > 20'));
     expect(authors.length, 1);
     expect(authors.first.age, 25);
   });
@@ -476,20 +476,20 @@ allImplementationTests() {
     Person person = await objectory.selectOne(
         Person, where.eq($Person.lastName.value('PersonTest2')));
     Occupation occupation =
-    await objectory.selectOne(Occupation, where.id(person.occupation.id));
+        await objectory.selectOne(Occupation, where.id(person.occupation.id));
 
     Person person1 = await objectory.selectOne(
         Person,
         where.innerJoin($Person.occupation, $Occupation.schema.tableName,
             $PersistentObject.id, where.eq($Occupation.name.value('test1'))));
-    expect(person1.lastName,'PersonTest1');
+    expect(person1.lastName, 'PersonTest1');
 
     Person person2 = await objectory.selectOne(
         Person,
         where.innerJoin($Person.occupation, $Occupation.schema.tableName,
             $PersistentObject.id, where.eq($Occupation.name.value('test2'))));
 
-    expect(person2.lastName,'PersonTest2');
+    expect(person2.lastName, 'PersonTest2');
   });
 
   test('COUNT by INNER JOIN', () async {
@@ -509,15 +509,21 @@ allImplementationTests() {
     Person person = await objectory.selectOne(
         Person, where.eq($Person.lastName.value('PersonTest2')));
     Occupation occupation =
-    await objectory.selectOne(Occupation, where.id(person.occupation.id));
+        await objectory.selectOne(Occupation, where.id(person.occupation.id));
 
     int count1 = await objectory.count(
         Person,
         where.innerJoin($Person.occupation, $Occupation.schema.tableName,
             $PersistentObject.id, where.eq($Occupation.name.value('test1'))));
-    expect(count1,1);
+    expect(count1, 1);
   });
 
-
-
+  test('putIds', () async {
+    var ids = [2, 5, 9];
+    int sessionId = await objectory.putIds(PersonIds, ids);
+    List<PersonIds> rows = await objectory.select(
+        PersonIds, where.eq($PersonIds.sessionId.value(sessionId)));
+    List<int> resultIds = rows.map((el) => el.person.id).toList();
+    expect(ids, orderedEquals(resultIds));
+  });
 }

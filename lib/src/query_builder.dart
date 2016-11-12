@@ -1,6 +1,6 @@
 library objectory_query;
 
-import 'field.dart';
+import 'schema.dart';
 import 'dart:convert';
 import 'dart:collection';
 

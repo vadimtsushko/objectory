@@ -56,6 +56,14 @@ class Branch {
   String name;
 }
 
+@Table(sessionIdsRole: true)
+class PersonIds {
+  @Field(externalKey: true)
+  int sessionId;
+  @Field(externalKey: true)
+  Person person;
+}
+
 main() {
   new ModelGenerator(#domain_model_proto)
       .generateTo('domain_model_generated.dart');

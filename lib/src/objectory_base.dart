@@ -5,7 +5,7 @@ import 'query_builder.dart';
 import 'dart:collection';
 import 'dart:async';
 import 'package:bson/bson.dart';
-import 'field.dart';
+import 'schema.dart';
 import 'dart:developer';
 
 
@@ -147,6 +147,9 @@ class Objectory {
 //  }
 
   Future recreateSchema(List<Type> typesToRecreate, {List<String> initHook, List<String> postHook}) {
+    throw new UnimplementedError();
+  }
+  Future<int> putIds(Type persistentType, Iterable<int> ids) {
     throw new UnimplementedError();
   }
 

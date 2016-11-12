@@ -19,42 +19,45 @@ main() async {
   objectory = new ObjectoryConsole(uri, registerClasses);
 //  ObjectoryConsole oc = objectory;
   await objectory.initDomainModel();
+  ObjectoryConsole oc = objectory as ObjectoryConsole;
 
+  int sessionId = await oc.putIds(PersonIds,[23,34,45]);
+  print(sessionId);
 //  String createView = oc.getCreateViewScript(objectory.tableSchema(PersonView));
 //  print(createView);
 
-  await objectory.truncate(Occupation);
-  await objectory.truncate(Person);
-
-  int occ1 = await objectory.insert(new Occupation()..name = 'test1');
-  int occ2 = await objectory.insert(new Occupation()..name = 'test2');
-
-  int p1 = await objectory.insert(new Person()
-    ..lastName = 'PersonTest1'
-    ..occupation = (new Occupation()..id = occ1));
-  int p2 = await objectory.insert(new Person()
-    ..lastName = 'PersonTest2'
-    ..occupation = (new Occupation()..id = occ2));
-
-  Person person = await objectory.selectOne(
-      Person, where.eq($Person.lastName.value('PersonTest2')));
-  Occupation occupation =
-      await objectory.selectOne(Occupation, where.id(person.occupation.id));
-  print(occupation);
-
-  person = await objectory.selectOne(
-      Person,
-      where.innerJoin($Person.occupation, $Occupation.schema.tableName,
-          $PersistentObject.id, where.eq($Occupation.name.value('test1'))));
-
-  print(person);
-
-  person = await objectory.selectOne(
-      Person,
-      where.innerJoin($Person.occupation, $Occupation.schema.tableName,
-          $PersistentObject.id, where.eq($Occupation.name.value('test2'))));
-
-  print(person);
+//  await objectory.truncate(Occupation);
+//  await objectory.truncate(Person);
+//
+//  int occ1 = await objectory.insert(new Occupation()..name = 'test1');
+//  int occ2 = await objectory.insert(new Occupation()..name = 'test2');
+//
+//  int p1 = await objectory.insert(new Person()
+//    ..lastName = 'PersonTest1'
+//    ..occupation = (new Occupation()..id = occ1));
+//  int p2 = await objectory.insert(new Person()
+//    ..lastName = 'PersonTest2'
+//    ..occupation = (new Occupation()..id = occ2));
+//
+//  Person person = await objectory.selectOne(
+//      Person, where.eq($Person.lastName.value('PersonTest2')));
+//  Occupation occupation =
+//      await objectory.selectOne(Occupation, where.id(person.occupation.id));
+//  print(occupation);
+//
+//  person = await objectory.selectOne(
+//      Person,
+//      where.innerJoin($Person.occupation, $Occupation.schema.tableName,
+//          $PersistentObject.id, where.eq($Occupation.name.value('test1'))));
+//
+//  print(person);
+//
+//  person = await objectory.selectOne(
+//      Person,
+//      where.innerJoin($Person.occupation, $Occupation.schema.tableName,
+//          $PersistentObject.id, where.eq($Occupation.name.value('test2'))));
+//
+//  print(person);
 
 
 //

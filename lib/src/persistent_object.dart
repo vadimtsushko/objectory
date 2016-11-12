@@ -5,7 +5,7 @@ import 'package:bson/bson.dart';
 import 'objectory_base.dart';
 import 'dart:async';
 import 'dart:collection';
-import 'field.dart';
+import 'schema.dart';
 
 PersistentObject getStub(int id) => new PersistentObject()..id = id;
 

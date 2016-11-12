@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'authenticator.dart';
 import 'objectory_console.dart';
 import 'dart:async';
+
 //Map<String, ObjectoryClient> connections;
 class RequestHeader {
   String command;
@@ -56,7 +57,8 @@ class ObjectoryClient {
         var header = new RequestHeader.fromMap(jdata['header']);
         Map<String, dynamic> content = jdata['content'] as Map<String, dynamic>;
         Map extParams = jdata['extParams'];
-        log.info('$userName ${header.collection} ${header.command} content: ${content} extParams: ${extParams}');
+        log.info(
+            '$userName ${header.collection} ${header.command} content: ${content} extParams: ${extParams}');
         if (header.command == 'authenticate') {
           authenticate(header, content);
           return;
@@ -83,6 +85,10 @@ class ObjectoryClient {
         }
         if (header.command == "count") {
           count(header, content, extParams);
+          return;
+        }
+        if (header.command == "putIds") {
+          putIds(header, content);
           return;
         }
         if (header.command == "find") {
@@ -132,7 +138,8 @@ class ObjectoryClient {
         new BSON().serialize({'header': header, 'content': content}).byteList));
   }
 
-  save(RequestHeader header, Map<String, dynamic> mapToSave, [Map idMap]) async {
+  save(RequestHeader header, Map<String, dynamic> mapToSave,
+      [Map idMap]) async {
     if (header.command == 'insert') {
       int newId = await objectory.doInsert(header.collection, mapToSave);
       sendResult(header, newId);
@@ -170,6 +177,13 @@ class ObjectoryClient {
     sendResult(header, responseData);
   }
 
+  putIds(RequestHeader header, Map content) async {
+    var ids = content['ids'] as List<int>;
+    Type cls = objectory.getClassTypeByCollection(header.collection);
+    int result = await objectory.putIds(cls, ids);
+    sendResult(header, result);
+  }
+
   remove(RequestHeader header, Map selector) async {
     int res = await objectory.doRemove(header.collection, selector['id']);
     sendResult(header, res);
@@ -182,7 +196,8 @@ class ObjectoryClient {
       return;
     }
     List<Map> list = await objectory.findRawObjects(
-        header.collection, _queryBuilder(selector, extParams));await find(header, selector, extParams);
+        header.collection, _queryBuilder(selector, extParams));
+    await find(header, selector, extParams);
     Map responseData = {};
     if (list.isNotEmpty) {
       responseData = list.first;
@@ -207,8 +222,6 @@ class ObjectoryClient {
     await objectory.initSqlSession(userName);
     sendResult(header, result);
   }
-
-
 
   sendError(header, String errorMessage) async {
     print(errorMessage);
