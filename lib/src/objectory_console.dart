@@ -74,8 +74,12 @@ class ObjectoryConsole extends Objectory {
         lines.add(
             '"modifiedTime" TIME WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIME');
       }
+      if (schema.modifiedByField) {
+        lines.add(
+            '''"modifiedBy" CHARACTER VARYING(255) NOT NULL DEFAULT '' ''');
+      }
 
-      schema.fields.values.forEach((fld) => _outputField(fld, output));
+      schema.fields.values.forEach((fld) => lines.add(_fieldSql(fld)));
       List<String> extKeys = schema.fields.values
           .where((fld) => fld.externalKey)
           .map((fld) => '"${fld.id}"')
@@ -99,11 +103,12 @@ class ObjectoryConsole extends Objectory {
             '''CREATE INDEX "${schema.tableName}_${foreignKey.id}_idx" ON "${schema.tableName}"
             USING btree ("${foreignKey.id}")''';
         await _execute(command);
+      }
 
-        if (schema.sessionIdsRole) {
-          var fieldName =
-              schema.fields.keys.firstWhere((fn) => fn != 'sessionId');
-          var createProcedureCommand = '''
+      if (schema.sessionIdsRole) {
+        var fieldName =
+            schema.fields.keys.firstWhere((fn) => fn != 'sessionId');
+        var createProcedureCommand = '''
         CREATE OR REPLACE FUNCTION public."${schema.tableName}_Put"(ids integer[])
   RETURNS integer AS
 \$BODY\$
@@ -113,7 +118,7 @@ DECLARE
    result integer = nextval('"${schema.tableName}_id_seq"');
 BEGIN
    WHILE id_index <= number_ids LOOP
-      INSERT INTO "PersonIds"("$fieldName", "sessionId") VALUES(ids[id_index],result);
+      INSERT INTO "${schema.tableName}"("$fieldName", "sessionId") VALUES(ids[id_index],result);
       id_index = id_index + 1;
    END LOOP;
    RETURN result;
@@ -122,8 +127,7 @@ END;
   LANGUAGE plpgsql VOLATILE
   COST 100;
         ''';
-          await _execute(createProcedureCommand);
-        }
+        await _execute(createProcedureCommand);
       }
     }
   }
@@ -210,27 +214,25 @@ END;
     }
   }
 
-  void _outputField(Field field, StringBuffer output, {withoutComma: false}) {
-    String comma = ',';
-    if (withoutComma) {
-      comma = '';
-    }
+  String _fieldSql(Field field) {
+    var output = new StringBuffer();
     output.write('  "${field.id}" ');
     if (field.foreignKey) {
-      output.write('INTEGER NOT NULL DEFAULT 0 $comma \n');
+      output.writeln('INTEGER NOT NULL DEFAULT 0');
     } else if (field.type == String) {
-      output.write("CHARACTER VARYING(255) NOT NULL DEFAULT '' $comma \n");
+      output.writeln("CHARACTER VARYING(255) NOT NULL DEFAULT ''");
     } else if (field.type == bool) {
-      output.write('BOOLEAN NOT NULL DEFAULT FALSE $comma \n');
+      output.writeln('BOOLEAN NOT NULL DEFAULT FALSE');
     } else if (field.type == DateTime) {
-      output.write("DATE $comma \n");
+      output.writeln("DATE");
     } else if (field.type == int) {
-      output.write('INTEGER NOT NULL DEFAULT 0 $comma \n');
+      output.writeln('INTEGER NOT NULL DEFAULT 0');
     } else if (field.type == num) {
-      output.write('FLOAT8 NOT NULL DEFAULT 0 $comma \n');
+      output.writeln('FLOAT8 NOT NULL DEFAULT 0');
     } else {
       throw new Exception('Not supported type ${field.type}');
     }
+    return output.toString();
   }
 
   Future dropTable(Type persistentClass, bool viewMode) async {
@@ -256,7 +258,7 @@ END;
     var buffer = new StringBuffer();
     buffer.writeln('ALTER TABLE "$tableName"');
     buffer.writeln('  ADD COLUMN');
-    _outputField(field, buffer, withoutComma: true);
+    buffer.writeln(_fieldSql(field));
     String command = buffer.toString();
     await _execute(command);
   }
@@ -397,10 +399,9 @@ END;
 
   initSqlSession(String userName) async {}
 
-  Future<int> putIds(Type persistentType, Iterable<int> ids) async {
-    String tbl = tableName(persistentType);
-    String command = """SELECT public."${tbl}_Put"('{${ids.join(',')}}')""";
-//    String command = "SELECT put_ids()";
+  Future<int> putIds(String tableName, Iterable<int> ids) async {
+    String command =
+        """SELECT public."${tableName}_Put"('{${ids.join(',')}}')""";
     print(command);
     var result = await connection.query(command).first;
     return result.toList().first;

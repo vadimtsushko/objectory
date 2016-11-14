@@ -21,8 +21,14 @@ main() async {
   await objectory.initDomainModel();
   ObjectoryConsole oc = objectory as ObjectoryConsole;
 
-  int sessionId = await oc.putIds(PersonIds,[23,34,45]);
-  print(sessionId);
+//  int sessionId = await oc.putIds($PersonIds.schema.tableName,[23,34,45]);
+//  print(sessionId);
+
+  await objectory.truncate(Author);
+  await oc.insert(new Author()..id = 0..age = 35..name = 'test');
+  Author author = await objectory.selectOne(Author, where.eq($Author.age.value(null)));
+  print(author.id);
+
 //  String createView = oc.getCreateViewScript(objectory.tableSchema(PersonView));
 //  print(createView);
 

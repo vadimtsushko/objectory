@@ -217,9 +217,9 @@ class ObjectoryWebsocketBrowserImpl extends Objectory {
     return count;
   }
 
-  Future<int> putIds(Type persistentType, Iterable<int> ids) async {
+  Future<int> putIds(String tableName, Iterable<int> ids) async {
     int count = await _postMessage(
-        _createCommand('putIds', tableName(persistentType)), {'ids': ids.toList()}, null);
+        _createCommand('putIds', tableName), {'ids': ids.toList()}, null);
     return count;
   }
 

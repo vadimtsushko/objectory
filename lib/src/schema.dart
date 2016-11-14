@@ -111,7 +111,7 @@ class $PersistentObject {
       label: 'Уд.',
       title: 'Пометка на удаление',
       type: bool,
-      logChanges: true,
+      logChanges: false,
       foreignKey: false,
       externalKey: false);
   static Field<DateTime> get modifiedDate => const Field<DateTime>(
@@ -119,7 +119,7 @@ class $PersistentObject {
       label: 'Дата изм.',
       title: 'Дата изменения строки',
       type: DateTime,
-      logChanges: true,
+      logChanges: false,
       foreignKey: false,
       externalKey: false);
   static Field<DateTime> get modifiedTime => const Field<DateTime>(
@@ -127,7 +127,15 @@ class $PersistentObject {
       label: 'Время изм.',
       title: 'Время изменения строки',
       type: DateTime,
-      logChanges: true,
+      logChanges: false,
+      foreignKey: false,
+      externalKey: false);
+  static Field<DateTime> get modifiedBy => const Field<DateTime>(
+      id: 'modifiedBy',
+      label: 'Автор изм.',
+      title: 'Автор последнего изменения строки',
+      type: String,
+      logChanges: false,
       foreignKey: false,
       externalKey: false);
   static TableSchema schema = new TableSchema(

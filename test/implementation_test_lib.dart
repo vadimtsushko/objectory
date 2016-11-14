@@ -520,10 +520,23 @@ allImplementationTests() {
 
   test('putIds', () async {
     var ids = [2, 5, 9];
-    int sessionId = await objectory.putIds(PersonIds, ids);
+    int sessionId = await objectory.putIds($PersonIds.schema.tableName, ids);
     List<PersonIds> rows = await objectory.select(
         PersonIds, where.eq($PersonIds.sessionId.value(sessionId)));
     List<int> resultIds = rows.map((el) => el.person.id).toList();
     expect(ids, orderedEquals(resultIds));
   });
+
+
+  test('insert with defined id', () async {
+    await objectory.truncate(Author);
+    await objectory.insert(new Author()..id = 0..age = 35..name = 'test');
+    Author author = await objectory.selectOne(Author);
+    expect(author.age, 35);
+    expect(author.name, 'test');
+    expect(author.id, 0);
+
+  });
+
+
 }

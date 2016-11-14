@@ -179,8 +179,7 @@ class ObjectoryClient {
 
   putIds(RequestHeader header, Map content) async {
     var ids = content['ids'] as List<int>;
-    Type cls = objectory.getClassTypeByCollection(header.collection);
-    int result = await objectory.putIds(cls, ids);
+    int result = await objectory.putIds(header.collection, ids);
     sendResult(header, result);
   }
 

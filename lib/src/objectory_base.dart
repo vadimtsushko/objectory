@@ -149,7 +149,7 @@ class Objectory {
   Future recreateSchema(List<Type> typesToRecreate, {List<String> initHook, List<String> postHook}) {
     throw new UnimplementedError();
   }
-  Future<int> putIds(Type persistentType, Iterable<int> ids) {
+  Future<int> putIds(String tableName, Iterable<int> ids) {
     throw new UnimplementedError();
   }
 
