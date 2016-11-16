@@ -527,16 +527,65 @@ allImplementationTests() {
     expect(ids, orderedEquals(resultIds));
   });
 
-
   test('insert with defined id', () async {
     await objectory.truncate(Author);
-    await objectory.insert(new Author()..id = 0..age = 35..name = 'test');
+    await objectory.insert(new Author()
+      ..id = 0
+      ..age = 35
+      ..name = 'test');
     Author author = await objectory.selectOne(Author);
     expect(author.age, 35);
     expect(author.name, 'test');
     expect(author.id, 0);
-
   });
 
+  test('JOIN with dublicated rows', () async {
+    await objectory.truncate(Person);
+    await objectory.truncate(PersonSimpleIds);
+    var person = new Person()..firstName = 'Test1';
+    int personId = await objectory.insert(person);
+    await objectory.insert(new PersonSimpleIds()..person = person);
+    await objectory.insert(new PersonSimpleIds()..person = person);
+    await objectory.insert(new PersonSimpleIds()..person = person);
+    var ids = [personId, personId, personId];
+    List<Person> persons = await objectory.select(
+        Person,
+        where.innerJoin($PersistentObject.id, $PersonSimpleIds.schema.tableName,
+            $PersonSimpleIds.person, null));
+    expect(persons.length, 3);
+  });
 
+  test('JOIN with DISTINCT', () async {
+    await objectory.truncate(Person);
+    await objectory.truncate(PersonSimpleIds);
+    var person = new Person()..firstName = 'Test1';
+    await objectory.insert(person);
+    await objectory.insert(new PersonSimpleIds()..person = person);
+    await objectory.insert(new PersonSimpleIds()..person = person);
+    await objectory.insert(new PersonSimpleIds()..person = person);
+    List<Person> persons = await objectory.select(
+        Person,
+        where
+            .innerJoin($PersistentObject.id, $PersonSimpleIds.schema.tableName,
+                $PersonSimpleIds.person, null)
+            .distrinct());
+    expect(persons.length, 1);
+  });
+
+  test('COUNT with DISTINCT', () async {
+    await objectory.truncate(Person);
+    await objectory.truncate(PersonSimpleIds);
+    var person = new Person()..firstName = 'Test1';
+    await objectory.insert(person);
+    await objectory.insert(new PersonSimpleIds()..person = person);
+    await objectory.insert(new PersonSimpleIds()..person = person);
+    await objectory.insert(new PersonSimpleIds()..person = person);
+    int count = await objectory.count(
+        Person,
+        where
+            .innerJoin($PersistentObject.id, $PersonSimpleIds.schema.tableName,
+                $PersonSimpleIds.person, null)
+            .countDistrinct($PersistentObject.id));
+    expect(count, 1);
+  });
 }

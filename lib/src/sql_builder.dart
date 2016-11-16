@@ -8,6 +8,7 @@ class SqlQueryBuilder {
   String limitClause = '';
   String skipClause = '';
   String joinClause = '';
+  String distinctClause = '';
   String rawQuery;
   List params = [];
   List paramPlaceholders = [];
@@ -29,7 +30,11 @@ class SqlQueryBuilder {
     if (rawQuery != null) {
       return;
     }
-    whereClause = ' WHERE ' + _processQueryNode(sourceQuery, tableName);
+    distinctClause = parent.map['DISTINCT'] ?? '';
+    var whereExpressions = _processQueryNode(sourceQuery, tableName);
+    if (whereExpressions != '') {
+      whereClause = ' WHERE ' + whereExpressions;
+    }
   }
 
   String getOrderBy() {
@@ -111,6 +116,10 @@ class SqlQueryBuilder {
           Map filter = expressionMap['FILTER'];
           joinClause =
               'INNER JOIN "$joinTable" ON "$joinTable"."$joinField" = "${tableName}"."$key" \n';
+          var subQuery = filter['QUERY'];
+          if (subQuery == null) {
+            return '';
+          }
           return _processQueryNode(filter['QUERY'], joinTable);
         }
       }
@@ -132,18 +141,32 @@ class SqlQueryBuilder {
         skipClause = ' OFFSET  ${parent.paramSkip}';
       }
     }
+
+    var m = parent?.map;
+    var fieldList = m == null ? null : m['FIELDS'] as List<String>;
+    String fieldsExpression = fieldList == null
+        ? '"$tableName".*'
+        : fieldList.map((fld) => '    "$tableName"."$fld"').join(',\n');
     orderByClause = getOrderBy();
-    return 'SELECT "$tableName".* FROM "$tableName" \n $joinClause $whereClause $orderByClause $limitClause  $skipClause';
+    return 'SELECT $distinctClause \n $fieldsExpression \n FROM "$tableName" \n $joinClause $whereClause $orderByClause $limitClause  $skipClause';
+  }
+
+  String getQueryCountSql() {
+    processQueryPart();
+    String countClause = '*';
+    if (parent?.map != null) {
+      String fld = parent.map['COUNT_DISTINCT'];
+      if (fld != null) {
+        countClause = 'DISTINCT "$tableName"."$fld"';
+      }
+    }
+
+    return 'SELECT Count($countClause) FROM "$tableName" $joinClause $whereClause';
   }
 
   String getDeleteSql() {
     processQueryPart();
     return 'DELETE FROM "$tableName" $whereClause';
-  }
-
-  String getQueryCountSql() {
-    processQueryPart();
-    return 'SELECT Count(*) FROM "$tableName" $joinClause $whereClause';
   }
 
   String getUpdateSql(Map<String, dynamic> toUpdate) {

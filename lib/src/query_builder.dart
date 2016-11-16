@@ -95,6 +95,16 @@ class QueryBuilder {
     return this;
   }
 
+  QueryBuilder distrinct() {
+    map['DISTINCT'] = 'DISTINCT';
+    return this;
+  }
+
+  QueryBuilder countDistrinct(Field field) {
+    map['COUNT_DISTINCT'] = field.id;
+    return this;
+  }
+
   QueryBuilder lte(FieldValue fieldValue) {
     _addExpression(fieldValue.fieldName, {"<=": fieldValue.value});
     return this;
@@ -104,8 +114,6 @@ class QueryBuilder {
     _addExpression('RAW_QUERY', value);
     return this;
   }
-
-
 
   QueryBuilder like(FieldValue fieldValue, {bool caseInsensitive: false}) {
     _addExpression(fieldValue.fieldName,
@@ -134,7 +142,7 @@ class QueryBuilder {
     _addExpression(field.id, {
       "INNER_JOIN": joinTabe,
       "JOIN_FIELD": joinField.id,
-      "FILTER": filterClause.map
+      "FILTER": filterClause?.map ?? {}
     });
     return this;
   }
@@ -195,21 +203,18 @@ class QueryBuilder {
     return this;
   }
 
-  QueryBuilder fields(List<String> fields) {
-    _ensureParamFields();
-    for (var field in fields) {
-      paramFields[field] = 1;
-    }
+  QueryBuilder fields(List<Field> fields) {
+    map['FIELDS'] = fields.map((f) => f.id).toList();
     return this;
   }
 
-  QueryBuilder excludeFields(List<String> fields) {
-    _ensureParamFields();
-    for (var field in fields) {
-      paramFields[field] = 0;
-    }
-    return this;
-  }
+//  QueryBuilder excludeFields(List<String> fields) {
+//    _ensureParamFields();
+//    for (var field in fields) {
+//      paramFields[field] = 0;
+//    }
+//    return this;
+//  }
 
   QueryBuilder limit(int limit) {
     paramLimit = limit;

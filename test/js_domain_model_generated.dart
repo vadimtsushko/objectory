@@ -73,6 +73,14 @@ class PersonIdsItem extends PersistentObjectItem {
 
 @JS()
 @anonymous
+class PersonSimpleIdsItem extends PersistentObjectItem {
+  external factory PersonSimpleIdsItem();
+  external int get person;
+  external set person(int value);
+}
+
+@JS()
+@anonymous
 class PersonItem extends PersistentObjectItem {
   external factory PersonItem();
   external String get firstName;

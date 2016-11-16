@@ -1,7 +1,7 @@
 //import 'package:postgresql/postgresql.dart';
 //import 'package:objectory/objectory.dart';
 import 'package:objectory/objectory_console.dart';
-import 'domain_model/domain_model.dart';
+import '../test/domain_model.dart';
 
 main() async {
 //  print(where.sortBy($Author.age, descending: true));
@@ -24,11 +24,16 @@ main() async {
 //  int sessionId = await oc.putIds($PersonIds.schema.tableName,[23,34,45]);
 //  print(sessionId);
 
-  await objectory.truncate(Author);
-  await oc.insert(new Author()..id = 0..age = 35..name = 'test');
-  Author author = await objectory.selectOne(Author, where.eq($Author.age.value(null)));
-  print(author.id);
-
+  await objectory.truncate(Person);
+  await objectory.truncate(PersonSimpleIds);
+  var person = new Person()..firstName = 'Test1';
+  await objectory.insert(person);
+  await objectory.insert(new PersonSimpleIds()..person = person);
+  await objectory.insert(new PersonSimpleIds()..person = person);
+  await objectory.insert(new PersonSimpleIds()..person = person);
+  int count = await objectory.count(
+      Person, where.innerJoin($PersistentObject.id, $PersonSimpleIds.schema.tableName, $PersonSimpleIds.person, null).distrinct());
+  print(count);
 //  String createView = oc.getCreateViewScript(objectory.tableSchema(PersonView));
 //  print(createView);
 

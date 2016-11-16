@@ -276,6 +276,45 @@ class PersonIds extends PersistentObject {
   set person(Person value) => setLinkedObject('person', value);
 }
 
+class $PersonSimpleIds {
+  static Field<int> get person => const Field<int>(
+      id: 'person',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: Person,
+      logChanges: true,
+      foreignKey: true,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static TableSchema schema = new TableSchema(
+      tableName: 'PersonSimpleIds',
+      tableType: PersonSimpleIds,
+      logChanges: true,
+      isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
+      cacheValues: false,
+      createScript: '''''',
+      queryString: '''''',
+      superSchema: $PersistentObject.schema,
+      fields: {'person': person});
+}
+
+class PersonSimpleIds extends PersistentObject {
+  TableSchema get $schema => $PersonSimpleIds.schema;
+  Person get person => getLinkedObject('person', Person);
+  set person(Person value) => setLinkedObject('person', value);
+}
+
 class $Person {
   static Field<String> get firstName => const Field<String>(
       id: 'firstName',
@@ -467,6 +506,8 @@ registerClasses(Objectory objectoryParam) {
       PersonView, () => new PersonView(), () => new List<PersonView>(), {});
   objectoryParam.registerClass(PersonIds, () => new PersonIds(),
       () => new List<PersonIds>(), {'person': Person});
+  objectoryParam.registerClass(PersonSimpleIds, () => new PersonSimpleIds(),
+      () => new List<PersonSimpleIds>(), {'person': Person});
   objectoryParam.registerClass(
       Person,
       () => new Person(),

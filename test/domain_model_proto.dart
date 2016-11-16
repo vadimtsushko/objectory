@@ -55,6 +55,14 @@ class PersonIds {
 }
 
 
+class PersonSimpleIds {
+  Person person;
+}
+
+
+
+
+
 main() {
   new ModelGenerator(#domain_model_proto)
       .generateTo('domain_model_generated.dart');
