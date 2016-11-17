@@ -7,10 +7,7 @@ import 'dart:async';
 import 'package:bson/bson.dart';
 import 'schema.dart';
 import 'dart:developer';
-
-
-
-
+import 'dart:async';
 
 Objectory objectory;
 
@@ -111,6 +108,7 @@ class Objectory {
     }
     return cache[classType][id];
   }
+
   @deprecated
   PersistentObject findInCacheOrGetProxy(int id, Type classType) {
     if (id == null) {
@@ -125,13 +123,12 @@ class Objectory {
   }
 
   /// Get object from cache
-  PersistentObject lookup(Type classType,int id) {
+  PersistentObject lookup(Type classType, int id) {
     if (id == null) {
       return null;
     }
     return findInCache(classType, id);
   }
-
 
   BasePersistentObject newInstance(Type classType) {
     if (_factories.containsKey(classType)) {
@@ -146,9 +143,11 @@ class Objectory {
 //        dbRef.id, objectory.getClassTypeByCollection(dbRef.collection));
 //  }
 
-  Future recreateSchema(List<Type> typesToRecreate, {List<String> initHook, List<String> postHook}) {
+  Future recreateSchema(List<Type> typesToRecreate,
+      {List<String> initHook, List<String> postHook}) {
     throw new UnimplementedError();
   }
+
   Future<int> putIds(String tableName, Iterable<int> ids) {
     throw new UnimplementedError();
   }
@@ -216,6 +215,7 @@ class Objectory {
     throw new UnimplementedError();
   }
 
+  Future<List<Map>> refreshUsers() async {}
   Future open() {
     throw new UnimplementedError();
   }
