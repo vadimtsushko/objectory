@@ -1,4 +1,3 @@
-library objectory;
 export 'src/persistent_object.dart';
 export 'src/query_builder.dart';
 export 'src/objectory_base.dart';

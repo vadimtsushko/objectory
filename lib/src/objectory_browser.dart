@@ -1,5 +1,3 @@
-library instock.shelf.objectory.browser_client;
-
 import 'dart:html';
 import 'persistent_object.dart';
 import 'objectory_base.dart';

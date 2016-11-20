@@ -1,5 +1,3 @@
-library objectory_base;
-
 import 'persistent_object.dart';
 import 'query_builder.dart';
 import 'dart:collection';
