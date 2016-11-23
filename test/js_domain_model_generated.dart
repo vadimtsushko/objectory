@@ -23,6 +23,22 @@ class PersistentObjectItem {
 
 @JS()
 @anonymous
+class AuditLogItem extends PersistentObjectItem {
+  external factory AuditLogItem();
+  external int get sourceTableId;
+  external set sourceTableId(int value);
+  external int get sourceId;
+  external set sourceId(int value);
+  external String get operationType;
+  external set operationType(String value);
+  external String get sourceTableName;
+  external set sourceTableName(String value);
+  external Map get content;
+  external set content(Map value);
+}
+
+@JS()
+@anonymous
 class OccupationItem extends PersistentObjectItem {
   external factory OccupationItem();
   external String get name;
@@ -73,6 +89,18 @@ class PersonIdsItem extends PersistentObjectItem {
 
 @JS()
 @anonymous
+class SimpleJsonItem extends PersistentObjectItem {
+  external factory SimpleJsonItem();
+  external int get extId;
+  external set extId(int value);
+  external Map get someMap;
+  external set someMap(Map value);
+  external DateTime get someDate;
+  external set someDate(DateTime value);
+}
+
+@JS()
+@anonymous
 class PersonSimpleIdsItem extends PersistentObjectItem {
   external factory PersonSimpleIdsItem();
   external int get person;
@@ -91,6 +119,10 @@ class PersonItem extends PersistentObjectItem {
   external set father(int value);
   external int get mother;
   external set mother(int value);
+  external DateTime get birthDate;
+  external set birthDate(DateTime value);
+  external int get doNotLog;
+  external set doNotLog(int value);
   external int get occupation;
   external set occupation(int value);
 }

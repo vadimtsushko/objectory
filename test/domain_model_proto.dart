@@ -15,13 +15,21 @@ class User {
   String email;
   String login;
 }
-@Table(cacheValues: true)
+
+@Table(cacheValues: true, tableId: 2)
 class Person {
   @Field(logChanges: true)
   String firstName;
+  @Field(logChanges: true)
   String lastName;
+  @Field(logChanges: true)
   Person father;
+  @Field(logChanges: true)
   Person mother;
+  @Field(logChanges: true)
+  DateTime birthDate;
+
+  int doNotLog;
   Occupation occupation;
 }
 
@@ -31,14 +39,12 @@ class Occupation {
   Branch branch;
 }
 
-@Table(
-    isView: true)
+@Table(isView: true, tableId: 2)
 class PersonView extends Person {
   @Field(parentTable: Occupation, parentField: 'name')
   String occupationName;
   @Field(parentTable: Branch, parentField: 'name')
   String branchName;
-
 }
 
 class Branch {
@@ -54,14 +60,26 @@ class PersonIds {
   Person person;
 }
 
-
 class PersonSimpleIds {
   Person person;
 }
 
+class SimpleJson {
+  int extId;
+  Map someMap;
+  DateTime someDate;
+}
 
-
-
+@Table(deletedField: false)
+class AuditLog {
+  int sourceTableId;
+  int sourceId;
+  @Field(label: 'Тип', title: 'Тип операции')
+  String operationType;
+  @Field(label: 'Таблица', title: 'Наименование исходной таблицы/представления')
+  String sourceTableName;
+  Map content;
+}
 
 main() {
   new ModelGenerator(#domain_model_proto)

@@ -588,4 +588,117 @@ allImplementationTests() {
             .countDistrinct($PersistentObject.id));
     expect(count, 1);
   });
+
+  test('JSON type', () async {
+    await objectory.truncate(SimpleJson);
+    var testMap = {
+      'field1': 23,
+      'field2': 'test',
+      'field3': new DateTime(2013, 1).toString()
+    };
+    int id = await objectory.insert(new SimpleJson()
+      ..extId = 2
+      ..someDate = new DateTime(2013, 1)
+      ..someMap = testMap);
+
+    SimpleJson testData = await objectory.selectOne(SimpleJson, where.id(id));
+
+    expect(testData.someMap, isMap);
+    expect(testData.someMap, containsPair('field1', 23));
+    expect(testData.someMap, containsPair('field2', 'test'));
+    expect(testData.someMap,
+        containsPair('field3', new DateTime(2013, 1).toString()));
+  });
+
+  test('Log object insertion', () async {
+    await objectory.truncate(Person);
+
+    int id = await objectory.insert(new Person()
+      ..birthDate = new DateTime(2013, 1)
+      ..firstName = 'Pat');
+
+    List<AuditLog> logRecs = await objectory.select(
+        AuditLog,
+        where
+            .eq($AuditLog.sourceTableId.value($Person.schema.tableId))
+            .eq($AuditLog.sourceId.value(id)));
+
+
+    expect(logRecs.length, 1);
+    expect(logRecs.first.content,
+        containsPair('birthDate', new DateTime(2013, 1).toString().split(' ').first));
+
+
+  });
+
+  test('Log object update of logged field', () async {
+    await objectory.truncate(Person);
+
+    int id = await objectory.insert(new Person()
+      ..birthDate = new DateTime(2013, 1)
+      ..firstName = 'Pat');
+
+    List<AuditLog> logRecs = await objectory.select(
+        AuditLog,
+        where
+            .eq($AuditLog.sourceTableId.value($Person.schema.tableId))
+            .eq($AuditLog.sourceId.value(id)));
+
+
+    expect(logRecs.length, 1);
+    expect(logRecs.first.content,
+        containsPair('birthDate', new DateTime(2013, 1).toString().split(' ').first));
+
+    Person person = await objectory.selectOne(Person, where.id(id));
+    person.lastName = 'Bi';
+    await objectory.save(person);
+    List<AuditLog> logRecs1 = await objectory.select(
+        AuditLog,
+        where
+            .eq($AuditLog.sourceTableId.value($Person.schema.tableId))
+            .eq($AuditLog.sourceId.value(id)));
+
+
+    expect(logRecs1.length, 2);
+    expect(logRecs1.last.content,
+        containsPair('birthDate', new DateTime(2013, 1).toString().split(' ').first));
+    expect(logRecs1.last.content,
+        containsPair('lastName', 'Bi'));
+
+  });
+
+  test('Log object update of non-logged field', () async {
+    await objectory.truncate(Person);
+
+    int id = await objectory.insert(new Person()
+      ..birthDate = new DateTime(2013, 1)
+      ..firstName = 'Pat');
+
+    List<AuditLog> logRecs = await objectory.select(
+        AuditLog,
+        where
+            .eq($AuditLog.sourceTableId.value($Person.schema.tableId))
+            .eq($AuditLog.sourceId.value(id)));
+
+
+    expect(logRecs.length, 1);
+    expect(logRecs.first.content,
+        containsPair('birthDate', new DateTime(2013, 1).toString().split(' ').first));
+
+    Person person = await objectory.selectOne(Person, where.id(id));
+    person.doNotLog = 23;
+    await objectory.save(person);
+    List<AuditLog> logRecs1 = await objectory.select(
+        AuditLog,
+        where
+            .eq($AuditLog.sourceTableId.value($Person.schema.tableId))
+            .eq($AuditLog.sourceId.value(id)));
+
+
+    expect(logRecs1.length, 1);
+
+  });
+
+
+
 }

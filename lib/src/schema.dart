@@ -14,7 +14,19 @@ class TableSchema {
   final bool modifiedTimeField;
   final bool modifiedByField;
   final String createScript;
-  const TableSchema(
+  final int tableId;
+
+  Set<String> _fieldsToLog;
+  Set<String> get fieldsToLog {
+    if (_fieldsToLog == null) {
+      _fieldsToLog = fields.values.where((Field fld) => fld.logChanges).map((Field fld) => fld.id).toSet();
+    }
+    return _fieldsToLog;
+  }
+
+
+
+   TableSchema(
       {this.fields,
       this.tableName,
       this.tableType,
@@ -28,6 +40,7 @@ class TableSchema {
       this.modifiedByField,
       this.modifiedTimeField,
       this.queryString,
+      this.tableId,
       this.cacheValues,
       this.superSchema});
   Field findField(String fieldName) {
@@ -97,56 +110,3 @@ class Field<T> {
   });
 }
 
-class $PersistentObject {
-  static Field<int> get id => const Field<int>(
-      id: 'id',
-      label: 'Ид.',
-      title: 'Внутренний идентификатор строки',
-      type: int,
-      logChanges: true,
-      foreignKey: false,
-      externalKey: false);
-  static Field<bool> get deleted => const Field<bool>(
-      id: 'deleted',
-      label: 'Уд.',
-      title: 'Пометка на удаление',
-      type: bool,
-      logChanges: false,
-      foreignKey: false,
-      externalKey: false);
-  static Field<DateTime> get modifiedDate => const Field<DateTime>(
-      id: 'modifiedDate',
-      label: 'Дата изм.',
-      title: 'Дата изменения строки',
-      type: DateTime,
-      logChanges: false,
-      foreignKey: false,
-      externalKey: false);
-  static Field<DateTime> get modifiedTime => const Field<DateTime>(
-      id: 'modifiedTime',
-      label: 'Время изм.',
-      title: 'Время изменения строки',
-      type: DateTime,
-      logChanges: false,
-      foreignKey: false,
-      externalKey: false);
-  static Field<DateTime> get modifiedBy => const Field<DateTime>(
-      id: 'modifiedBy',
-      label: 'Автор изм.',
-      title: 'Автор последнего изменения строки',
-      type: String,
-      logChanges: false,
-      foreignKey: false,
-      externalKey: false);
-  static TableSchema schema = new TableSchema(
-      tableName: null,
-      logChanges: false,
-      isView: true,
-      superSchema: null,
-      fields: {
-        'id': id,
-        'deleted': deleted,
-        'modifiedDate': modifiedDate,
-        'modifiedTime': modifiedTime,
-      });
-}

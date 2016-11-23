@@ -25,15 +25,31 @@ main() async {
 //  print(sessionId);
 
   await objectory.truncate(Person);
-  await objectory.truncate(PersonSimpleIds);
-  var person = new Person()..firstName = 'Test1';
-  await objectory.insert(person);
-  await objectory.insert(new PersonSimpleIds()..person = person);
-  await objectory.insert(new PersonSimpleIds()..person = person);
-  await objectory.insert(new PersonSimpleIds()..person = person);
-  int count = await objectory.count(
-      Person, where.innerJoin($PersistentObject.id, $PersonSimpleIds.schema.tableName, $PersonSimpleIds.person, null).distrinct());
-  print(count);
+
+  int id = await objectory.insert(new Person()
+    ..birthDate = new DateTime(2013, 1)
+    ..firstName = 'Pat');
+
+  List<AuditLog> logRecs = await objectory.select(
+      AuditLog,
+      where
+          .eq($AuditLog.sourceTableId.value($Person.schema.tableId))
+          .eq($AuditLog.sourceId.value(id)));
+
+
+  Person person = await objectory.selectOne(Person, where.id(id));
+  person.doNotLog = 23;
+  await objectory.save(person);
+  List<AuditLog> logRecs1 = await objectory.select(
+      AuditLog,
+      where
+          .eq($AuditLog.sourceTableId.value($Person.schema.tableId))
+          .eq($AuditLog.sourceId.value(id)));
+    print(logRecs1);
+
+
+
+
 //  String createView = oc.getCreateViewScript(objectory.tableSchema(PersonView));
 //  print(createView);
 

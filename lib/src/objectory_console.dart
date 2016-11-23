@@ -28,6 +28,7 @@ class ObjectoryConsole extends Objectory {
   Future<int> doInsert(String tableName, Map toInsert) async {
     var command = SqlQueryBuilder.getInsertCommand(
         tableName, toInsert as Map<String, dynamic>);
+    print(command);
     List<Row> res = await connection.query(command, toInsert).toList();
     return res.first.toList().first;
   }
@@ -225,6 +226,8 @@ END;
       output.writeln('BOOLEAN NOT NULL DEFAULT FALSE');
     } else if (field.type == DateTime) {
       output.writeln("DATE");
+    } else if (field.type == Map) {
+      output.writeln("JSON");
     } else if (field.type == int) {
       output.writeln('INTEGER NOT NULL DEFAULT 0');
     } else if (field.type == num) {

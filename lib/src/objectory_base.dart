@@ -6,6 +6,7 @@ import 'package:bson/bson.dart';
 import 'schema.dart';
 import 'dart:developer';
 import 'dart:async';
+import 'common_schema.dart';
 
 Objectory objectory;
 
@@ -83,7 +84,7 @@ class Objectory {
   final Map<String, Type> _collectionNameToTypeMap = new Map<String, Type>();
   bool useFieldLevelUpdate = true;
   bool _isOpen = false;
-  bool saveAuditData = false;
+  bool saveAuditData = true;
   Objectory(this.uri, this.registerClassesCallback);
   void clearCache(Type classType) {
     cache[classType].clear();
@@ -213,7 +214,10 @@ class Objectory {
     throw new UnimplementedError();
   }
 
-  Future<List<Map>> refreshUsers() async {}
+  Future<List<Map>> refreshUsers() async {
+    throw new UnimplementedError();
+  }
+
   Future open() {
     throw new UnimplementedError();
   }
@@ -227,14 +231,12 @@ class Objectory {
   }
 
   Future insert(PersistentObject persistentObject) async {
-    if (saveAuditData) {
-      persistentObject.map['createdBy'] = userName;
-      persistentObject.map['createdAt'] = new DateTime.now();
-      await saveObjectToHistory(persistentObject, 'i');
-    }
     int newId =
         await doInsert(persistentObject.tableName, persistentObject.map);
     persistentObject.id = newId;
+    if (saveAuditData) {
+      await saveObjectToHistory(persistentObject, 'i');
+    }
     objectory.completeFetch(persistentObject);
     return newId;
   }
@@ -390,13 +392,28 @@ class Objectory {
     if (!saveAuditData) {
       return;
     }
-    String historyCollectionName = obj.tableName + 'History';
-    Map toInsert = new Map.from(obj.map);
-    var objectId = toInsert.remove('id');
-    toInsert['id'] = idGenerator();
-    toInsert['_originalObjectId'] = objectId;
-    toInsert['_logOperationType'] = operationType;
-    await doInsert(historyCollectionName, toInsert);
+    if (obj.$schema.tableId == 0) {
+      return;
+    }
+    if (operationType == 'u') {
+      if (obj.dirtyFields.intersection(obj.$schema.fieldsToLog).isEmpty) {
+        return;
+      }
+    }
+    var content = {};
+    for (var key in obj.map.keys) {
+      content[key] = obj.map[key] is DateTime
+          ? obj.map[key].toString().split(' ').first
+          : obj.map[key];
+    }
+    await doInsert('AuditLog', {
+      "sourceTableId": obj.$schema.tableId,
+      "sourceTableName": obj.tableName,
+      "sourceId": obj.id,
+      "content": content,
+      "modifiedBy": userName,
+      "operationType": operationType
+    });
   }
 
   HistoryRecord getHistoryRecord(List<String> fields, Map item, Map prevItem) {

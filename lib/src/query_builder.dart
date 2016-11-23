@@ -1,6 +1,7 @@
 library objectory_query;
 
 import 'schema.dart';
+import 'common_schema.dart';
 import 'dart:convert';
 import 'dart:collection';
 

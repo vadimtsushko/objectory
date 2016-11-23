@@ -1,6 +1,117 @@
 /// Warning! That file is generated. Do not edit it manually
 part of domain_model;
 
+class $AuditLog {
+  static Field<int> get sourceTableId => const Field<int>(
+      id: 'sourceTableId',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: 0,
+      type: int,
+      logChanges: false,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<int> get sourceId => const Field<int>(
+      id: 'sourceId',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: 0,
+      type: int,
+      logChanges: false,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<String> get operationType => const Field<String>(
+      id: 'operationType',
+      label: 'Тип',
+      title: 'Тип операции',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: false,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<String> get sourceTableName => const Field<String>(
+      id: 'sourceTableName',
+      label: 'Таблица',
+      title: 'Наименование исходной таблицы/представления',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: false,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<Map> get content => const Field<Map>(
+      id: 'content',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: Map,
+      logChanges: false,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static TableSchema schema = new TableSchema(
+      tableName: 'AuditLog',
+      tableType: AuditLog,
+      tableId: 0,
+      logChanges: true,
+      isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: false,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
+      cacheValues: false,
+      createScript: '''''',
+      queryString: '''''',
+      superSchema: $PersistentObject.schema,
+      fields: {
+        'sourceTableId': sourceTableId,
+        'sourceId': sourceId,
+        'operationType': operationType,
+        'sourceTableName': sourceTableName,
+        'content': content
+      });
+}
+
+class AuditLog extends PersistentObject {
+  TableSchema get $schema => $AuditLog.schema;
+  int get sourceTableId => getProperty('sourceTableId');
+  set sourceTableId(int value) => setProperty('sourceTableId', value);
+  int get sourceId => getProperty('sourceId');
+  set sourceId(int value) => setProperty('sourceId', value);
+  String get operationType => getProperty('operationType');
+  set operationType(String value) => setProperty('operationType', value);
+  String get sourceTableName => getProperty('sourceTableName');
+  set sourceTableName(String value) => setProperty('sourceTableName', value);
+  Map<String, dynamic> get content =>
+      getProperty('content') as Map<String, dynamic>;
+  set content(Map<String, dynamic> value) => setProperty('content', value);
+}
+
 class $Occupation {
   static Field<String> get name => const Field<String>(
       id: 'name',
@@ -11,7 +122,7 @@ class $Occupation {
       staticValue: '',
       defaultValue: '',
       type: String,
-      logChanges: true,
+      logChanges: false,
       foreignKey: false,
       externalKey: false,
       width: 0,
@@ -25,7 +136,7 @@ class $Occupation {
       staticValue: '',
       defaultValue: null,
       type: Branch,
-      logChanges: true,
+      logChanges: false,
       foreignKey: true,
       externalKey: false,
       width: 0,
@@ -33,6 +144,7 @@ class $Occupation {
   static TableSchema schema = new TableSchema(
       tableName: 'Occupation',
       tableType: Occupation,
+      tableId: 0,
       logChanges: true,
       isView: false,
       sessionIdsRole: false,
@@ -66,7 +178,7 @@ class $User {
       staticValue: '',
       defaultValue: '',
       type: String,
-      logChanges: true,
+      logChanges: false,
       foreignKey: false,
       externalKey: false,
       width: 0,
@@ -80,7 +192,7 @@ class $User {
       staticValue: '',
       defaultValue: '',
       type: String,
-      logChanges: true,
+      logChanges: false,
       foreignKey: false,
       externalKey: false,
       width: 0,
@@ -94,7 +206,7 @@ class $User {
       staticValue: '',
       defaultValue: '',
       type: String,
-      logChanges: true,
+      logChanges: false,
       foreignKey: false,
       externalKey: false,
       width: 0,
@@ -102,6 +214,7 @@ class $User {
   static TableSchema schema = new TableSchema(
       tableName: 'User',
       tableType: User,
+      tableId: 0,
       logChanges: false,
       isView: false,
       sessionIdsRole: false,
@@ -137,7 +250,7 @@ class $Branch {
       staticValue: '',
       defaultValue: '',
       type: String,
-      logChanges: true,
+      logChanges: false,
       foreignKey: false,
       externalKey: false,
       width: 0,
@@ -145,6 +258,7 @@ class $Branch {
   static TableSchema schema = new TableSchema(
       tableName: 'Branch',
       tableType: Branch,
+      tableId: 0,
       logChanges: true,
       isView: false,
       sessionIdsRole: false,
@@ -176,7 +290,7 @@ class $PersonView {
       staticValue: '',
       defaultValue: '',
       type: String,
-      logChanges: true,
+      logChanges: false,
       foreignKey: false,
       externalKey: false,
       width: 0,
@@ -190,7 +304,7 @@ class $PersonView {
       staticValue: '',
       defaultValue: '',
       type: String,
-      logChanges: true,
+      logChanges: false,
       foreignKey: false,
       externalKey: false,
       width: 0,
@@ -198,6 +312,7 @@ class $PersonView {
   static TableSchema schema = new TableSchema(
       tableName: 'PersonView',
       tableType: PersonView,
+      tableId: 2,
       logChanges: true,
       isView: true,
       sessionIdsRole: false,
@@ -231,7 +346,7 @@ class $PersonIds {
       staticValue: '',
       defaultValue: 0,
       type: int,
-      logChanges: true,
+      logChanges: false,
       foreignKey: false,
       externalKey: true,
       width: 0,
@@ -245,7 +360,7 @@ class $PersonIds {
       staticValue: '',
       defaultValue: null,
       type: Person,
-      logChanges: true,
+      logChanges: false,
       foreignKey: true,
       externalKey: true,
       width: 0,
@@ -253,6 +368,7 @@ class $PersonIds {
   static TableSchema schema = new TableSchema(
       tableName: 'PersonIds',
       tableType: PersonIds,
+      tableId: 0,
       logChanges: true,
       isView: false,
       sessionIdsRole: true,
@@ -276,6 +392,79 @@ class PersonIds extends PersistentObject {
   set person(Person value) => setLinkedObject('person', value);
 }
 
+class $SimpleJson {
+  static Field<int> get extId => const Field<int>(
+      id: 'extId',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: 0,
+      type: int,
+      logChanges: false,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<Map> get someMap => const Field<Map>(
+      id: 'someMap',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: Map,
+      logChanges: false,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<DateTime> get someDate => const Field<DateTime>(
+      id: 'someDate',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: DateTime,
+      logChanges: false,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static TableSchema schema = new TableSchema(
+      tableName: 'SimpleJson',
+      tableType: SimpleJson,
+      tableId: 0,
+      logChanges: true,
+      isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
+      cacheValues: false,
+      createScript: '''''',
+      queryString: '''''',
+      superSchema: $PersistentObject.schema,
+      fields: {'extId': extId, 'someMap': someMap, 'someDate': someDate});
+}
+
+class SimpleJson extends PersistentObject {
+  TableSchema get $schema => $SimpleJson.schema;
+  int get extId => getProperty('extId');
+  set extId(int value) => setProperty('extId', value);
+  Map<String, dynamic> get someMap =>
+      getProperty('someMap') as Map<String, dynamic>;
+  set someMap(Map<String, dynamic> value) => setProperty('someMap', value);
+  DateTime get someDate => getProperty('someDate');
+  set someDate(DateTime value) => setProperty('someDate', value);
+}
+
 class $PersonSimpleIds {
   static Field<int> get person => const Field<int>(
       id: 'person',
@@ -286,7 +475,7 @@ class $PersonSimpleIds {
       staticValue: '',
       defaultValue: null,
       type: Person,
-      logChanges: true,
+      logChanges: false,
       foreignKey: true,
       externalKey: false,
       width: 0,
@@ -294,6 +483,7 @@ class $PersonSimpleIds {
   static TableSchema schema = new TableSchema(
       tableName: 'PersonSimpleIds',
       tableType: PersonSimpleIds,
+      tableId: 0,
       logChanges: true,
       isView: false,
       sessionIdsRole: false,
@@ -372,6 +562,34 @@ class $Person {
       externalKey: false,
       width: 0,
       tootltipsOnContent: false);
+  static Field<DateTime> get birthDate => const Field<DateTime>(
+      id: 'birthDate',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: DateTime,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<int> get doNotLog => const Field<int>(
+      id: 'doNotLog',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: 0,
+      type: int,
+      logChanges: false,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
   static Field<int> get occupation => const Field<int>(
       id: 'occupation',
       label: '',
@@ -381,7 +599,7 @@ class $Person {
       staticValue: '',
       defaultValue: null,
       type: Occupation,
-      logChanges: true,
+      logChanges: false,
       foreignKey: true,
       externalKey: false,
       width: 0,
@@ -389,6 +607,7 @@ class $Person {
   static TableSchema schema = new TableSchema(
       tableName: 'Person',
       tableType: Person,
+      tableId: 2,
       logChanges: true,
       isView: false,
       sessionIdsRole: false,
@@ -406,6 +625,8 @@ class $Person {
         'lastName': lastName,
         'father': father,
         'mother': mother,
+        'birthDate': birthDate,
+        'doNotLog': doNotLog,
         'occupation': occupation
       });
 }
@@ -420,6 +641,10 @@ class Person extends PersistentObject {
   set father(Person value) => setLinkedObject('father', value);
   Person get mother => getLinkedObject('mother', Person);
   set mother(Person value) => setLinkedObject('mother', value);
+  DateTime get birthDate => getProperty('birthDate');
+  set birthDate(DateTime value) => setProperty('birthDate', value);
+  int get doNotLog => getProperty('doNotLog');
+  set doNotLog(int value) => setProperty('doNotLog', value);
   Occupation get occupation => getLinkedObject('occupation', Occupation);
   set occupation(Occupation value) => setLinkedObject('occupation', value);
 }
@@ -434,7 +659,7 @@ class $Author {
       staticValue: '',
       defaultValue: '',
       type: String,
-      logChanges: true,
+      logChanges: false,
       foreignKey: false,
       externalKey: false,
       width: 0,
@@ -448,7 +673,7 @@ class $Author {
       staticValue: '',
       defaultValue: '',
       type: String,
-      logChanges: true,
+      logChanges: false,
       foreignKey: false,
       externalKey: false,
       width: 0,
@@ -462,7 +687,7 @@ class $Author {
       staticValue: '',
       defaultValue: 0,
       type: int,
-      logChanges: true,
+      logChanges: false,
       foreignKey: false,
       externalKey: false,
       width: 0,
@@ -470,6 +695,7 @@ class $Author {
   static TableSchema schema = new TableSchema(
       tableName: 'Author',
       tableType: Author,
+      tableId: 0,
       logChanges: true,
       isView: false,
       sessionIdsRole: false,
@@ -496,6 +722,8 @@ class Author extends PersistentObject {
 }
 
 registerClasses(Objectory objectoryParam) {
+  objectoryParam.registerClass(
+      AuditLog, () => new AuditLog(), () => new List<AuditLog>(), {});
   objectoryParam.registerClass(Occupation, () => new Occupation(),
       () => new List<Occupation>(), {'branch': Branch});
   objectoryParam
@@ -506,6 +734,8 @@ registerClasses(Objectory objectoryParam) {
       PersonView, () => new PersonView(), () => new List<PersonView>(), {});
   objectoryParam.registerClass(PersonIds, () => new PersonIds(),
       () => new List<PersonIds>(), {'person': Person});
+  objectoryParam.registerClass(
+      SimpleJson, () => new SimpleJson(), () => new List<SimpleJson>(), {});
   objectoryParam.registerClass(PersonSimpleIds, () => new PersonSimpleIds(),
       () => new List<PersonSimpleIds>(), {'person': Person});
   objectoryParam.registerClass(

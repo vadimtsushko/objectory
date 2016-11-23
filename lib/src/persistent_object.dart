@@ -169,6 +169,10 @@ class PersistentObject extends BasePersistentObject {
   DateTime get modifiedDate => map['modifiedDate'];
 
   DateTime get modifiedTime => map['modifiedTime'];
+  String get modifiedBy => map['modifiedBy'];
+  set modifiedBy(String value) {
+    setProperty('modifiedBy', value);
+  }
 
   Map<String, Field> get $fields =>
       throw new Exception('Should be implemented');

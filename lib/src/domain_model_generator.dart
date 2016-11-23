@@ -19,7 +19,7 @@ class Field {
   const Field(
       {this.label: '',
       this.title: '',
-      this.logChanges: true,
+      this.logChanges: false,
       this.tootltipsOnContent: false,
       this.width: 0,
       this.parentTable: null,
@@ -41,6 +41,7 @@ class Table {
   final bool modifiedDateField;
   final bool modifiedTimeField;
   final bool modifiedByField;
+  final int tableId;
   const Table(
       {this.logChanges: true,
       this.isView: false,
@@ -50,6 +51,7 @@ class Table {
       this.deletedField: true,
       this.modifiedDateField: true,
       this.modifiedTimeField: true,
+      this.tableId: 0,
       this.modifiedByField: true,
       this.sessionIdsRole: false,
       this.cacheValues: false});
@@ -99,10 +101,26 @@ part of domain_model;
   generateTo(String outFileName) {
     init();
     processAll();
+//    checkOutput();
     generateOutput();
     saveOuput(outFileName);
     generateJsWrapperOutput();
     saveOuput('js_$outFileName');
+  }
+
+  checkOutput() {
+    var tableIdMap = <int, int>{};
+    for (var each in classGenerators) {
+      tableIdMap[each.table.tableId] =
+          (tableIdMap[each.table.tableId] ?? 0) + 1;
+    }
+    for (var key in tableIdMap.keys) {
+      if (key != 0) {
+        if (tableIdMap[key] > 1) {
+          throw new Exception('Duplicate tableId value: $key');
+        }
+      }
+    }
   }
 
   generateJsWrapperOutput() {
@@ -166,6 +184,7 @@ class PersistentObjectItem{
         output.write(
             '  objectoryParam.registerClass($cls,()=>new $cls(),()=>new List<$cls>(), $linkedTypeMap);\n');
       }
+
       output.write('}\n');
     }
   }
@@ -211,11 +230,18 @@ class PersistentObjectItem{
   void generateOuputForProperty(PropertyGenerator propertyGenerator) {
     //output.write(propertyGenerator.commentLine);
     if (propertyGenerator.propertyType == PropertyType.SIMPLE) {
+      var typeStr = '${propertyGenerator.type}';
+      var typeCast = '';
+      if (typeStr == 'Map') {
+        typeStr = 'Map<String, dynamic>';
+        typeCast = 'as $typeStr';
+      }
+
       output
-          .write('  ${propertyGenerator.type} get ${propertyGenerator.name} => '
-              "getProperty('${propertyGenerator.name}');\n");
+          .write('  $typeStr get ${propertyGenerator.name} => '
+              "getProperty('${propertyGenerator.name}') $typeCast;\n");
       output.write(
-          '  set ${propertyGenerator.name} (${propertyGenerator.type} value) => '
+          '  set ${propertyGenerator.name} ($typeStr value) => '
           "setProperty('${propertyGenerator.name}',value);\n");
     }
     if (propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT) {
@@ -302,6 +328,7 @@ class PersistentObjectItem{
     output.writeln(" static TableSchema schema = new TableSchema(");
     output.writeln("tableName: '${classGenerator.type}',");
     output.writeln("tableType: ${classGenerator.type},");
+    output.writeln("tableId: ${classGenerator.table.tableId},");
     output.writeln("logChanges: ${classGenerator.table.logChanges},");
     output.writeln("isView: ${classGenerator.table.isView},");
     output.writeln("sessionIdsRole: ${classGenerator.table.sessionIdsRole},");
@@ -406,6 +433,7 @@ class PropertyGenerator {
         t == double ||
         t == String ||
         t == DateTime ||
+        t == Map ||
         t == bool ||
         t == num) {
       return;
