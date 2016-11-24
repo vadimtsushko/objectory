@@ -19,7 +19,7 @@ class TableSchema {
   Set<String> _fieldsToLog;
   Set<String> get fieldsToLog {
     if (_fieldsToLog == null) {
-      _fieldsToLog = fields.values
+      _fieldsToLog = allFields.values
           .where((Field fld) => fld.logChanges)
           .map((Field fld) => fld.id)
           .toSet();
@@ -27,13 +27,13 @@ class TableSchema {
     return _fieldsToLog;
   }
 
-  Set<String> _allFields;
-  Set<String> get allFields {
+  Map<String, Field> _allFields;
+  Map<String, Field> get allFields {
     if (_allFields == null) {
-      _allFields = fields.values.map((Field fld) => fld.id).toSet();
+      _allFields = new Map<String, Field>.from(fields);
       TableSchema parent = superSchema;
       while (parent != null) {
-        _allFields.addAll(fields.values.map((Field fld) => fld.id));
+        _allFields.addAll(parent.fields);
         parent = parent.superSchema;
       }
     }

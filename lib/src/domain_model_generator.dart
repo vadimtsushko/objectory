@@ -19,7 +19,7 @@ class Field {
   const Field(
       {this.label: '',
       this.title: '',
-      this.logChanges: false,
+      this.logChanges: true,
       this.tootltipsOnContent: false,
       this.width: 0,
       this.parentTable: null,
@@ -303,7 +303,7 @@ class PersistentObjectItem{
           "      const Field<$fieldType>(id: '${propertyGenerator.name}',label: '${propertyGenerator.field.label}',title: '${propertyGenerator.field.title}',\n");
 
       output.write(
-          "          parentTable: ${propertyGenerator.field.parentTable},parentField: '${propertyGenerator.field.parentField}',staticValue: '${propertyGenerator.field.staticValue}',\n");
+          "          parentTable: ${propertyGenerator.field.parentTable},parentField: '${propertyGenerator.field.parentField}',staticValue: \"${propertyGenerator.field.staticValue}\",\n");
       var defaultValue = propertyGenerator.field.defaultValue;
       if (defaultValue == null) {
         if (propertyGenerator.type == bool) {

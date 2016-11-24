@@ -435,31 +435,31 @@ class Objectory {
     return result;
   }
 
-  Future<List<HistoryRecord>> getHistoryFor(PersistentObject object) async {
-    var result = new List<HistoryRecord>();
-
-    String query = '''
-SELECT
- "AuditLog".*
- FROM "AuditLog"
-   WHERE ("AuditLog"."sourceTableId" = ${object.$schema.tableId} AND "AuditLog"."sourceId" = ${object.id})
-     ORDER BY "modifiedDate","modifiedTime"
-    ''';
-
-    var items = await findRawObjects('AuditLog', where.rawQuery(query));
-    var fields = object.$schema.allFields;
-    Map prevItem = {'content': {}};
-    for (Map item in items) {
-      var historyRecord =
-          getHistoryRecord(fields, item, prevItem);
-      if (historyRecord.content != '') {
-        result.add(historyRecord);
-      }
-      prevItem = item;
-    }
-
-    return result;
-  }
+//  Future<List<HistoryRecord>> getHistoryFor(PersistentObject object) async {
+//    var result = new List<HistoryRecord>();
+//
+//    String query = '''
+//SELECT
+// "AuditLog".*
+// FROM "AuditLog"
+//   WHERE ("AuditLog"."sourceTableId" = ${object.$schema.tableId} AND "AuditLog"."sourceId" = ${object.id})
+//     ORDER BY "modifiedDate","modifiedTime"
+//    ''';
+//
+//    var items = await findRawObjects('AuditLog', where.rawQuery(query));
+//    var fields = object.$schema.allFields;
+//    Map prevItem = {'content': {}};
+//    for (Map item in items) {
+//      var historyRecord =
+//          getHistoryRecord(fields, item, prevItem);
+//      if (historyRecord.content != '') {
+//        result.add(historyRecord);
+//      }
+//      prevItem = item;
+//    }
+//
+//    return result;
+//  }
 
   ObjectoryCollection operator [](Type classType) => _collections[classType];
 }

@@ -28,7 +28,7 @@ class ObjectoryConsole extends Objectory {
   Future<int> doInsert(String tableName, Map toInsert) async {
     var command = SqlQueryBuilder.getInsertCommand(
         tableName, toInsert as Map<String, dynamic>);
-    print(command);
+//    print(command);
     List<Row> res = await connection.query(command, toInsert).toList();
     return res.first.toList().first;
   }
@@ -351,7 +351,7 @@ END;
       String tableName, QueryBuilder selector) async {
     SqlQueryBuilder sqlBuilder = new SqlQueryBuilder(tableName, selector);
     String command = sqlBuilder.getQuerySql();
-    print(command);
+//    print(command);
     List<Row> result;
     try {
       result = await connection.query(command, sqlBuilder.params).toList();
@@ -405,7 +405,7 @@ END;
   Future<int> putIds(String tableName, Iterable<int> ids) async {
     String command =
         """SELECT public."${tableName}_Put"('{${ids.join(',')}}')""";
-    print(command);
+//    print(command);
     var result = await connection.query(command).first;
     return result.toList().first;
   }

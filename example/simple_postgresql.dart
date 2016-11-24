@@ -24,8 +24,6 @@ main() async {
 //  int sessionId = await oc.putIds($PersonIds.schema.tableName,[23,34,45]);
 //  print(sessionId);
 
-  await objectory.truncate(Person);
-
   int id = await objectory.insert(new Person()
     ..birthDate = new DateTime(2013, 1)
     ..firstName = 'Pat');
@@ -36,15 +34,18 @@ main() async {
           .eq($AuditLog.sourceTableId.value($Person.schema.tableId))
           .eq($AuditLog.sourceId.value(id)));
 
+
+
   Person person = await objectory.selectOne(Person, where.id(id));
-  person.lastName = 'QWERT';
+  person.doNotLog = 23;
   await objectory.save(person);
+  List<AuditLog> logRecs1 = await objectory.select(
+      AuditLog,
+      where
+          .eq($AuditLog.sourceTableId.value($Person.schema.tableId))
+          .eq($AuditLog.sourceId.value(id)));
 
-
-  var history = await objectory.getHistoryFor(person);
-
-  print(history);
-
+  print(logRecs1.length);
 //  String createView = oc.getCreateViewScript(objectory.tableSchema(PersonView));
 //  print(createView);
 

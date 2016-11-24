@@ -18,17 +18,12 @@ class User {
 
 @Table(cacheValues: true, tableId: 2)
 class Person {
-  @Field(logChanges: true)
   String firstName;
-  @Field(logChanges: true)
   String lastName;
-  @Field(logChanges: true)
   Person father;
-  @Field(logChanges: true)
   Person mother;
-  @Field(logChanges: true)
   DateTime birthDate;
-
+  @Field(logChanges: false)
   int doNotLog;
   Occupation occupation;
 }
