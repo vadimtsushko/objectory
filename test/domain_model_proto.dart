@@ -79,6 +79,7 @@ class AuditLog {
   @Field(label: 'Таблица', title: 'Наименование исходной таблицы/представления')
   String sourceTableName;
   Map content;
+  String updatedFields;
 }
 
 main() {

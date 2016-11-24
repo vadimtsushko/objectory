@@ -19,14 +19,28 @@ class TableSchema {
   Set<String> _fieldsToLog;
   Set<String> get fieldsToLog {
     if (_fieldsToLog == null) {
-      _fieldsToLog = fields.values.where((Field fld) => fld.logChanges).map((Field fld) => fld.id).toSet();
+      _fieldsToLog = fields.values
+          .where((Field fld) => fld.logChanges)
+          .map((Field fld) => fld.id)
+          .toSet();
     }
     return _fieldsToLog;
   }
 
+  Set<String> _allFields;
+  Set<String> get allFields {
+    if (_allFields == null) {
+      _allFields = fields.values.map((Field fld) => fld.id).toSet();
+      TableSchema parent = superSchema;
+      while (parent != null) {
+        _allFields.addAll(fields.values.map((Field fld) => fld.id));
+        parent = parent.superSchema;
+      }
+    }
+    return _allFields;
+  }
 
-
-   TableSchema(
+  TableSchema(
       {this.fields,
       this.tableName,
       this.tableType,
@@ -109,4 +123,3 @@ class Field<T> {
     this.parentField: '',
   });
 }
-

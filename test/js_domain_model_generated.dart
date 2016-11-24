@@ -35,6 +35,8 @@ class AuditLogItem extends PersistentObjectItem {
   external set sourceTableName(String value);
   external Map get content;
   external set content(Map value);
+  external String get updatedFields;
+  external set updatedFields(String value);
 }
 
 @JS()

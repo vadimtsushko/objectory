@@ -11,12 +11,13 @@ import 'common_schema.dart';
 Objectory objectory;
 
 class HistoryRecord {
-  DateTime timestamp;
+  DateTime modifiedDate;
+  DateTime modifiedTime;
   String author;
   String operation;
   String content;
   String toString() =>
-      'LogItem(author: $author, timestamp: $timestamp, content: $content)';
+      'LogItem(author: $author, modifiedDate: $modifiedDate, modifiedTime: $modifiedTime, content: $content)';
 }
 
 class ObjectoryCollection {
@@ -412,46 +413,53 @@ class Objectory {
       "sourceId": obj.id,
       "content": content,
       "modifiedBy": userName,
+      "updatedFields": obj.dirtyFields.join(','),
       "operationType": operationType
     });
   }
 
-  HistoryRecord getHistoryRecord(List<String> fields, Map item, Map prevItem) {
+  HistoryRecord getHistoryRecord(
+      Iterable<String> fields, Map item, Map prevItem) {
     HistoryRecord result = new HistoryRecord();
-    result.operation = item['_logOperationType'];
-    if (result.operation == 'i') {
-      result.timestamp = item['createdAt'];
-      result.author = item['createdBy'];
-    } else {
-      result.timestamp = item['modifiedAt'];
-      result.author = item['modifiedBy'];
-    }
+    result.operation = item['operationType'];
+    result.modifiedDate = item['modifiedDate'];
+//    result.modifiedTime = item['modifiedTime'];
+    result.author = item['modifiedBy'];
     var contentList = new List<String>();
     for (var field in fields) {
-      if (prevItem.isEmpty || item[field] != prevItem[field]) {
-        contentList.add('$field: ${item[field]}');
+      if (prevItem.isEmpty || item['content'][field] != prevItem['content'][field]) {
+        contentList.add('$field: ${item['content'][field]}');
       }
     }
     result.content = contentList.join(', ');
     return result;
   }
 
-//  Future<List<HistoryRecord>> getHistoryFor(PersistentObject object) async {
-//    var result = new List<HistoryRecord>();
-//    var items = await findRawObjects(object.collectionName + 'History',
-//        where.eq('_originalObjectId', object.id).sortBy('modifiedAt'));
-//    var fields = object.$allFields;
-//    Map prevItem = {};
-//    for (Map item in items) {
-//      var historyRecord = getHistoryRecord(fields, item, prevItem);
-//      if (historyRecord.content != '') {
-//        result.add(historyRecord);
-//      }
-//      prevItem = item;
-//    }
-//
-//    return result;
-//  }
+  Future<List<HistoryRecord>> getHistoryFor(PersistentObject object) async {
+    var result = new List<HistoryRecord>();
+
+    String query = '''
+SELECT
+ "AuditLog".*
+ FROM "AuditLog"
+   WHERE ("AuditLog"."sourceTableId" = ${object.$schema.tableId} AND "AuditLog"."sourceId" = ${object.id})
+     ORDER BY "modifiedDate","modifiedTime"
+    ''';
+
+    var items = await findRawObjects('AuditLog', where.rawQuery(query));
+    var fields = object.$schema.allFields;
+    Map prevItem = {'content': {}};
+    for (Map item in items) {
+      var historyRecord =
+          getHistoryRecord(fields, item, prevItem);
+      if (historyRecord.content != '') {
+        result.add(historyRecord);
+      }
+      prevItem = item;
+    }
+
+    return result;
+  }
 
   ObjectoryCollection operator [](Type classType) => _collections[classType];
 }

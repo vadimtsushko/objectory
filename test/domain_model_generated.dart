@@ -72,6 +72,20 @@ class $AuditLog {
       externalKey: false,
       width: 0,
       tootltipsOnContent: false);
+  static Field<String> get updatedFields => const Field<String>(
+      id: 'updatedFields',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: false,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
   static TableSchema schema = new TableSchema(
       tableName: 'AuditLog',
       tableType: AuditLog,
@@ -93,7 +107,8 @@ class $AuditLog {
         'sourceId': sourceId,
         'operationType': operationType,
         'sourceTableName': sourceTableName,
-        'content': content
+        'content': content,
+        'updatedFields': updatedFields
       });
 }
 
@@ -110,6 +125,8 @@ class AuditLog extends PersistentObject {
   Map<String, dynamic> get content =>
       getProperty('content') as Map<String, dynamic>;
   set content(Map<String, dynamic> value) => setProperty('content', value);
+  String get updatedFields => getProperty('updatedFields');
+  set updatedFields(String value) => setProperty('updatedFields', value);
 }
 
 class $Occupation {

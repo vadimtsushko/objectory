@@ -36,19 +36,14 @@ main() async {
           .eq($AuditLog.sourceTableId.value($Person.schema.tableId))
           .eq($AuditLog.sourceId.value(id)));
 
-
   Person person = await objectory.selectOne(Person, where.id(id));
-  person.doNotLog = 23;
+  person.lastName = 'QWERT';
   await objectory.save(person);
-  List<AuditLog> logRecs1 = await objectory.select(
-      AuditLog,
-      where
-          .eq($AuditLog.sourceTableId.value($Person.schema.tableId))
-          .eq($AuditLog.sourceId.value(id)));
-    print(logRecs1);
 
 
+  var history = await objectory.getHistoryFor(person);
 
+  print(history);
 
 //  String createView = oc.getCreateViewScript(objectory.tableSchema(PersonView));
 //  print(createView);
@@ -85,7 +80,6 @@ main() async {
 //          $PersistentObject.id, where.eq($Occupation.name.value('test2'))));
 //
 //  print(person);
-
 
 //
 //  await objectory.truncate(Person);
