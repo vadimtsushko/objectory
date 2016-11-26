@@ -1,26 +1,26 @@
-name: objectory
-version: 0.5.1-dev
-author: Vadim Tsushko <vadimtsushko@gmail.com>
-description: Object document mapper/persistency layer for server-side and browser apps
-homepage: https://github.com/vadimtsushko/objectory
-environment:
-  sdk: '>=0.8.10+6 <2.0.0'
-dependencies:
-  browser: ^0.10.0
-  logging: ^0.11.2
-  logging_handlers: ^0.8.0
-  console_log_handler: ^0.2.1
-  quiver: ^0.21.4
-  http: ^0.11.3
-  shelf: ^0.6.5
-  js: any
-  shelf_cors: ^0.2.1
-  postgresql: ^0.3.3
-  bson: ^0.2.0
-  meta: ^1.0.4
-dev_dependencies:
-  dart_style : ^0.2.11
-  args: ^0.13.4
-  hop: ^0.27.0
-  stream: ^1.5.3
-  test: ^0.12.0
+author: "Vadim Tsushko <vadimtsushko@gmail.com>"
+description: "Object document mapper/persistency layer for server-side and browser apps"
+homepage: "https://github.com/vadimtsushko/objectory"
+name: "objectory"
+version: "0.5.1-dev"
+dependencies: 
+  browser: "^0.10.0"
+  bson: "^0.2.0"
+  console_log_handler: "^0.2.1"
+  http: "^0.11.3"
+  js: "any"
+  logging: "^0.11.2"
+  logging_handlers: "^0.8.0"
+  meta: "^1.0.4"
+  postgresql: "^0.3.3"
+  quiver: "^0.21.4"
+  shelf: "^0.6.5"
+  shelf_cors: "^0.2.1"
+dev_dependencies: 
+  args: "^0.13.4"
+  dart_style: "^0.2.11"
+  hop: "^0.27.0"
+  stream: "^1.5.3"
+  test: "^0.12.0"
+environment: 
+  sdk: ">=0.8.10+6 <2.0.0"
