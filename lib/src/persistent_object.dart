@@ -5,27 +5,7 @@ import 'package:bson/bson.dart';
 import 'objectory_base.dart';
 import 'dart:async';
 import 'dart:collection';
-<<<<<<< HEAD
-import 'package:quiver/core.dart';
-part 'persistent_list.dart';
-
-enum PropertyType {
-  String,
-  int,
-  double,
-  bool,
-  DateTime,
-  num,
-  ObjectId,
-  LinkedObject,
-  EmbeddedPersistentObject,
-  List,
-  ListOfLinks,
-  ListOfEmbeddedObjects
-}
-=======
 import 'schema.dart';
->>>>>>> origin/postgress
 
 PersistentObject getStub(int id) => new PersistentObject()..id = id;
 

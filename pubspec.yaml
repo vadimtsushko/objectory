@@ -1,19 +1,15 @@
 name: objectory
-version: 0.5.5
+version: 0.5.1-dev
 author: Vadim Tsushko <vadimtsushko@gmail.com>
 description: Object document mapper/persistency layer for server-side and browser apps
 homepage: https://github.com/vadimtsushko/objectory
 environment:
-  sdk: '>=1.10.0 <2.0.0'
+  sdk: '>=0.8.10+6 <2.0.0'
 dependencies:
   browser: ^0.10.0
   logging: ^0.11.2
   logging_handlers: ^0.8.0
   console_log_handler: ^0.2.1
-<<<<<<< HEAD
-  mongo_dart: 0.2.9
-=======
->>>>>>> origin/postgress
   mongo_dart_query: ^0.2.0
   quiver: ^0.21.4
   http: ^0.11.3

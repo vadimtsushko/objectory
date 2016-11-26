@@ -8,7 +8,7 @@ class $AuditLog {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: 0,
       type: int,
       logChanges: true,
@@ -22,7 +22,7 @@ class $AuditLog {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: 0,
       type: int,
       logChanges: true,
@@ -36,7 +36,7 @@ class $AuditLog {
       title: 'Тип операции',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: '',
       type: String,
       logChanges: true,
@@ -50,7 +50,7 @@ class $AuditLog {
       title: 'Наименование исходной таблицы/представления',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: '',
       type: String,
       logChanges: true,
@@ -64,7 +64,7 @@ class $AuditLog {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: null,
       type: Map,
       logChanges: true,
@@ -78,7 +78,7 @@ class $AuditLog {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: '',
       type: String,
       logChanges: true,
@@ -136,7 +136,7 @@ class $Occupation {
       title: 'Titular name of profession',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: '',
       type: String,
       logChanges: true,
@@ -150,7 +150,7 @@ class $Occupation {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: null,
       type: Branch,
       logChanges: true,
@@ -192,7 +192,7 @@ class $User {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: '',
       type: String,
       logChanges: true,
@@ -206,7 +206,7 @@ class $User {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: '',
       type: String,
       logChanges: true,
@@ -220,7 +220,7 @@ class $User {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: '',
       type: String,
       logChanges: true,
@@ -264,7 +264,7 @@ class $Branch {
       title: 'Branch of wisdom',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: '',
       type: String,
       logChanges: true,
@@ -304,7 +304,7 @@ class $PersonView {
       title: 'Titular name of profession',
       parentTable: Occupation,
       parentField: 'name',
-      staticValue: '',
+      staticValue: "",
       defaultValue: '',
       type: String,
       logChanges: true,
@@ -318,7 +318,7 @@ class $PersonView {
       title: 'Branch of wisdom',
       parentTable: Branch,
       parentField: 'name',
-      staticValue: '',
+      staticValue: "",
       defaultValue: '',
       type: String,
       logChanges: true,
@@ -360,7 +360,7 @@ class $PersonIds {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: 0,
       type: int,
       logChanges: true,
@@ -374,7 +374,7 @@ class $PersonIds {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: null,
       type: Person,
       logChanges: true,
@@ -416,7 +416,7 @@ class $SimpleJson {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: 0,
       type: int,
       logChanges: true,
@@ -430,7 +430,7 @@ class $SimpleJson {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: null,
       type: Map,
       logChanges: true,
@@ -444,7 +444,7 @@ class $SimpleJson {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: null,
       type: DateTime,
       logChanges: true,
@@ -489,7 +489,7 @@ class $PersonSimpleIds {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: null,
       type: Person,
       logChanges: true,
@@ -523,28 +523,13 @@ class PersonSimpleIds extends PersistentObject {
 }
 
 class $Person {
-<<<<<<< HEAD
-  static String get firstName => 'firstName';
-  static String get lastName => 'lastName';
-  static final $Address address = new $Address('address');
-  static String get father => 'father';
-  static String get mother => 'mother';
-  static String get age => 'age';
-  static String get children => 'children';
-  static final List<String> allFields = [firstName, lastName, father, mother, age, children]..addAll([address].expand((e)=>e.allFields));
-  static final List<PropertyDescriptor> simpleFields = [
-    const PropertyDescriptor('firstName', PropertyType.String, 'firstName')
-    ,const PropertyDescriptor('lastName', PropertyType.String, 'lastName')
-    ,const PropertyDescriptor('age', PropertyType.num, 'age')
-  ];
-=======
   static Field<String> get firstName => const Field<String>(
       id: 'firstName',
       label: '',
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: '',
       type: String,
       logChanges: true,
@@ -558,7 +543,7 @@ class $Person {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: '',
       type: String,
       logChanges: true,
@@ -572,7 +557,7 @@ class $Person {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: null,
       type: Person,
       logChanges: true,
@@ -586,7 +571,7 @@ class $Person {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: null,
       type: Person,
       logChanges: true,
@@ -600,7 +585,7 @@ class $Person {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: null,
       type: DateTime,
       logChanges: true,
@@ -614,7 +599,7 @@ class $Person {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: 0,
       type: int,
       logChanges: false,
@@ -628,7 +613,7 @@ class $Person {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: null,
       type: Occupation,
       logChanges: true,
@@ -661,7 +646,6 @@ class $Person {
         'doNotLog': doNotLog,
         'occupation': occupation
       });
->>>>>>> origin/postgress
 }
 
 class Person extends PersistentObject {
@@ -673,12 +657,6 @@ class Person extends PersistentObject {
   Person get father => getLinkedObject('father', Person);
   set father(Person value) => setLinkedObject('father', value);
   Person get mother => getLinkedObject('mother', Person);
-<<<<<<< HEAD
-  set mother (Person value) => setLinkedObject('mother',value);
-  num get age => getProperty('age');
-  set age (num value) => setProperty('age',value);
-  List<Person> get children => getPersistentList(Person,'children');
-=======
   set mother(Person value) => setLinkedObject('mother', value);
   DateTime get birthDate => getProperty('birthDate');
   set birthDate(DateTime value) => setProperty('birthDate', value);
@@ -686,7 +664,6 @@ class Person extends PersistentObject {
   set doNotLog(int value) => setProperty('doNotLog', value);
   Occupation get occupation => getLinkedObject('occupation', Occupation);
   set occupation(Occupation value) => setLinkedObject('occupation', value);
->>>>>>> origin/postgress
 }
 
 class $Author {
@@ -696,7 +673,7 @@ class $Author {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: '',
       type: String,
       logChanges: true,
@@ -710,7 +687,7 @@ class $Author {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: '',
       type: String,
       logChanges: true,
@@ -724,7 +701,7 @@ class $Author {
       title: '',
       parentTable: null,
       parentField: '',
-      staticValue: '',
+      staticValue: "",
       defaultValue: 0,
       type: int,
       logChanges: true,

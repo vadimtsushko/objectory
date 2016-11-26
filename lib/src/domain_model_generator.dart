@@ -66,9 +66,9 @@ class PropertyType {
   const PropertyType._internal(this._value);
   String toString() => 'PropertyType.$_value';
   static const PERSISTENT_OBJECT =
-      const PropertyType._internal('PERSISTENT_OBJECT');
+  const PropertyType._internal('PERSISTENT_OBJECT');
   static const PERSISTENT_LIST =
-      const PropertyType._internal('PERSISTENT_LIST');
+  const PropertyType._internal('PERSISTENT_LIST');
   static const SIMPLE = const PropertyType._internal('SIMPLE');
 }
 
@@ -85,7 +85,7 @@ part of domain_model;
   List<Type> _classesOrdered = [];
   final Map<Type, List> _linkedTypes = new Map<Type, List>();
   final Map<String, PropertyGenerator> fieldsMap =
-      new Map<String, PropertyGenerator>();
+  new Map<String, PropertyGenerator>();
   ModelGenerator(this.libraryName);
   StringBuffer output = new StringBuffer();
   init() {
@@ -212,7 +212,7 @@ class PersistentObjectItem{
     classGenerator.properties.forEach(generateOuputForProperty);
     _linkedTypes[classGenerator.type] = classGenerator.properties
         .where((PropertyGenerator p) =>
-            p.propertyType == PropertyType.PERSISTENT_OBJECT)
+    p.propertyType == PropertyType.PERSISTENT_OBJECT)
         .map((PropertyGenerator p) => [p.name, p.type])
         .toList();
     output.write('}\n\n');
@@ -239,19 +239,19 @@ class PersistentObjectItem{
 
       output
           .write('  $typeStr get ${propertyGenerator.name} => '
-              "getProperty('${propertyGenerator.name}') $typeCast;\n");
+          "getProperty('${propertyGenerator.name}') $typeCast;\n");
       output.write(
           '  set ${propertyGenerator.name} ($typeStr value) => '
-          "setProperty('${propertyGenerator.name}',value);\n");
+              "setProperty('${propertyGenerator.name}',value);\n");
     }
     if (propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT) {
       output.write(
           '  ${propertyGenerator.type} get ${propertyGenerator.name} => '
-          "getLinkedObject('${propertyGenerator.name}', ${propertyGenerator.type});\n");
+              "getLinkedObject('${propertyGenerator.name}', ${propertyGenerator.type});\n");
 
       output.write(
           '  set ${propertyGenerator.name}(${propertyGenerator.type} value) => '
-          "setLinkedObject('${propertyGenerator.name}', value);\n");
+              "setLinkedObject('${propertyGenerator.name}', value);\n");
 
 //      String capitalized =
 //          propertyGenerator.name.substring(0, 1).toUpperCase() +
@@ -262,7 +262,7 @@ class PersistentObjectItem{
     if (propertyGenerator.propertyType == PropertyType.PERSISTENT_LIST) {
       output.write(
           '  ${propertyGenerator.type} get ${propertyGenerator.name} => '
-          "getPersistentList(${propertyGenerator.listElementType}.value('${propertyGenerator.name}'));\n");
+              "getPersistentList(${propertyGenerator.listElementType}.value('${propertyGenerator.name}'));\n");
     }
   }
 
@@ -294,9 +294,9 @@ class PersistentObjectItem{
 
     allProperties.forEach((propertyGenerator) {
       Type fieldType =
-          propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT
-              ? int
-              : propertyGenerator.type;
+      propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT
+          ? int
+          : propertyGenerator.type;
       output.write(
           "  static Field<$fieldType> get ${propertyGenerator.name} =>\n");
       output.write(
@@ -359,7 +359,7 @@ class PersistentObjectItem{
     for (PropertyGenerator each in fieldsMap.values) {
       if (each.field.parentTable != null) {
         PropertyGenerator parentFieldGenerator =
-            fieldsMap['${each.field.parentTable}|${each.field.parentField}'];
+        fieldsMap['${each.field.parentTable}|${each.field.parentField}'];
         if (parentFieldGenerator == null) {
           throw new Exception(
               'Parent field not found: ${each.field.parentTable} -> ${each.field.parentField}');
@@ -429,9 +429,6 @@ class PropertyGenerator {
     }
     Type t = vm.type.reflectedType;
     type = t;
-<<<<<<< HEAD
-    if (t == int || t == double || t == String || t == DateTime || t == bool || t == num) {
-=======
     if (t == int ||
         t == double ||
         t == String ||
@@ -439,7 +436,6 @@ class PropertyGenerator {
         t == Map ||
         t == bool ||
         t == num) {
->>>>>>> origin/postgress
       return;
     }
 

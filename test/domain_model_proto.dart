@@ -22,10 +22,6 @@ class Person {
   String lastName;
   Person father;
   Person mother;
-<<<<<<< HEAD
-  num age;
-  List<Person> children;
-=======
   DateTime birthDate;
   @Field(logChanges: false)
   int doNotLog;
@@ -79,7 +75,6 @@ class AuditLog {
   String sourceTableName;
   Map content;
   String updatedFields;
->>>>>>> origin/postgress
 }
 
 main() {
