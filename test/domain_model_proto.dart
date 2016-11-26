@@ -22,6 +22,7 @@ class Person {
   String lastName;
   Person father;
   Person mother;
+<<<<<<< HEAD
   DateTime birthDate;
   @Field(logChanges: false)
   int doNotLog;
@@ -75,6 +76,10 @@ class AuditLog {
   String sourceTableName;
   Map content;
   String updatedFields;
+=======
+  num age;
+  List<Person> children;
+>>>>>>> develop
 }
 
 main() {

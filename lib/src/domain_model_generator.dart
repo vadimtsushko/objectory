@@ -429,6 +429,7 @@ class PropertyGenerator {
     }
     Type t = vm.type.reflectedType;
     type = t;
+<<<<<<< HEAD
     if (t == int ||
         t == double ||
         t == String ||
@@ -436,6 +437,9 @@ class PropertyGenerator {
         t == Map ||
         t == bool ||
         t == num) {
+=======
+    if (t == int || t == double || t == String || t == DateTime || t == bool || t == num) {
+>>>>>>> develop
       return;
     }
 
