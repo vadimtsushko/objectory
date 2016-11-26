@@ -1,6 +1,9 @@
-library objectory;
-export 'package:objectory/src/persistent_object.dart';
-export 'package:objectory/src/objectory_query_builder.dart';
-export 'package:objectory/src/objectory_base.dart';
-export 'package:objectory/src/objectory_direct_connection_impl.dart';
-//export 'package:bson/bson.dart';
+export 'src/persistent_object.dart';
+export 'src/query_builder.dart';
+export 'src/objectory_base.dart';
+export 'src/objectory_console.dart';
+export 'src/objectory_base.dart';
+export 'src/schema.dart';
+export 'src/common_schema.dart';
+export 'src/authenticator.dart';
+

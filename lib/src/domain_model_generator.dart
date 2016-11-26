@@ -3,32 +3,61 @@ library schema_generator;
 import 'dart:mirrors';
 import 'dart:io';
 import 'package:path/path.dart' as path;
-import 'package:objectory/src/persistent_object.dart';
+import 'package:dart_style/dart_style.dart';
+
+class Field {
+  final String label;
+  final String title;
+  final bool logChanges;
+  final int width;
+  final bool tootltipsOnContent;
+  final Type parentTable;
+  final String parentField;
+  final bool externalKey;
+  final String staticValue;
+  final defaultValue;
+  const Field(
+      {this.label: '',
+      this.title: '',
+      this.logChanges: true,
+      this.tootltipsOnContent: false,
+      this.width: 0,
+      this.parentTable: null,
+      this.defaultValue: null,
+      this.staticValue: '',
+      this.parentField: '',
+      this.externalKey: false});
+}
+
+class Table {
+  final bool logChanges;
+  final bool isView;
+  final bool cacheValues;
+  final String createScript;
+  final String queryString;
+  final bool sessionIdsRole;
+  final bool idField;
+  final bool deletedField;
+  final bool modifiedDateField;
+  final bool modifiedTimeField;
+  final bool modifiedByField;
+  final int tableId;
+  const Table(
+      {this.logChanges: true,
+      this.isView: false,
+      this.createScript: '',
+      this.queryString: '',
+      this.idField: true,
+      this.deletedField: true,
+      this.modifiedDateField: true,
+      this.modifiedTimeField: true,
+      this.tableId: 0,
+      this.modifiedByField: true,
+      this.sessionIdsRole: false,
+      this.cacheValues: false});
+}
 
 ///<-- Metadata
-class Embedded {
-  const Embedded();
-}
-
-const embedded = const Embedded();
-
-class SimpleProperty {
-  const SimpleProperty();
-}
-
-const simpleProperty = const SimpleProperty();
-
-class AsClass {
-  final String value;
-  const AsClass(this.value);
-}
-
-class Label {
-  final String value;
-  const Label(this.value);
-}
-
-const label = const Label('TEST');
 
 /// --> Metadata
 
@@ -49,11 +78,14 @@ class ModelGenerator {
 part of domain_model;
 
 ''';
+
   Symbol libraryName;
   List<ClassGenerator> classGenerators = new List<ClassGenerator>();
   Map<Type, ClassMirror> classMirrors = new Map<Type, ClassMirror>();
   List<Type> _classesOrdered = [];
   final Map<Type, List> _linkedTypes = new Map<Type, List>();
+  final Map<String, PropertyGenerator> fieldsMap =
+      new Map<String, PropertyGenerator>();
   ModelGenerator(this.libraryName);
   StringBuffer output = new StringBuffer();
   init() {
@@ -69,28 +101,80 @@ part of domain_model;
   generateTo(String outFileName) {
     init();
     processAll();
+//    checkOutput();
     generateOutput();
     saveOuput(outFileName);
+    generateJsWrapperOutput();
+    saveOuput('js_$outFileName');
+  }
+
+  checkOutput() {
+    var tableIdMap = <int, int>{};
+    for (var each in classGenerators) {
+      tableIdMap[each.table.tableId] =
+          (tableIdMap[each.table.tableId] ?? 0) + 1;
+    }
+    for (var key in tableIdMap.keys) {
+      if (key != 0) {
+        if (tableIdMap[key] > 1) {
+          throw new Exception('Duplicate tableId value: $key');
+        }
+      }
+    }
+  }
+
+  generateJsWrapperOutput() {
+    const JS_WRAPPER_HEADER = '''
+/// Warning! That file is generated. Do not edit it manually
+
+@JS()
+library js_wrapper;
+import 'package:js/js.dart';
+
+
+@JS()
+@anonymous
+class PersistentObjectItem{
+  external int get id;
+  external set id(int value);
+  external String get modifiedBy;
+  external set modifiedBy(String value);
+  external DateTime get modifiedAtDate;
+  external set modifiedAtDate(DateTime value);
+  external DateTime get modifiedAtTime;
+  external set modifiedAtTime(DateTime value);
+  external DateTime get modifiedAt;
+  external set modifiedAt(DateTime value);
+  external factory PersistentObjectItem ();
+}
+
+
+  ''';
+
+    output = new StringBuffer();
+    output.write(JS_WRAPPER_HEADER);
+
+    classGenerators.forEach((cls) {
+      generateOuputForJsWrapper(cls);
+    });
   }
 
   void generateOutput(
       {bool header: true,
       bool persistentClasses: true,
-      bool schemaClasses: true,
+      bool schemaClasses: false,
       bool register: true}) {
     if (header) {
       output.write(HEADER);
     }
     classGenerators.forEach((cls) {
-      if (schemaClasses) {
-        generateOuputForSchemaClass(cls);
-      }
+      generateOuputForTableSchema(cls);
       if (persistentClasses) {
         generateOuputForClass(cls);
       }
     });
     if (register) {
-      output.write('registerClasses() {\n');
+      output.write('registerClasses(Objectory objectoryParam) {\n');
       for (Type cls in _classesOrdered) {
         var linkedTypeMap = {};
         for (List each in _linkedTypes[cls]) {
@@ -98,8 +182,9 @@ part of domain_model;
         }
 
         output.write(
-            '  objectory.registerClass($cls,()=>new $cls(),()=>new List<$cls>(), $linkedTypeMap);\n');
+            '  objectoryParam.registerClass($cls,()=>new $cls(),()=>new List<$cls>(), $linkedTypeMap);\n');
       }
+
       output.write('}\n');
     }
   }
@@ -109,20 +194,21 @@ part of domain_model;
       var targetDir = path.dirname(path.fromUri(Platform.script));
       fileName = path.join(targetDir, path.basename(fileName));
     }
-    new File(fileName).writeAsStringSync(output.toString());
-    print('Created file: $fileName');
+    var formatter = new DartFormatter();
+    try {
+      var formattedOutput = formatter.format(output.toString(), uri: fileName);
+      new File(fileName).writeAsStringSync(formattedOutput);
+      print('Created file: $fileName');
+    } on FormatterException catch (ex) {
+      print(ex);
+    }
   }
 
   void generateOuputForClass(ClassGenerator classGenerator) {
-    var embeddedModifier = classGenerator.isEmbedded ? 'Embedded' : '';
     output.write(
-        'class ${classGenerator.persistentClassName} extends ${embeddedModifier}PersistentObject {\n');
+        'class ${classGenerator.type} extends ${classGenerator.superClass} {\n');
     output.writeln(
-        "  String get collectionName => '${classGenerator.persistentClassName}';");
-    if (!classGenerator.isEmbedded) {
-      output.writeln("  List<String> get \$allFields => \$${classGenerator
-              .persistentClassName}.allFields;");
-    }
+        "  TableSchema get \$schema => \$${classGenerator.type}.schema;");
     classGenerator.properties.forEach(generateOuputForProperty);
     _linkedTypes[classGenerator.type] = classGenerator.properties
         .where((PropertyGenerator p) =>
@@ -132,116 +218,164 @@ part of domain_model;
     output.write('}\n\n');
   }
 
+  void generateOuputForJsWrapper(ClassGenerator classGenerator) {
+    output.write('@JS()\n@anonymous\n');
+    output.write(
+        'class ${classGenerator.type}Item extends ${classGenerator.superClass}Item {\n');
+    output.writeln("  external factory ${classGenerator.type}Item();");
+    classGenerator.properties.forEach(generateOuputForJsProperty);
+    output.write('}\n\n');
+  }
+
   void generateOuputForProperty(PropertyGenerator propertyGenerator) {
     //output.write(propertyGenerator.commentLine);
     if (propertyGenerator.propertyType == PropertyType.SIMPLE) {
+      var typeStr = '${propertyGenerator.type}';
+      var typeCast = '';
+      if (typeStr == 'Map') {
+        typeStr = 'Map<String, dynamic>';
+        typeCast = 'as $typeStr';
+      }
+
       output
-          .write('  ${propertyGenerator.type} get ${propertyGenerator.name} => '
-              "getProperty('${propertyGenerator.name}');\n");
+          .write('  $typeStr get ${propertyGenerator.name} => '
+              "getProperty('${propertyGenerator.name}') $typeCast;\n");
       output.write(
-          '  set ${propertyGenerator.name} (${propertyGenerator.type} value) => '
+          '  set ${propertyGenerator.name} ($typeStr value) => '
           "setProperty('${propertyGenerator.name}',value);\n");
     }
     if (propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT) {
-      if (isEmbeddedPersistent(propertyGenerator)) {
-        output.write(
-            '  ${propertyGenerator.type} get ${propertyGenerator.name} => '
-            "getEmbeddedObject(${propertyGenerator.type},'${propertyGenerator.name}');\n");
-      } else {
-        output.write(
-            '  ${propertyGenerator.type} get ${propertyGenerator.name} => '
-            "getLinkedObject('${propertyGenerator.name}', ${propertyGenerator.type});\n");
-        output.write(
-            '  set ${propertyGenerator.name} (${propertyGenerator.type} value) => '
-            "setLinkedObject('${propertyGenerator.name}',value);\n");
-      }
+      output.write(
+          '  ${propertyGenerator.type} get ${propertyGenerator.name} => '
+          "getLinkedObject('${propertyGenerator.name}', ${propertyGenerator.type});\n");
+
+      output.write(
+          '  set ${propertyGenerator.name}(${propertyGenerator.type} value) => '
+          "setLinkedObject('${propertyGenerator.name}', value);\n");
+
+//      String capitalized =
+//          propertyGenerator.name.substring(0, 1).toUpperCase() +
+//              propertyGenerator.name.substring(1);
+//      output.write('  set${capitalized}Id(int value) => '
+//          "setForeignKey('${propertyGenerator.name}',value);\n");
     }
     if (propertyGenerator.propertyType == PropertyType.PERSISTENT_LIST) {
       output.write(
           '  ${propertyGenerator.type} get ${propertyGenerator.name} => '
-          "getPersistentList(${propertyGenerator.listElementType},'${propertyGenerator.name}');\n");
+          "getPersistentList(${propertyGenerator.listElementType}.value('${propertyGenerator.name}'));\n");
     }
   }
 
-  void generateOuputForSchemaClass(ClassGenerator classGenerator) {
+  void generateOuputForJsProperty(PropertyGenerator propertyGenerator) {
+    //output.write(propertyGenerator.commentLine);
+    Type type = propertyGenerator.propertyType == PropertyType.SIMPLE
+        ? propertyGenerator.type
+        : int;
+    output.write('  external $type get ${propertyGenerator.name};\n');
+    output.write('  external set ${propertyGenerator.name} ($type value);\n');
+  }
+
+  void generateOuputForTableSchema(ClassGenerator classGenerator) {
     output.write('class \$${classGenerator.type} {\n');
-    var staticModifier = 'static ';
-    var propertyNamePrefix = "'";
-    if (classGenerator.isEmbedded) {
-      staticModifier = '';
-      propertyNamePrefix = "_pathToMe + '.";
-      output.write("  String _pathToMe;\n");
-      output.write("  \$${classGenerator.type}(this._pathToMe);\n");
-    }
-    classGenerator.properties.forEach((propertyGenerator) {
-      if (isEmbeddedPersistent(propertyGenerator)) {
-        var propName = classGenerator.isEmbedded
-            ? "_pathToMe + '.${propertyGenerator.name}'"
-            : "'${propertyGenerator.name}'";
-        output.write(
-            "  ${staticModifier}final \$${propertyGenerator.type} ${propertyGenerator.name} = new \$${propertyGenerator.type}($propName);\n");
-      } else {
-        output.write(
-            "  ${staticModifier}String get ${propertyGenerator.name} => ${propertyNamePrefix}${propertyGenerator.name}';\n");
-      }
-    });
-    var simpleProperties = classGenerator.properties
-        .where((e) => !isEmbeddedPersistent(e))
-        .map((PropertyGenerator e) => e.name)
-        .toList()
-        .toString();
-    var embeddedProperties = classGenerator.properties
-        .where((e) => isEmbeddedPersistent(e))
-        .map((PropertyGenerator e) => e.name)
-        .toList();
-    var chunkForEmbeddedProperies = '';
-    if (embeddedProperties.isNotEmpty) {
-      chunkForEmbeddedProperies =
-          "..addAll($embeddedProperties.expand((e)=>e.allFields))";
-    }
-    if (!classGenerator.isEmbedded) {
-//      output.write(
-//          "  List<String> get allFields => ${simpleProperties}${chunkForEmbeddedProperies};\n");
-//    } else {
+    List<PropertyGenerator> allProperties = [];
+//      schema.Fields.id,
+//      schema.Fields.deleted,
+//      schema.Fields.modifiedDate,
+//      schema.Fields.modifiedTime
+//    ].map((schema.Field fld) {
+//      Field metaField = new Field(label: fld.label, title: fld.title);
+//      return new PropertyGenerator()
+//        ..name = fld.id
+//        ..type = fld.type
+//        ..field = metaField
+//        ..propertyType = PropertyType.SIMPLE;
+//    }).toList();
+    allProperties.addAll(classGenerator.properties);
+
+    allProperties.forEach((propertyGenerator) {
+      Type fieldType =
+          propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT
+              ? int
+              : propertyGenerator.type;
       output.write(
-          "  static final List<String> allFields = $simpleProperties${chunkForEmbeddedProperies};\n");
-    }
+          "  static Field<$fieldType> get ${propertyGenerator.name} =>\n");
+      output.write(
+          "      const Field<$fieldType>(id: '${propertyGenerator.name}',label: '${propertyGenerator.field.label}',title: '${propertyGenerator.field.title}',\n");
 
+      output.write(
+          "          parentTable: ${propertyGenerator.field.parentTable},parentField: '${propertyGenerator.field.parentField}',staticValue: \"${propertyGenerator.field.staticValue}\",\n");
+      var defaultValue = propertyGenerator.field.defaultValue;
+      if (defaultValue == null) {
+        if (propertyGenerator.type == bool) {
+          defaultValue = false;
+        } else if (propertyGenerator.type == String) {
+          defaultValue = "''";
+        } else if (propertyGenerator.type == int ||
+            propertyGenerator.type == double ||
+            propertyGenerator.type == num) {
+          defaultValue = 0;
+        }
+      }
+      output.writeln("          defaultValue: $defaultValue,");
+      output.write(
+          "          type: ${propertyGenerator.type},logChanges: ${propertyGenerator.field.logChanges}, foreignKey: ${propertyGenerator.propertyType == PropertyType.PERSISTENT_OBJECT},externalKey: ${propertyGenerator.field.externalKey},width: ${propertyGenerator.field.width},tootltipsOnContent: ${propertyGenerator.field.tootltipsOnContent});\n");
+    });
+    bool createBaseFields = !classGenerator.table.sessionIdsRole;
     var fields = classGenerator.properties
-        .where((e) => e.propertyType == PropertyType.SIMPLE)
-        .toList();
-    generateFieldDescriptors(fields);
-    output.write('}\n\n');
+        .map((PropertyGenerator e) => "          '${e.name}': ${e.name}")
+        .toList()
+        .join(',\n');
+    output.writeln(" static TableSchema schema = new TableSchema(");
+    output.writeln("tableName: '${classGenerator.type}',");
+    output.writeln("tableType: ${classGenerator.type},");
+    output.writeln("tableId: ${classGenerator.table.tableId},");
+    output.writeln("logChanges: ${classGenerator.table.logChanges},");
+    output.writeln("isView: ${classGenerator.table.isView},");
+    output.writeln("sessionIdsRole: ${classGenerator.table.sessionIdsRole},");
+    output.writeln(
+        "idField: ${createBaseFields && classGenerator.table.idField},");
+    output.writeln(
+        "deletedField: ${createBaseFields && classGenerator.table.deletedField},");
+    output.writeln(
+        "modifiedDateField: ${createBaseFields && classGenerator.table.modifiedDateField},");
+    output.writeln(
+        "modifiedTimeField: ${createBaseFields && classGenerator.table.modifiedTimeField},");
+    output.writeln(
+        "modifiedByField: ${createBaseFields && classGenerator.table.modifiedByField},");
+
+    output.writeln("cacheValues: ${classGenerator.table.cacheValues},");
+    output.writeln("createScript: '''${classGenerator.table.createScript}''',");
+    output.writeln("queryString: '''${classGenerator.table.queryString}''',");
+
+    output.writeln("superSchema: \$${classGenerator.superClass}.schema,");
+    output.writeln('fields: {$fields\n      });');
+    output.writeln('}');
   }
 
-  generateFieldDescriptors(List<PropertyGenerator> simpleProperties) {
-    output.writeln("  static final List<PropertyDescriptor> simpleFields = [");
-    var comma = '';
-    for (var property in simpleProperties) {
-      var label = property.label == null ? property.name : property.label;
-      output.writeln(
-          "    ${comma}const PropertyDescriptor('${property.name}', PropertyType.${property.type}, '$label')");
-      comma = ',';
-    }
-    output.writeln("  ];");
-  }
-
-  bool isEmbeddedPersistent(PropertyGenerator propertyGenerator) {
-    if (propertyGenerator.propertyType != PropertyType.PERSISTENT_OBJECT) {
-      return false;
-    }
-    ClassGenerator targetClass = classGenerators.firstWhere(
-        (cg) => cg.type == propertyGenerator.type,
-        orElse: () => null);
-    if (targetClass == null) {
-      throw new StateError(
-          'Not found class ${propertyGenerator.type} in prototype schema');
-    }
-    return targetClass.isEmbedded;
-  }
+  generateFieldDescriptors(List<PropertyGenerator> simpleProperties) {}
 
   processAll() {
     _classesOrdered.forEach(processClass);
+    for (PropertyGenerator each in fieldsMap.values) {
+      if (each.field.parentTable != null) {
+        PropertyGenerator parentFieldGenerator =
+            fieldsMap['${each.field.parentTable}|${each.field.parentField}'];
+        if (parentFieldGenerator == null) {
+          throw new Exception(
+              'Parent field not found: ${each.field.parentTable} -> ${each.field.parentField}');
+        }
+
+        Field field = new Field(
+            parentTable: each.field.parentTable,
+            parentField: each.field.parentField,
+            label: parentFieldGenerator.field.label,
+            title: parentFieldGenerator.field.title,
+            tootltipsOnContent: parentFieldGenerator.field.tootltipsOnContent,
+            width: parentFieldGenerator.field.width);
+
+        each.field = field;
+      }
+    }
   }
 
   processClass(Type classType) {
@@ -250,16 +384,16 @@ part of domain_model;
     classGenerators.add(generatorClass);
     generatorClass.type = classMirror.reflectedType;
     if (!classMirror.metadata.isEmpty) {
-      generatorClass.isEmbedded =
-          classMirror.metadata.any((m) => m.type.reflectedType == Embedded);
-      var asClassMirror = classMirror.metadata.firstWhere(
-          (m) => m.type.reflectedType == AsClass,
-          orElse: () => null);
-      if (asClassMirror != null) {
-        generatorClass.asClass = asClassMirror.getField(#value).reflectee;
-      }
+      classMirror.metadata.where((m) => m.reflectee is Table).forEach((m) {
+        generatorClass.table = m.reflectee as Table;
+      });
+    } else {
+      generatorClass.table = new Table();
     }
-
+    generatorClass.superClass = classMirror.superclass.reflectedType.toString();
+    if (generatorClass.superClass == 'Object') {
+      generatorClass.superClass = 'PersistentObject';
+    }
     classMirror.declarations.forEach((Symbol name, DeclarationMirror vm) =>
         processProperty(generatorClass, name, vm));
   }
@@ -270,52 +404,53 @@ part of domain_model;
       classGenerator.properties.add(property);
       property.name = MirrorSystem.getName(name);
       property.processVariableMirror(vm);
+      fieldsMap['${classGenerator.type}|${property.name}'] = property;
     }
   }
 }
 
 class PropertyGenerator {
-  PropertyDescriptor descriptor;
+//  PropertyDescriptor descriptor;
   String name;
-  String label;
+  Field field;
+
   Type type;
   Type listElementType;
   PropertyType propertyType = PropertyType.SIMPLE;
   String toString() => 'PropertyGenerator($name,$type,$propertyType)';
   String get commentLine => '  // $type $name\n';
-  processVariableMirror(VariableMirror vm) {
-    vm.metadata.where((m) => m.reflectee is Label).forEach((m) {
-      var memberLabel = m.reflectee as Label;
-      label = memberLabel.value;
-    });
 
+  processVariableMirror(VariableMirror vm) {
+    vm.metadata.where((m) => m.reflectee is Field).forEach((m) {
+      field = m.reflectee as Field;
+    });
+    if (field == null) {
+      field = const Field();
+    }
     Type t = vm.type.reflectedType;
     type = t;
+<<<<<<< HEAD
     if (t == int || t == double || t == String || t == DateTime || t == bool || t == num) {
+=======
+    if (t == int ||
+        t == double ||
+        t == String ||
+        t == DateTime ||
+        t == Map ||
+        t == bool ||
+        t == num) {
+>>>>>>> origin/postgress
       return;
     }
 
-    if (vm.metadata.any((m) => m.type.reflectedType == SimpleProperty)) {
-      return;
-    }
-    if (vm.type.simpleName == #List) {
-      propertyType = PropertyType.PERSISTENT_LIST;
-      if (vm.type.typeArguments.length != 1) {
-        throw new StateError('List property $name should use type argument');
-      }
-      ;
-      listElementType = vm.type.typeArguments.first.reflectedType;
-      return;
-    }
     propertyType = PropertyType.PERSISTENT_OBJECT;
   }
 }
 
 class ClassGenerator {
+  Table table;
   Type type;
-  bool isEmbedded = false;
-  String asClass;
-  String get persistentClassName => asClass == null ? '$type' : asClass;
+  String superClass;
   List<PropertyGenerator> properties = new List<PropertyGenerator>();
-  String toString() => 'ClassGenerator(isEmbedded=$isEmbedded,$properties)';
+  String toString() => 'ClassGenerator($properties)';
 }

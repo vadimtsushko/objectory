@@ -1,116 +1,529 @@
 /// Warning! That file is generated. Do not edit it manually
 part of domain_model;
 
-class $Article {
-  static String get title => 'title';
-  static String get body => 'body';
-  static String get author => 'author';
-  static String get comments => 'comments';
-  static final List<String> allFields = [title, body, author, comments];
-  static final List<PropertyDescriptor> simpleFields = [
-    const PropertyDescriptor('title', PropertyType.String, 'title')
-    ,const PropertyDescriptor('body', PropertyType.String, 'body')
-  ];
+class $AuditLog {
+  static Field<int> get sourceTableId => const Field<int>(
+      id: 'sourceTableId',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: 0,
+      type: int,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<int> get sourceId => const Field<int>(
+      id: 'sourceId',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: 0,
+      type: int,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<String> get operationType => const Field<String>(
+      id: 'operationType',
+      label: 'Тип',
+      title: 'Тип операции',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<String> get sourceTableName => const Field<String>(
+      id: 'sourceTableName',
+      label: 'Таблица',
+      title: 'Наименование исходной таблицы/представления',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<Map> get content => const Field<Map>(
+      id: 'content',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: Map,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<String> get updatedFields => const Field<String>(
+      id: 'updatedFields',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static TableSchema schema = new TableSchema(
+      tableName: 'AuditLog',
+      tableType: AuditLog,
+      tableId: 0,
+      logChanges: true,
+      isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: false,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
+      cacheValues: false,
+      createScript: '''''',
+      queryString: '''''',
+      superSchema: $PersistentObject.schema,
+      fields: {
+        'sourceTableId': sourceTableId,
+        'sourceId': sourceId,
+        'operationType': operationType,
+        'sourceTableName': sourceTableName,
+        'content': content,
+        'updatedFields': updatedFields
+      });
 }
 
-class Article extends PersistentObject {
-  String get collectionName => 'Article';
-  List<String> get $allFields => $Article.allFields;
-  String get title => getProperty('title');
-  set title (String value) => setProperty('title',value);
-  String get body => getProperty('body');
-  set body (String value) => setProperty('body',value);
-  Author get author => getLinkedObject('author', Author);
-  set author (Author value) => setLinkedObject('author',value);
-  List<Comment> get comments => getPersistentList(Comment,'comments');
+class AuditLog extends PersistentObject {
+  TableSchema get $schema => $AuditLog.schema;
+  int get sourceTableId => getProperty('sourceTableId');
+  set sourceTableId(int value) => setProperty('sourceTableId', value);
+  int get sourceId => getProperty('sourceId');
+  set sourceId(int value) => setProperty('sourceId', value);
+  String get operationType => getProperty('operationType');
+  set operationType(String value) => setProperty('operationType', value);
+  String get sourceTableName => getProperty('sourceTableName');
+  set sourceTableName(String value) => setProperty('sourceTableName', value);
+  Map<String, dynamic> get content =>
+      getProperty('content') as Map<String, dynamic>;
+  set content(Map<String, dynamic> value) => setProperty('content', value);
+  String get updatedFields => getProperty('updatedFields');
+  set updatedFields(String value) => setProperty('updatedFields', value);
 }
 
-class $Address {
-  String _pathToMe;
-  $Address(this._pathToMe);
-  String get cityName => _pathToMe + '.cityName';
-  String get zipCode => _pathToMe + '.zipCode';
-  String get streetName => _pathToMe + '.streetName';
-  static final List<PropertyDescriptor> simpleFields = [
-    const PropertyDescriptor('cityName', PropertyType.String, 'cityName')
-    ,const PropertyDescriptor('zipCode', PropertyType.String, 'zipCode')
-    ,const PropertyDescriptor('streetName', PropertyType.String, 'streetName')
-  ];
+class $Occupation {
+  static Field<String> get name => const Field<String>(
+      id: 'name',
+      label: 'Ocuppation',
+      title: 'Titular name of profession',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<int> get branch => const Field<int>(
+      id: 'branch',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: Branch,
+      logChanges: true,
+      foreignKey: true,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static TableSchema schema = new TableSchema(
+      tableName: 'Occupation',
+      tableType: Occupation,
+      tableId: 0,
+      logChanges: true,
+      isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
+      cacheValues: false,
+      createScript: '''''',
+      queryString: '''''',
+      superSchema: $PersistentObject.schema,
+      fields: {'name': name, 'branch': branch});
 }
 
-class Address extends EmbeddedPersistentObject {
-  String get collectionName => 'Address';
-  String get cityName => getProperty('cityName');
-  set cityName (String value) => setProperty('cityName',value);
-  String get zipCode => getProperty('zipCode');
-  set zipCode (String value) => setProperty('zipCode',value);
-  String get streetName => getProperty('streetName');
-  set streetName (String value) => setProperty('streetName',value);
+class Occupation extends PersistentObject {
+  TableSchema get $schema => $Occupation.schema;
+  String get name => getProperty('name');
+  set name(String value) => setProperty('name', value);
+  Branch get branch => getLinkedObject('branch', Branch);
+  set branch(Branch value) => setLinkedObject('branch', value);
 }
 
 class $User {
-  static String get name => 'name';
-  static String get email => 'email';
-  static String get login => 'login';
-  static final List<String> allFields = [name, email, login];
-  static final List<PropertyDescriptor> simpleFields = [
-    const PropertyDescriptor('name', PropertyType.String, 'name')
-    ,const PropertyDescriptor('email', PropertyType.String, 'email')
-    ,const PropertyDescriptor('login', PropertyType.String, 'login')
-  ];
+  static Field<String> get name => const Field<String>(
+      id: 'name',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<String> get email => const Field<String>(
+      id: 'email',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<String> get login => const Field<String>(
+      id: 'login',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static TableSchema schema = new TableSchema(
+      tableName: 'User',
+      tableType: User,
+      tableId: 0,
+      logChanges: false,
+      isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
+      cacheValues: false,
+      createScript: '''''',
+      queryString: '''''',
+      superSchema: $PersistentObject.schema,
+      fields: {'name': name, 'email': email, 'login': login});
 }
 
 class User extends PersistentObject {
-  String get collectionName => 'User';
-  List<String> get $allFields => $User.allFields;
+  TableSchema get $schema => $User.schema;
   String get name => getProperty('name');
-  set name (String value) => setProperty('name',value);
+  set name(String value) => setProperty('name', value);
   String get email => getProperty('email');
-  set email (String value) => setProperty('email',value);
+  set email(String value) => setProperty('email', value);
   String get login => getProperty('login');
-  set login (String value) => setProperty('login',value);
+  set login(String value) => setProperty('login', value);
 }
 
-class $Comment {
-  String _pathToMe;
-  $Comment(this._pathToMe);
-  String get user => _pathToMe + '.user';
-  String get body => _pathToMe + '.body';
-  String get date => _pathToMe + '.date';
-  static final List<PropertyDescriptor> simpleFields = [
-    const PropertyDescriptor('body', PropertyType.String, 'body')
-    ,const PropertyDescriptor('date', PropertyType.DateTime, 'date')
-  ];
+class $Branch {
+  static Field<String> get name => const Field<String>(
+      id: 'name',
+      label: 'Branch',
+      title: 'Branch of wisdom',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static TableSchema schema = new TableSchema(
+      tableName: 'Branch',
+      tableType: Branch,
+      tableId: 0,
+      logChanges: true,
+      isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
+      cacheValues: false,
+      createScript: '''''',
+      queryString: '''''',
+      superSchema: $PersistentObject.schema,
+      fields: {'name': name});
 }
 
-class Comment extends EmbeddedPersistentObject {
-  String get collectionName => 'Comment';
-  User get user => getLinkedObject('user', User);
-  set user (User value) => setLinkedObject('user',value);
-  String get body => getProperty('body');
-  set body (String value) => setProperty('body',value);
-  DateTime get date => getProperty('date');
-  set date (DateTime value) => setProperty('date',value);
-}
-
-class $Customer {
-  static String get name => 'name';
-  static String get addresses => 'addresses';
-  static final List<String> allFields = [name, addresses];
-  static final List<PropertyDescriptor> simpleFields = [
-    const PropertyDescriptor('name', PropertyType.String, 'name')
-  ];
-}
-
-class Customer extends PersistentObject {
-  String get collectionName => 'Customer';
-  List<String> get $allFields => $Customer.allFields;
+class Branch extends PersistentObject {
+  TableSchema get $schema => $Branch.schema;
   String get name => getProperty('name');
-  set name (String value) => setProperty('name',value);
-  List<Address> get addresses => getPersistentList(Address,'addresses');
+  set name(String value) => setProperty('name', value);
+}
+
+class $PersonView {
+  static Field<String> get occupationName => const Field<String>(
+      id: 'occupationName',
+      label: 'Ocuppation',
+      title: 'Titular name of profession',
+      parentTable: Occupation,
+      parentField: 'name',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<String> get branchName => const Field<String>(
+      id: 'branchName',
+      label: 'Branch',
+      title: 'Branch of wisdom',
+      parentTable: Branch,
+      parentField: 'name',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static TableSchema schema = new TableSchema(
+      tableName: 'PersonView',
+      tableType: PersonView,
+      tableId: 2,
+      logChanges: true,
+      isView: true,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
+      cacheValues: false,
+      createScript: '''''',
+      queryString: '''''',
+      superSchema: $Person.schema,
+      fields: {'occupationName': occupationName, 'branchName': branchName});
+}
+
+class PersonView extends Person {
+  TableSchema get $schema => $PersonView.schema;
+  String get occupationName => getProperty('occupationName');
+  set occupationName(String value) => setProperty('occupationName', value);
+  String get branchName => getProperty('branchName');
+  set branchName(String value) => setProperty('branchName', value);
+}
+
+class $PersonIds {
+  static Field<int> get sessionId => const Field<int>(
+      id: 'sessionId',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: 0,
+      type: int,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: true,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<int> get person => const Field<int>(
+      id: 'person',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: Person,
+      logChanges: true,
+      foreignKey: true,
+      externalKey: true,
+      width: 0,
+      tootltipsOnContent: false);
+  static TableSchema schema = new TableSchema(
+      tableName: 'PersonIds',
+      tableType: PersonIds,
+      tableId: 0,
+      logChanges: true,
+      isView: false,
+      sessionIdsRole: true,
+      idField: false,
+      deletedField: false,
+      modifiedDateField: false,
+      modifiedTimeField: false,
+      modifiedByField: false,
+      cacheValues: false,
+      createScript: '''''',
+      queryString: '''''',
+      superSchema: $PersistentObject.schema,
+      fields: {'sessionId': sessionId, 'person': person});
+}
+
+class PersonIds extends PersistentObject {
+  TableSchema get $schema => $PersonIds.schema;
+  int get sessionId => getProperty('sessionId');
+  set sessionId(int value) => setProperty('sessionId', value);
+  Person get person => getLinkedObject('person', Person);
+  set person(Person value) => setLinkedObject('person', value);
+}
+
+class $SimpleJson {
+  static Field<int> get extId => const Field<int>(
+      id: 'extId',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: 0,
+      type: int,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<Map> get someMap => const Field<Map>(
+      id: 'someMap',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: Map,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<DateTime> get someDate => const Field<DateTime>(
+      id: 'someDate',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: DateTime,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static TableSchema schema = new TableSchema(
+      tableName: 'SimpleJson',
+      tableType: SimpleJson,
+      tableId: 0,
+      logChanges: true,
+      isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
+      cacheValues: false,
+      createScript: '''''',
+      queryString: '''''',
+      superSchema: $PersistentObject.schema,
+      fields: {'extId': extId, 'someMap': someMap, 'someDate': someDate});
+}
+
+class SimpleJson extends PersistentObject {
+  TableSchema get $schema => $SimpleJson.schema;
+  int get extId => getProperty('extId');
+  set extId(int value) => setProperty('extId', value);
+  Map<String, dynamic> get someMap =>
+      getProperty('someMap') as Map<String, dynamic>;
+  set someMap(Map<String, dynamic> value) => setProperty('someMap', value);
+  DateTime get someDate => getProperty('someDate');
+  set someDate(DateTime value) => setProperty('someDate', value);
+}
+
+class $PersonSimpleIds {
+  static Field<int> get person => const Field<int>(
+      id: 'person',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: Person,
+      logChanges: true,
+      foreignKey: true,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static TableSchema schema = new TableSchema(
+      tableName: 'PersonSimpleIds',
+      tableType: PersonSimpleIds,
+      tableId: 0,
+      logChanges: true,
+      isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
+      cacheValues: false,
+      createScript: '''''',
+      queryString: '''''',
+      superSchema: $PersistentObject.schema,
+      fields: {'person': person});
+}
+
+class PersonSimpleIds extends PersistentObject {
+  TableSchema get $schema => $PersonSimpleIds.schema;
+  Person get person => getLinkedObject('person', Person);
+  set person(Person value) => setLinkedObject('person', value);
 }
 
 class $Person {
+<<<<<<< HEAD
   static String get firstName => 'firstName';
   static String get lastName => 'lastName';
   static final $Address address = new $Address('address');
@@ -124,56 +537,252 @@ class $Person {
     ,const PropertyDescriptor('lastName', PropertyType.String, 'lastName')
     ,const PropertyDescriptor('age', PropertyType.num, 'age')
   ];
+=======
+  static Field<String> get firstName => const Field<String>(
+      id: 'firstName',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<String> get lastName => const Field<String>(
+      id: 'lastName',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<int> get father => const Field<int>(
+      id: 'father',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: Person,
+      logChanges: true,
+      foreignKey: true,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<int> get mother => const Field<int>(
+      id: 'mother',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: Person,
+      logChanges: true,
+      foreignKey: true,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<DateTime> get birthDate => const Field<DateTime>(
+      id: 'birthDate',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: DateTime,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<int> get doNotLog => const Field<int>(
+      id: 'doNotLog',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: 0,
+      type: int,
+      logChanges: false,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<int> get occupation => const Field<int>(
+      id: 'occupation',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: null,
+      type: Occupation,
+      logChanges: true,
+      foreignKey: true,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static TableSchema schema = new TableSchema(
+      tableName: 'Person',
+      tableType: Person,
+      tableId: 2,
+      logChanges: true,
+      isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
+      cacheValues: true,
+      createScript: '''''',
+      queryString: '''''',
+      superSchema: $PersistentObject.schema,
+      fields: {
+        'firstName': firstName,
+        'lastName': lastName,
+        'father': father,
+        'mother': mother,
+        'birthDate': birthDate,
+        'doNotLog': doNotLog,
+        'occupation': occupation
+      });
+>>>>>>> origin/postgress
 }
 
 class Person extends PersistentObject {
-  String get collectionName => 'Person';
-  List<String> get $allFields => $Person.allFields;
+  TableSchema get $schema => $Person.schema;
   String get firstName => getProperty('firstName');
-  set firstName (String value) => setProperty('firstName',value);
+  set firstName(String value) => setProperty('firstName', value);
   String get lastName => getProperty('lastName');
-  set lastName (String value) => setProperty('lastName',value);
-  Address get address => getEmbeddedObject(Address,'address');
+  set lastName(String value) => setProperty('lastName', value);
   Person get father => getLinkedObject('father', Person);
-  set father (Person value) => setLinkedObject('father',value);
+  set father(Person value) => setLinkedObject('father', value);
   Person get mother => getLinkedObject('mother', Person);
+<<<<<<< HEAD
   set mother (Person value) => setLinkedObject('mother',value);
   num get age => getProperty('age');
   set age (num value) => setProperty('age',value);
   List<Person> get children => getPersistentList(Person,'children');
+=======
+  set mother(Person value) => setLinkedObject('mother', value);
+  DateTime get birthDate => getProperty('birthDate');
+  set birthDate(DateTime value) => setProperty('birthDate', value);
+  int get doNotLog => getProperty('doNotLog');
+  set doNotLog(int value) => setProperty('doNotLog', value);
+  Occupation get occupation => getLinkedObject('occupation', Occupation);
+  set occupation(Occupation value) => setLinkedObject('occupation', value);
+>>>>>>> origin/postgress
 }
 
 class $Author {
-  static String get name => 'name';
-  static String get email => 'email';
-  static String get age => 'age';
-  static final $Address address = new $Address('address');
-  static final List<String> allFields = [name, email, age]..addAll([address].expand((e)=>e.allFields));
-  static final List<PropertyDescriptor> simpleFields = [
-    const PropertyDescriptor('name', PropertyType.String, 'name')
-    ,const PropertyDescriptor('email', PropertyType.String, 'email')
-    ,const PropertyDescriptor('age', PropertyType.int, 'age')
-  ];
+  static Field<String> get name => const Field<String>(
+      id: 'name',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<String> get email => const Field<String>(
+      id: 'email',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: '',
+      type: String,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static Field<int> get age => const Field<int>(
+      id: 'age',
+      label: '',
+      title: '',
+      parentTable: null,
+      parentField: '',
+      staticValue: '',
+      defaultValue: 0,
+      type: int,
+      logChanges: true,
+      foreignKey: false,
+      externalKey: false,
+      width: 0,
+      tootltipsOnContent: false);
+  static TableSchema schema = new TableSchema(
+      tableName: 'Author',
+      tableType: Author,
+      tableId: 0,
+      logChanges: true,
+      isView: false,
+      sessionIdsRole: false,
+      idField: true,
+      deletedField: true,
+      modifiedDateField: true,
+      modifiedTimeField: true,
+      modifiedByField: true,
+      cacheValues: false,
+      createScript: '''''',
+      queryString: '''''',
+      superSchema: $PersistentObject.schema,
+      fields: {'name': name, 'email': email, 'age': age});
 }
 
 class Author extends PersistentObject {
-  String get collectionName => 'Author';
-  List<String> get $allFields => $Author.allFields;
+  TableSchema get $schema => $Author.schema;
   String get name => getProperty('name');
-  set name (String value) => setProperty('name',value);
+  set name(String value) => setProperty('name', value);
   String get email => getProperty('email');
-  set email (String value) => setProperty('email',value);
+  set email(String value) => setProperty('email', value);
   int get age => getProperty('age');
-  set age (int value) => setProperty('age',value);
-  Address get address => getEmbeddedObject(Address,'address');
+  set age(int value) => setProperty('age', value);
 }
 
-registerClasses() {
-  objectory.registerClass(Article,()=>new Article(),()=>new List<Article>(), {'author': Author});
-  objectory.registerClass(Address,()=>new Address(),()=>new List<Address>(), {});
-  objectory.registerClass(User,()=>new User(),()=>new List<User>(), {});
-  objectory.registerClass(Comment,()=>new Comment(),()=>new List<Comment>(), {'user': User});
-  objectory.registerClass(Customer,()=>new Customer(),()=>new List<Customer>(), {});
-  objectory.registerClass(Person,()=>new Person(),()=>new List<Person>(), {'address': Address, 'father': Person, 'mother': Person});
-  objectory.registerClass(Author,()=>new Author(),()=>new List<Author>(), {'address': Address});
+registerClasses(Objectory objectoryParam) {
+  objectoryParam.registerClass(
+      AuditLog, () => new AuditLog(), () => new List<AuditLog>(), {});
+  objectoryParam.registerClass(Occupation, () => new Occupation(),
+      () => new List<Occupation>(), {'branch': Branch});
+  objectoryParam
+      .registerClass(User, () => new User(), () => new List<User>(), {});
+  objectoryParam
+      .registerClass(Branch, () => new Branch(), () => new List<Branch>(), {});
+  objectoryParam.registerClass(
+      PersonView, () => new PersonView(), () => new List<PersonView>(), {});
+  objectoryParam.registerClass(PersonIds, () => new PersonIds(),
+      () => new List<PersonIds>(), {'person': Person});
+  objectoryParam.registerClass(
+      SimpleJson, () => new SimpleJson(), () => new List<SimpleJson>(), {});
+  objectoryParam.registerClass(PersonSimpleIds, () => new PersonSimpleIds(),
+      () => new List<PersonSimpleIds>(), {'person': Person});
+  objectoryParam.registerClass(
+      Person,
+      () => new Person(),
+      () => new List<Person>(),
+      {'father': Person, 'mother': Person, 'occupation': Occupation});
+  objectoryParam
+      .registerClass(Author, () => new Author(), () => new List<Author>(), {});
 }

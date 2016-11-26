@@ -5,9 +5,13 @@ import 'domain_model.dart';
 import 'implementation_test_lib.dart';
 
 
-const DefaultUri = 'mongodb://127.0.0.1/objectory_vm1_tests';
+const DefaultUri = 'postgres://test:test@localhost:5432/objectory_test';
 
 main() async {
-  objectory = new ObjectoryDirectConnectionImpl(DefaultUri, registerClasses, true );
+  objectory = new ObjectoryConsole(DefaultUri, registerClasses);
+  await objectory.initDomainModel();
+  await objectory.recreateSchema(objectory.persistentTypes);
+  print('Database schema recreated');
+  await objectory.close();
   group('VM implementation tests', () => allImplementationTests());
 }

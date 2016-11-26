@@ -10,13 +10,20 @@ dependencies:
   logging: ^0.11.2
   logging_handlers: ^0.8.0
   console_log_handler: ^0.2.1
+<<<<<<< HEAD
   mongo_dart: 0.2.9
+=======
+>>>>>>> origin/postgress
   mongo_dart_query: ^0.2.0
   quiver: ^0.21.4
   http: ^0.11.3
   shelf: ^0.6.5
+  js: any
   shelf_cors: ^0.2.1
+  postgresql: ^0.3.3
+  meta: ^1.0.4
 dev_dependencies:
+  dart_style : ^0.2.11
   args: ^0.13.4
   hop: ^0.27.0
   stream: ^1.5.3
