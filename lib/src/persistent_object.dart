@@ -5,27 +5,7 @@ import 'package:bson/bson.dart';
 import 'objectory_base.dart';
 import 'dart:async';
 import 'dart:collection';
-<<<<<<< HEAD
 import 'schema.dart';
-=======
-import 'package:quiver/core.dart';
-part 'persistent_list.dart';
-
-enum PropertyType {
-  String,
-  int,
-  double,
-  bool,
-  DateTime,
-  num,
-  ObjectId,
-  LinkedObject,
-  EmbeddedPersistentObject,
-  List,
-  ListOfLinks,
-  ListOfEmbeddedObjects
-}
->>>>>>> develop
 
 PersistentObject getStub(int id) => new PersistentObject()..id = id;
 
